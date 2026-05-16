@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Menu &amp; Varian Rasa — Corndog-Ku</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -16,13 +17,12 @@
             border-color: var(--color-primary);
         }
 
-        /* Sort dropdown */
-        #sort-dropdown {
-            display: none;
-        }
-        #sort-dropdown.open {
-            display: block;
-        }
+        /* Sort/Filter dropdowns — toggled via Tailwind 'hidden' class */
+        .sort-option-card:hover { background-color: #fafafa; }
+
+        /* Hide scrollbar on category strip */
+        .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
 
         /* Product card hover */
         .product-card {
@@ -41,7 +41,7 @@
 ══════════════════════════════════════════════════════════════ --}}
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-4">
 
         {{-- Brand --}}
         <a href="{{ route('welcome') }}" class="flex items-center gap-2 flex-none">
@@ -70,16 +70,185 @@
         {{-- Right actions --}}
         <div class="flex items-center gap-2 flex-none">
 
-            {{-- Sort trigger --}}
-            <button id="btn-sort-toggle" type="button"
-                    class="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-                    title="Urutkan Produk">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
-                </svg>
-            </button>
+            {{-- Filter trigger + floating dropdown --}}
+            <div class="relative inline-block">
+                <button id="btn-filter-toggle" type="button"
+                        class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                        title="Filter Produk">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                </button>
+
+                {{-- Filter dropdown card --}}
+                <div id="dropdown-filter"
+                     class="absolute top-full right-0 mt-3 w-80 bg-white rounded-2xl z-50 hidden"
+                     style="box-shadow: 0 8px 40px rgba(0,0,0,0.14); border: 1px solid #f0f0f0;">
+                    {{-- Pointer arrow --}}
+                    <div class="absolute -top-2 right-3 w-4 h-4 bg-white rotate-45"
+                         style="border-left: 1px solid #f0f0f0; border-top: 1px solid #f0f0f0;"></div>
+
+                    <div class="p-5" style="max-height: 80vh; overflow-y: auto;">
+                        {{-- Header --}}
+                        <div class="mb-4">
+                            <p class="font-bold text-base" style="color: var(--color-black);">Filter Produk</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Sesuaikan produk yang ingin ditampilkan</p>
+                        </div>
+
+                        {{-- Batas Harga --}}
+                        <div class="mb-4">
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Batas Harga</p>
+
+                            {{-- Min / Max inputs --}}
+                            <div class="flex items-end gap-2 mb-3">
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-semibold text-gray-400 block mb-1">Min</label>
+                                    <input id="filter-price-min" type="number" placeholder="0"
+                                           class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-red-100"
+                                           style="border-color: var(--color-border);">
+                                </div>
+                                <span class="pb-2 text-gray-300 text-base flex-none">—</span>
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-semibold text-gray-400 block mb-1">Max</label>
+                                    <input id="filter-price-max" type="number" placeholder="100000"
+                                           class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-red-100"
+                                           style="border-color: var(--color-border);">
+                                </div>
+                            </div>
+
+                            {{-- Slider track --}}
+                            <div class="relative mb-3" style="height: 6px;">
+                                <div class="absolute inset-0 rounded-full" style="background-color: #e5e7eb;"></div>
+                                <div id="filter-range-fill" class="absolute inset-y-0 left-0 rounded-full"
+                                     style="background-color: var(--color-primary); width: 100%;"></div>
+                                <input id="filter-range" type="range" min="0" max="100000" value="100000" step="1000"
+                                       class="absolute inset-0 w-full opacity-0 cursor-pointer"
+                                       style="height: 6px;">
+                            </div>
+
+                            {{-- Quick-select pills --}}
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" class="price-pill px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                                        style="border-color: var(--color-border); color: #555;"
+                                        data-min="0" data-max="10000">&lt; Rp 10.000</button>
+                                <button type="button" class="price-pill px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                                        style="border-color: var(--color-border); color: #555;"
+                                        data-min="10000" data-max="25000">Rp 10.000 – 25.000</button>
+                                <button type="button" class="price-pill px-3 py-1 rounded-full text-xs font-semibold border transition-all"
+                                        style="border-color: var(--color-border); color: #555;"
+                                        data-min="25000" data-max="">&gt; Rp 25.000</button>
+                            </div>
+                        </div>
+
+                        {{-- Kategori --}}
+                        <div class="mb-5">
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Kategori</p>
+                            <div class="space-y-2.5">
+                                @foreach (['Corndog Asin', 'Corndog Manis', 'Toppoki', 'Combo', 'Es Teler Kwentel', 'Bingsoo'] as $filterCat)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="filter-cat" value="{{ $filterCat }}"
+                                               class="filter-cat-check w-4 h-4 rounded cursor-pointer accent-red-700">
+                                        <span class="text-sm font-medium text-gray-700 group-hover:text-red-700 transition-colors">
+                                            {{ $filterCat }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="flex gap-2 pt-4 border-t border-gray-100">
+                            <button id="btn-filter-reset" type="button"
+                                    class="flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors hover:bg-gray-50"
+                                    style="border-color: var(--color-border); color: #555;">
+                                Reset
+                            </button>
+                            <button id="btn-filter-apply" type="button"
+                                    class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-opacity hover:opacity-85"
+                                    style="background-color: var(--color-primary); color: white;">
+                                Terapkan Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Sort trigger + floating dropdown --}}
+            <div class="relative inline-block">
+                <button id="btn-sort-toggle" type="button"
+                        class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                        title="Urutkan Produk">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                    </svg>
+                </button>
+
+                {{-- Sort dropdown card --}}
+                <div id="dropdown-sort"
+                     class="absolute top-full right-0 mt-3 w-80 bg-white rounded-2xl z-50 hidden"
+                     style="box-shadow: 0 8px 40px rgba(0,0,0,0.14); border: 1px solid #f0f0f0;">
+                    {{-- Pointer arrow --}}
+                    <div class="absolute -top-2 right-3 w-4 h-4 bg-white rotate-45"
+                         style="border-left: 1px solid #f0f0f0; border-top: 1px solid #f0f0f0;"></div>
+
+                    <div class="p-5">
+                        {{-- Header --}}
+                        <div class="mb-4">
+                            <p class="font-bold text-base" style="color: var(--color-black);">Urutkan Produk</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Pilih urutan tampilan produk</p>
+                        </div>
+
+                        {{-- Option cards --}}
+                        <div class="space-y-2 mb-5">
+                            <label class="sort-option-card flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all"
+                                   style="border-color: #e5e7eb;">
+                                <input type="radio" name="sort-option" value="price-asc" class="hidden">
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-none sort-radio-ring"
+                                     style="border-color: #d1d5db;">
+                                    <div class="w-2.5 h-2.5 rounded-full sort-radio-dot hidden"
+                                         style="background-color: var(--color-primary);"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm" style="color: var(--color-black);">Harga: Rendah ke Tinggi</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Tampilkan dari harga terendah</p>
+                                </div>
+                            </label>
+
+                            <label class="sort-option-card flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all"
+                                   style="border-color: #e5e7eb;">
+                                <input type="radio" name="sort-option" value="price-desc" class="hidden">
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-none sort-radio-ring"
+                                     style="border-color: #d1d5db;">
+                                    <div class="w-2.5 h-2.5 rounded-full sort-radio-dot hidden"
+                                         style="background-color: var(--color-primary);"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm" style="color: var(--color-black);">Harga: Tinggi ke Rendah</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Tampilkan dari harga tertinggi</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="flex gap-2 pt-4 border-t border-gray-100">
+                            <button id="btn-sort-reset" type="button"
+                                    class="flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors hover:bg-gray-50"
+                                    style="border-color: var(--color-border); color: #555;">
+                                Reset
+                            </button>
+                            <button id="btn-sort-apply" type="button"
+                                    class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-opacity hover:opacity-85"
+                                    style="background-color: var(--color-primary); color: white;">
+                                Terapkan Urutan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {{-- Cart --}}
             <a href="{{ route('cart') }}"
@@ -90,9 +259,9 @@
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
                              1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
+                <span id="cart-badge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
                              flex items-center justify-center"
-                      style="background-color: var(--color-accent); color: var(--color-black);">0</span>
+                      style="background-color: var(--color-accent); color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
 
             @auth
@@ -127,53 +296,13 @@
         </div>
     </div>
 
-    {{-- Sort dropdown (slides below navbar) --}}
-    <div id="sort-dropdown"
-         class="absolute top-full left-0 right-0 bg-white border-t z-20 shadow-lg"
-         style="border-color: var(--color-border);">
-        <div class="max-w-md mx-auto px-4 py-4">
-            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Urutkan Produk</p>
-            <div class="space-y-2 mb-4">
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="radio" name="sort-option" value="price-asc" class="accent-red-700">
-                    <span class="text-sm font-medium text-gray-700 group-hover:text-red-700 transition-colors">
-                        Harga: Rendah ke Tinggi
-                    </span>
-                </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="radio" name="sort-option" value="price-desc" class="accent-red-700">
-                    <span class="text-sm font-medium text-gray-700 group-hover:text-red-700 transition-colors">
-                        Harga: Tinggi ke Rendah
-                    </span>
-                </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="radio" name="sort-option" value="default" checked class="accent-red-700">
-                    <span class="text-sm font-medium text-gray-700 group-hover:text-red-700 transition-colors">
-                        Default
-                    </span>
-                </label>
-            </div>
-            <div class="flex gap-2">
-                <button id="btn-sort-reset" type="button"
-                        class="flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors hover:bg-gray-50"
-                        style="border-color: var(--color-border); color: #666;">
-                    Reset
-                </button>
-                <button id="btn-sort-apply" type="button"
-                        class="flex-1 py-2 rounded-xl text-sm font-bold transition-opacity hover:opacity-80"
-                        style="background-color: var(--color-primary); color: white;">
-                    Terapkan Urutan
-                </button>
-            </div>
-        </div>
-    </div>
 </header>
 
 {{-- ══════════════════════════════════════════════════════════════
      CUSTOMIZE CORNDOG BANNER
 ══════════════════════════════════════════════════════════════ --}}
 <section class="pt-6 pb-4 sm:pt-8 sm:pb-6" style="background-color: var(--color-light);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12">
         <a href="{{ url('/customize') }}"
            class="flex flex-col sm:flex-row items-center justify-between overflow-hidden rounded-2xl no-underline
                   transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -213,20 +342,19 @@
     $categories   = ['Semua', 'Corndog Asin', 'Corndog Manis', 'Toppoki', 'Combo', 'Es Teler Kwentel', 'Bingsoo'];
 @endphp
 
-<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<section class="w-full">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8">
 
-    {{-- Category tabs — horizontally scrollable on mobile --}}
-    <div class="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div class="flex gap-2 min-w-max sm:min-w-0 sm:flex-wrap">
-            @foreach ($categories as $i => $cat)
-                <button type="button"
-                        class="cat-tab px-5 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-all duration-150 hover:opacity-85 {{ $i === 0 ? 'active' : '' }}"
-                        data-cat="{{ $cat }}"
-                        style="{{ $i !== 0 ? 'border-color: var(--color-border); color: var(--color-black); background-color: var(--color-white);' : 'border-color: var(--color-primary);' }}">
-                    {{ $cat }}
-                </button>
-            @endforeach
-        </div>
+    {{-- Category tabs — horizontally scrollable on mobile, wrapping on desktop --}}
+    <div class="flex flex-row overflow-x-auto hide-scrollbar gap-3 pb-4 mb-8 w-full md:flex-wrap md:justify-center">
+        @foreach ($categories as $i => $cat)
+            <button type="button"
+                    class="cat-tab shrink-0 px-5 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-all duration-150 hover:opacity-85 {{ $i === 0 ? 'active' : '' }}"
+                    data-cat="{{ $cat }}"
+                    style="{{ $i !== 0 ? 'border-color: var(--color-border); color: var(--color-black); background-color: var(--color-white);' : 'border-color: var(--color-primary);' }}">
+                {{ $cat }}
+            </button>
+        @endforeach
     </div>
 
     {{-- Active category label + result count --}}
@@ -242,7 +370,7 @@
 
     {{-- Product grid --}}
     <div id="product-grid"
-         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
 
         @foreach ($menuProducts as $p)
             <div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"
@@ -297,13 +425,14 @@
         <p class="text-sm text-gray-400 mt-1">Coba kata kunci lain atau pilih kategori berbeda.</p>
     </div>
 
+    </div>{{-- /.inner container --}}
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
      FOOTER
 ══════════════════════════════════════════════════════════════ --}}
 <footer style="background-color: var(--color-primary);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
             <div>
@@ -373,15 +502,16 @@
 {{-- ══════════════════════════════════════════════════════════════
      PRODUCT DETAIL MODAL
 ══════════════════════════════════════════════════════════════ --}}
-<div id="product-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden transition-opacity duration-300" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+<div id="product-modal"
+     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden"
+     style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
 
-    {{-- Modal box --}}
-    <div id="product-modal-box" class="bg-white rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.5)] border border-gray-700 w-full max-w-md flex flex-col relative transform scale-100">
+    <div id="product-modal-box"
+         class="bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-3xl flex flex-col md:flex-row relative">
 
-        {{-- X close button --}}
+        {{-- Close button --}}
         <button type="button" id="modal-close"
-                class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center
-                       rounded-full bg-white/80 hover:bg-gray-100 transition-colors"
+                class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-gray-100 transition-colors"
                 aria-label="Tutup">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -389,21 +519,27 @@
             </svg>
         </button>
 
-        {{-- Product image --}}
-        <img id="modal-image" src="" alt="" class="w-full h-56 object-cover">
+        {{-- LEFT: Product image on warm peach background --}}
+        <div class="w-full md:w-1/2 flex justify-center items-center p-6 md:p-10"
+             style="background-color: #FDECD8; min-height: 280px;">
+            <img id="modal-image" src="" alt=""
+                 class="w-full max-w-[240px] md:max-w-none h-56 md:h-72 object-contain drop-shadow-xl">
+        </div>
 
-        {{-- Content --}}
-        <div class="p-6 flex flex-col gap-4">
+        {{-- RIGHT: Details --}}
+        <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between gap-5">
 
+            {{-- Name + price --}}
             <div>
                 <h3 id="modal-title"
-                    class="text-xl font-bold leading-tight"
+                    class="text-xl font-bold leading-snug mb-2"
                     style="color: var(--color-black);"></h3>
                 <p id="modal-price"
-                   class="text-base font-semibold mt-1"
+                   class="text-xl font-black"
                    style="color: var(--color-primary);"></p>
             </div>
 
+            {{-- Description --}}
             <p id="modal-description"
                class="text-sm leading-relaxed"
                style="color: #525252;"></p>
@@ -414,43 +550,64 @@
                 <div class="flex items-center gap-2 px-2 py-1.5 rounded-[8px]"
                      style="background-color: rgba(255,203,99,0.24); border: 1px solid #ffcb63;">
                     <button type="button" id="modal-qty-minus"
-                            class="w-7 h-7 rounded-full flex items-center justify-center
-                                   font-bold text-base leading-none hover:opacity-70"
-                            style="background-color: #ffcb63; color: #525252;">
-                        &#8722;
-                    </button>
-                    <span id="modal-qty"
-                          class="w-7 text-center font-bold text-sm"
-                          style="color: #3d3d3d;">1</span>
+                            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-base leading-none hover:opacity-70"
+                            style="background-color: #ffcb63; color: #525252;">&#8722;</button>
+                    <span id="modal-qty" class="w-7 text-center font-bold text-sm" style="color: #3d3d3d;">1</span>
                     <button type="button" id="modal-qty-plus"
-                            class="w-7 h-7 rounded-full flex items-center justify-center
-                                   font-bold text-base leading-none hover:opacity-70"
-                            style="background-color: var(--color-primary); color: white;">
-                        +
-                    </button>
+                            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-base leading-none hover:opacity-70"
+                            style="background-color: var(--color-primary); color: white;">+</button>
                 </div>
             </div>
 
-            {{-- CTA button --}}
-            <button type="button" id="modal-btn-cart"
-                    class="w-full py-3 font-bold text-sm text-white hover:opacity-90 transition-opacity"
-                    style="border-radius: 12px; background-color: var(--color-primary);">
-                Tambah ke Keranjang
-            </button>
+            {{-- Action buttons --}}
+            <div class="flex flex-col gap-3">
+                {{-- Outline: add to cart, stay on page --}}
+                <button type="button"
+                        class="btn-add-only w-full py-3 rounded-xl text-sm font-bold
+                               flex items-center justify-center gap-2 border-2 transition-opacity hover:opacity-80"
+                        style="border-color: var(--color-primary); color: var(--color-primary); background-color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-none" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Masukan Ke Keranjang
+                </button>
 
-        </div>{{-- /.content --}}
+                {{-- Solid: add then redirect to cart --}}
+                <button type="button"
+                        class="btn-order-now w-full py-3 rounded-xl text-sm font-bold
+                               text-white transition-opacity hover:opacity-85"
+                        style="background-color: var(--color-primary);">
+                    Pesan Sekarang
+                </button>
+            </div>
+        </div>
 
     </div>{{-- /#product-modal-box --}}
-
 </div>{{-- /#product-modal --}}
 
 <script>
 $(function () {
 
+    /* ── CSRF header for all AJAX requests ───────────────── */
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
+
     /* ── State ──────────────────────────────────────────── */
-    var activeCat  = 'Semua';
-    var searchTerm = '';
-    var sortMode   = 'default';
+    var activeCat      = 'Semua';
+    var searchTerm     = '';
+    var sortMode       = 'default';
+    var filterMinPrice = 0;
+    var filterMaxPrice = Infinity;
+    var filterCats     = [];
+
+    /* ── Current modal product data ─────────────────────── */
+    var currentProductId    = null;
+    var currentProductPrice = 0;
+    var currentProductImage = '';
+    var currentProductDesc  = '';
 
     /* Store original order --*/
     var $grid    = $('#product-grid');
@@ -461,14 +618,17 @@ $(function () {
         var visible = 0;
 
         $grid.children('.product-card').each(function () {
-            var $card   = $(this);
-            var cat     = $card.data('category');
-            var name    = $card.data('name');
+            var $card  = $(this);
+            var cat    = $card.data('category');
+            var name   = $card.data('name');
+            var price  = parseInt($card.data('price'), 10) || 0;
 
-            var catMatch  = (activeCat === 'Semua') || (cat === activeCat);
-            var nameMatch = (searchTerm === '') || name.includes(searchTerm);
+            var catMatch       = (activeCat === 'Semua') || (cat === activeCat);
+            var nameMatch      = (searchTerm === '') || name.includes(searchTerm);
+            var priceMatch     = (price >= filterMinPrice) && (price <= filterMaxPrice);
+            var filterCatMatch = (filterCats.length === 0) || (filterCats.indexOf(cat) !== -1);
 
-            if (catMatch && nameMatch) {
+            if (catMatch && nameMatch && priceMatch && filterCatMatch) {
                 $card.removeClass('hidden');
                 visible++;
             } else {
@@ -520,31 +680,104 @@ $(function () {
         applyFilters();
     });
 
+    /* ── Dropdown helpers ──────────────────────────────────── */
+    function closeAllDropdowns() {
+        $('#dropdown-sort, #dropdown-filter').addClass('hidden');
+    }
+
+    function updateSortUI() {
+        var selected = $('input[name="sort-option"]:checked').val();
+        $('.sort-option-card').each(function () {
+            var val    = $(this).find('input[type=radio]').val();
+            var active = (val === selected);
+            $(this).css({
+                'border-color':     active ? 'var(--color-primary)' : '#e5e7eb',
+                'background-color': active ? '#fff5f5' : ''
+            });
+            $(this).find('.sort-radio-ring').css('border-color', active ? 'var(--color-primary)' : '#d1d5db');
+            $(this).find('.sort-radio-dot').toggleClass('hidden', !active);
+        });
+    }
+
     /* ── Sort dropdown toggle ──────────────────────────────── */
     $('#btn-sort-toggle').on('click', function (e) {
         e.stopPropagation();
-        $('#sort-dropdown').toggleClass('open');
+        var wasHidden = $('#dropdown-sort').hasClass('hidden');
+        closeAllDropdowns();
+        if (wasHidden) $('#dropdown-sort').removeClass('hidden');
     });
 
+    /* ── Filter dropdown toggle ────────────────────────────── */
+    $('#btn-filter-toggle').on('click', function (e) {
+        e.stopPropagation();
+        var wasHidden = $('#dropdown-filter').hasClass('hidden');
+        closeAllDropdowns();
+        if (wasHidden) $('#dropdown-filter').removeClass('hidden');
+    });
+
+    /* ── Close both on outside click ──────────────────────── */
     $(document).on('click', function (e) {
-        if (!$(e.target).closest('#sort-dropdown, #btn-sort-toggle').length) {
-            $('#sort-dropdown').removeClass('open');
+        if (!$(e.target).closest('#dropdown-sort, #btn-sort-toggle, #dropdown-filter, #btn-filter-toggle').length) {
+            closeAllDropdowns();
         }
+    });
+
+    /* ── Sort option card click (visual feedback) ──────────── */
+    $(document).on('click', '.sort-option-card', function () {
+        $(this).find('input[type=radio]').prop('checked', true);
+        updateSortUI();
     });
 
     /* ── Sort apply ────────────────────────────────────────── */
     $('#btn-sort-apply').on('click', function () {
         sortMode = $('input[name="sort-option"]:checked').val() || 'default';
-        $('#sort-dropdown').removeClass('open');
+        closeAllDropdowns();
         applySort();
     });
 
     /* ── Sort reset ────────────────────────────────────────── */
     $('#btn-sort-reset').on('click', function () {
-        $('input[name="sort-option"][value="default"]').prop('checked', true);
+        $('input[name="sort-option"]').prop('checked', false);
         sortMode = 'default';
-        $('#sort-dropdown').removeClass('open');
+        updateSortUI();
+        closeAllDropdowns();
         applySort();
+    });
+
+    /* ── Filter apply ──────────────────────────────────────── */
+    $('#btn-filter-apply').on('click', function () {
+        var minVal     = $('#filter-price-min').val();
+        var maxVal     = $('#filter-price-max').val();
+        filterMinPrice = minVal ? parseInt(minVal, 10) : 0;
+        filterMaxPrice = maxVal ? parseInt(maxVal, 10) : Infinity;
+
+        filterCats = [];
+        $('.filter-cat-check:checked').each(function () {
+            filterCats.push($(this).val());
+        });
+
+        closeAllDropdowns();
+        applyFilters();
+    });
+
+    /* ── Filter reset ──────────────────────────────────────── */
+    $('#btn-filter-reset').on('click', function () {
+        filterMinPrice = 0;
+        filterMaxPrice = Infinity;
+        filterCats     = [];
+        $('#filter-price-min, #filter-price-max').val('');
+        $('.filter-cat-check').prop('checked', false);
+        $('.price-pill').css({ 'border-color': 'var(--color-border)', 'background-color': '', 'color': '#555' });
+        closeAllDropdowns();
+        applyFilters();
+    });
+
+    /* ── Price quick-select pills ──────────────────────────── */
+    $(document).on('click', '.price-pill', function () {
+        $('.price-pill').css({ 'border-color': 'var(--color-border)', 'background-color': '', 'color': '#555' });
+        $(this).css({ 'border-color': 'var(--color-primary)', 'background-color': '#fff5f5', 'color': 'var(--color-primary)' });
+        $('#filter-price-min').val($(this).data('min') || '');
+        $('#filter-price-max').val($(this).data('max') || '');
     });
 
     /* ── Init ──────────────────────────────────────────────── */
@@ -559,14 +792,98 @@ $(function () {
 
     $(document).on('click', '.btn-pesan', function () {
         var $b = $(this);
+        currentProductId    = $b.data('id');
+        currentProductPrice = parseInt($b.data('price'), 10) || 0;
+        currentProductImage = $b.data('image');
+        currentProductDesc  = $b.data('description');
+
         $('#modal-title').text($b.data('name'));
-        $('#modal-price').text(fmtRp(parseInt($b.data('price'), 10) || 0) + ' / pcs');
-        $('#modal-description').text($b.data('description'));
-        $('#modal-image').attr({ src: $b.data('image'), alt: $b.data('name') });
+        $('#modal-price').text(fmtRp(currentProductPrice) + ' / pcs');
+        $('#modal-description').text(currentProductDesc);
+        $('#modal-image').attr({ src: currentProductImage, alt: $b.data('name') });
         $('#modal-qty').text('1');
         $('#product-modal').removeClass('hidden').addClass('flex');
         $('body').css('overflow', 'hidden');
     });
+
+    /* ── Add to cart (outline button) — stay on page ────── */
+    $(document).on('click', '.btn-add-only', function () {
+        var $btn     = $(this);
+        var origHtml = $btn.html();
+        var qty      = parseInt($('#modal-qty').text(), 10) || 1;
+
+        $btn.prop('disabled', true).text('Menambahkan...');
+
+        $.ajax({
+            url:    '{{ route("cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id:  currentProductId,
+                name:        $('#modal-title').text(),
+                price:       currentProductPrice,
+                qty:         qty,
+                image:       currentProductImage,
+                description: currentProductDesc,
+            },
+            success: function (response) {
+                if (response.success) {
+                    closeModal();
+                    showCartToast('Ditambahkan ke keranjang!');
+                    $('#cart-badge').text(response.count);
+                }
+            },
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html(origHtml);
+            }
+        });
+    });
+
+    /* ── Pesan Sekarang (solid button) — add then redirect ─ */
+    $(document).on('click', '.btn-order-now', function () {
+        var $btn = $(this);
+        var qty  = parseInt($('#modal-qty').text(), 10) || 1;
+
+        $btn.prop('disabled', true).text('Memproses...');
+
+        $.ajax({
+            url:    '{{ route("cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id:  currentProductId,
+                name:        $('#modal-title').text(),
+                price:       currentProductPrice,
+                qty:         qty,
+                image:       currentProductImage,
+                description: currentProductDesc,
+            },
+            success: function (response) {
+                if (response.success) {
+                    window.location.href = '{{ route("cart") }}';
+                }
+            },
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
+                $btn.prop('disabled', false).text('Pesan Sekarang');
+            }
+        });
+    });
+
+    function showCartToast(msg, isError) {
+        var bg = isError ? '#c00f0c' : '#A6171C';
+        var $t = $('<div>').text(msg).css({
+            position: 'fixed', bottom: '28px', left: '50%',
+            transform: 'translateX(-50%)',
+            background: bg, color: '#fff',
+            padding: '11px 28px', borderRadius: '999px',
+            fontWeight: '700', fontSize: '14px',
+            zIndex: 99999, boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+            whiteSpace: 'nowrap'
+        }).appendTo('body');
+        setTimeout(function () { $t.fadeOut(300, function () { $(this).remove(); }); }, 2500);
+    }
 
     $('#modal-qty-plus').on('click', function () {
         var q = parseInt($('#modal-qty').text(), 10);

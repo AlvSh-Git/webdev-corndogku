@@ -64,7 +64,7 @@
                 <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px]
                              font-bold flex items-center justify-center"
                       style="background-color: var(--color-accent);
-                             color: var(--color-black);">0</span>
+                             color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
 
             @auth

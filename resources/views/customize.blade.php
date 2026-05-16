@@ -31,6 +31,9 @@
             border-color: #A6171C;
         }
 
+        /* Carousel dot size */
+        #carousel-dots > div { width: 0.875rem; height: 0.875rem; }
+
         /* Carousel transition */
         #carousel-img {
             transition: opacity 0.2s ease, transform 0.2s ease;
@@ -39,6 +42,18 @@
             opacity: 0;
             transform: scale(0.95);
         }
+
+        /* Stepper override — circles rendered by JS use these sizes */
+        #stepper > div > div:first-child {
+            width: 3rem !important;
+            height: 3rem !important;
+            font-size: 1.25rem !important;
+        }
+        #stepper > div > span {
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+        }
+        .step-line { min-width: 36px; }
 
         /* Sauce chip badges */
         .sauce-chip {
@@ -59,7 +74,7 @@
 ══════════════════════════════════════════════════════════════ --}}
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
 
         <a href="{{ route('welcome') }}" class="flex items-center gap-2 flex-none">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Corndog-Ku"
@@ -90,7 +105,7 @@
                 </svg>
                 <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
                              flex items-center justify-center"
-                      style="background-color: var(--color-accent); color: var(--color-black);">0</span>
+                      style="background-color: var(--color-accent); color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
 
             @auth
@@ -132,7 +147,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      MAIN — CUSTOM CORNDOG WIZARD
 ══════════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+<section class="relative overflow-hidden min-h-screen">
 
     {{-- Decorative large circles --}}
     <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none"
@@ -154,7 +169,7 @@
     <div class="absolute bottom-48 right-[10%] w-3 h-3 rounded-full pointer-events-none"
          style="background-color: #FFBE54; opacity:0.5;"></div>
 
-    <div class="max-w-5xl mx-auto relative z-10">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 relative z-10">
 
         {{-- ── Top row: Title + Stepper ──────────────────────── --}}
         <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 mb-8 lg:mb-10">
@@ -163,24 +178,24 @@
             <div class="flex-none">
                 {{-- Squiggly underline decoration (SVG) --}}
                 <div class="relative leading-none">
-                    <div class="text-6xl sm:text-7xl font-black leading-none tracking-tight">
+                    <div class="text-6xl sm:text-7xl lg:text-[90px] xl:text-[108px] font-black leading-none tracking-tight">
                         <span style="color: #1a1a1a;">CUSTOM</span>
                         {{-- Spark accent --}}
-                        <span class="inline-block ml-1 text-3xl" style="color: #FFBE54;">✦</span>
+                        <span class="inline-block ml-1 text-3xl lg:text-4xl" style="color: #FFBE54;">✦</span>
                     </div>
-                    <div class="text-6xl sm:text-7xl font-black leading-none tracking-tight"
+                    <div class="text-6xl sm:text-7xl lg:text-[90px] xl:text-[108px] font-black leading-none tracking-tight"
                          style="color: var(--color-primary);">CORNDOG</div>
                     {{-- Wavy underline --}}
-                    <svg class="mt-1" width="260" height="12" viewBox="0 0 260 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 6 Q22 2 42 6 Q62 10 82 6 Q102 2 122 6 Q142 10 162 6 Q182 2 202 6 Q222 10 242 6 Q252 3 258 6"
-                              stroke="#A6171C" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <svg class="mt-1" width="340" height="14" viewBox="0 0 340 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 7 Q28 2 54 7 Q80 12 106 7 Q132 2 158 7 Q184 12 210 7 Q236 2 262 7 Q288 12 314 7 Q327 4 338 7"
+                              stroke="#A6171C" stroke-width="3.5" stroke-linecap="round" fill="none"/>
                     </svg>
                 </div>
                 {{-- Subtitle pill --}}
-                <div class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm"
+                <div class="mt-5 inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-bold text-base lg:text-lg"
                      style="background-color: #FFBE54; color: #1a1a1a;">
                     Buat Corndog Favoritemu Sesuai Seleramu
-                    <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="#A6171C">
+                    <svg class="w-5 h-5 flex-none" viewBox="0 0 24 24" fill="#A6171C">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                 </div>
@@ -193,13 +208,16 @@
         </div>
 
         {{-- ── Carousel + Instruction layout ─────────────────── --}}
-        <div class="relative flex items-center gap-4 min-h-[440px]">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+
+            {{-- LEFT: Carousel --}}
+            <div class="flex items-center gap-4 justify-center">
 
             {{-- Left arrow --}}
             <button id="btn-prev"
                     type="button"
-                    class="flex-none w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-xl hover:shadow-lg transition-shadow active:scale-95"
+                    class="flex-none w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center
+                           font-bold text-2xl md:text-4xl hover:shadow-lg transition-shadow active:scale-95"
                     style="color: var(--color-primary);">
                 &#8249;
             </button>
@@ -208,68 +226,69 @@
             <div id="carousel-center" class="flex-1 flex flex-col items-center justify-center relative">
 
                 {{-- Peach blob --}}
-                <div class="corndog-blob w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80
+                <div class="corndog-blob w-80 h-80 sm:w-96 sm:h-96 lg:w-[500px] lg:h-[500px]
                             flex items-center justify-center relative">
                     <img id="carousel-img"
                          src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
                          alt="Corndog preview"
-                         class="w-48 sm:w-56 lg:w-64 h-auto object-contain drop-shadow-xl">
+                         class="h-[280px] sm:h-[380px] lg:h-[560px] w-auto object-contain drop-shadow-xl">
                     {{-- Spark accent near image --}}
-                    <div class="absolute top-2 right-2 text-2xl pointer-events-none"
+                    <div class="absolute top-3 right-3 text-3xl pointer-events-none"
                          style="color: #A6171C;">✦</div>
                 </div>
 
                 {{-- Selection name pill --}}
-                <div class="selection-pill mt-4 px-6 py-2 rounded-full text-center min-w-[180px]"
+                <div class="selection-pill mt-5 px-8 py-3 rounded-full text-center min-w-[220px]"
                      id="carousel-label">
-                    <span class="font-black text-base tracking-widest"
+                    <span class="font-black text-xl tracking-widest"
                           id="carousel-label-text"
                           style="color: var(--color-primary);">SOSIS &amp; MOZZA</span>
-                    <div id="carousel-label-price" class="text-xs font-semibold mt-0.5 hidden"
+                    <div id="carousel-label-price" class="text-sm font-semibold mt-1 hidden"
                          style="color: var(--color-primary);"></div>
                 </div>
 
                 {{-- Dot indicators --}}
-                <div id="carousel-dots" class="flex items-center gap-2 mt-4"></div>
+                <div id="carousel-dots" class="flex items-center gap-3 mt-5"></div>
 
                 {{-- Step 3 sauce chips (hidden except step 3) --}}
-                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center mt-3 max-w-xs"></div>
+                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center mt-4 max-w-sm"></div>
             </div>
 
             {{-- Right arrow --}}
             <button id="btn-next"
                     type="button"
-                    class="flex-none w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-xl hover:shadow-lg transition-shadow active:scale-95"
+                    class="flex-none w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center
+                           font-bold text-2xl md:text-4xl hover:shadow-lg transition-shadow active:scale-95"
                     style="color: var(--color-primary);">
                 &#8250;
             </button>
 
-            {{-- Step instruction card (absolute, bottom-right) --}}
+            </div>{{-- /.carousel left column --}}
+
+            {{-- RIGHT: Step instruction card --}}
             <div id="step-card"
-                 class="absolute bottom-0 right-16 bg-white rounded-2xl p-4 shadow-md
-                        w-56 hidden lg:block">
-                <div class="flex items-start gap-3">
+                 class="bg-white rounded-2xl p-8 md:p-10 shadow-lg self-center">
+                <div class="flex items-start gap-4">
                     <div id="step-card-num"
-                         class="w-8 h-8 rounded-full flex items-center justify-center
-                                text-white font-bold text-sm flex-none"
+                         class="w-12 h-12 rounded-full flex items-center justify-center
+                                text-white font-bold text-xl flex-none"
                          style="background-color: var(--color-primary);">1</div>
                     <div>
-                        <p id="step-card-title" class="font-bold text-sm" style="color: var(--color-black);">
+                        <p id="step-card-title" class="font-bold text-xl lg:text-2xl" style="color: var(--color-black);">
                             Pilih Isi Corndog
                         </p>
-                        <p id="step-card-desc" class="text-xs text-gray-500 mt-1 leading-relaxed">
+                        <p id="step-card-desc" class="text-base text-gray-500 mt-2 leading-relaxed">
                             Geser atau gunakan tombol untuk memilih isi favoritemu
                         </p>
                     </div>
                 </div>
                 {{-- Sauce add button (step 3 only) --}}
-                <div id="add-sauce-wrap" class="hidden mt-3 pt-3 border-t border-gray-100">
-                    <p class="text-xs text-right mb-2" style="color: var(--color-primary);">Max 2 sauce*</p>
+                <div id="add-sauce-wrap" class="hidden mt-5 pt-5 border-t border-gray-100">
+                    <p class="text-sm text-right mb-3 font-semibold" style="color: var(--color-primary);">Max 2 sauce*</p>
                     <button id="add-sauce-btn"
                             type="button"
-                            class="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg
-                                   text-sm font-bold border-2 transition-colors hover:opacity-80"
+                            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                                   text-base font-bold border-2 transition-colors hover:opacity-80"
                             style="border-color: var(--color-primary); color: var(--color-primary);">
                         <span>+</span> Add Sauce
                     </button>
@@ -298,17 +317,18 @@
         </div>
 
         {{-- ── Next / Back buttons ─────────────────────────────── --}}
-        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
             <button id="btn-back"
                     type="button"
-                    class="hidden sm:inline-flex items-center justify-center px-8 py-3.5 rounded-xl
-                           font-bold text-sm border-2 transition-opacity hover:opacity-70"
+                    class="hidden sm:inline-flex items-center justify-center px-10 py-5 rounded-2xl
+                           font-bold text-base border-2 transition-opacity hover:opacity-70"
                     style="border-color: var(--color-primary); color: var(--color-primary);">
                 &#8592; Kembali
             </button>
             <button id="btn-next-step"
                     type="button"
-                    class="flex-1 py-4 rounded-xl font-bold text-base tracking-wide
+                    class="flex-1 max-w-4xl mx-auto w-full py-5 rounded-2xl font-bold
+                           text-xl md:text-2xl tracking-wide
                            transition-opacity hover:opacity-85 active:scale-[0.99]"
                     style="background-color: var(--color-primary); color: var(--color-white);">
                 Next Pilih Varian
@@ -321,7 +341,7 @@
      FOOTER
 ══════════════════════════════════════════════════════════════ --}}
 <footer style="background-color: var(--color-primary);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
             <div>

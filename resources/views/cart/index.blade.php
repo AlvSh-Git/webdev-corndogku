@@ -65,35 +65,37 @@
                 </button>
             </div>
 
-            {{-- Item list --}}
+            {{-- Item list — rendered from session cart --}}
             <div id="cart-items" class="flex flex-col gap-4">
 
-                {{-- ── ITEM 1 ── --}}
+                @foreach ($cartItems as $productId => $item)
                 <div class="cart-item flex items-start gap-3 p-4 rounded-[15px] border"
                      style="border-color: #d2d2d2;"
-                     data-id="1" data-price="18000">
+                     data-id="{{ $productId }}"
+                     data-price="{{ $item['price'] }}">
 
                     <div class="flex items-center pt-1 flex-none">
                         <input type="checkbox" class="item-check w-5 h-5 rounded cursor-pointer"
                                style="accent-color: var(--color-primary);" checked>
                     </div>
 
-                    <img src="{{ asset('assets/img/CA_DOUBLE_CHEESE.png') }}"
-                         alt="Double Cheese"
+                    <img src="{{ $item['image'] }}"
+                         alt="{{ $item['name'] }}"
                          class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border flex-none"
-                         style="border-color: #d2d2d2;">
+                         style="border-color: #d2d2d2;"
+                         onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
 
                     <div class="flex-1 min-w-0">
                         <div class="flex items-start justify-between gap-2">
                             <div>
                                 <h3 class="font-bold text-base sm:text-lg leading-tight"
-                                    style="color: var(--color-black);">Double Cheese</h3>
+                                    style="color: var(--color-black);">{{ $item['name'] }}</h3>
+                                @if (!empty($item['description']))
                                 <p class="text-xs sm:text-sm mt-1 leading-snug"
-                                   style="color: #9c9c9c;">
-                                    Corndog with full-stretch mozzarella and golden crunchy batter.
-                                </p>
+                                   style="color: #9c9c9c;">{{ $item['description'] }}</p>
+                                @endif
                                 <p class="text-xs mt-1 font-medium" style="color: #9c9c9c;">
-                                    Rp 18.000 / pcs
+                                    Rp {{ number_format($item['price'], 0, ',', '.') }} / pcs
                                 </p>
                             </div>
                             <button type="button"
@@ -116,137 +118,20 @@
                                                font-bold text-lg leading-none hover:opacity-70 transition-opacity"
                                         style="background-color: #ffcb63; color: #525252;">&#8722;</button>
                                 <span class="item-qty w-7 text-center font-bold text-sm"
-                                      style="color: #3d3d3d;">2</span>
+                                      style="color: #3d3d3d;">{{ $item['qty'] }}</span>
                                 <button type="button"
                                         class="btn-qty-plus w-7 h-7 rounded-full flex items-center justify-center
                                                font-bold text-lg leading-none hover:opacity-70 transition-opacity"
                                         style="background-color: var(--color-primary); color: white;">+</button>
                             </div>
                             <span class="item-total font-bold text-base sm:text-lg"
-                                  style="color: var(--color-primary);">Rp 36.000</span>
+                                  style="color: var(--color-primary);">
+                                Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}
+                            </span>
                         </div>
                     </div>
-                </div>{{-- /ITEM 1 --}}
-
-                {{-- ── ITEM 2 ── --}}
-                <div class="cart-item flex items-start gap-3 p-4 rounded-[15px] border"
-                     style="border-color: #d2d2d2;"
-                     data-id="2" data-price="15000">
-
-                    <div class="flex items-center pt-1 flex-none">
-                        <input type="checkbox" class="item-check w-5 h-5 rounded cursor-pointer"
-                               style="accent-color: var(--color-primary);" checked>
-                    </div>
-
-                    <img src="{{ asset('assets/img/CA_FULL_MOZZA.png') }}"
-                         alt="Mozzarella Original"
-                         class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border flex-none"
-                         style="border-color: #d2d2d2;">
-
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between gap-2">
-                            <div>
-                                <h3 class="font-bold text-base sm:text-lg leading-tight"
-                                    style="color: var(--color-black);">Mozzarella Original</h3>
-                                <p class="text-xs sm:text-sm mt-1 leading-snug"
-                                   style="color: #9c9c9c;">
-                                    Classic corndog with premium mozzarella filling inside.
-                                </p>
-                                <p class="text-xs mt-1 font-medium" style="color: #9c9c9c;">
-                                    Rp 15.000 / pcs
-                                </p>
-                            </div>
-                            <button type="button"
-                                    class="btn-remove-item flex-none hover:opacity-60 transition-opacity"
-                                    style="color: #9c9c9c;" aria-label="Hapus item">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0
-                                             01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0
-                                             00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
-                            <div class="flex items-center gap-2 px-2 py-1.5 rounded-[10px]"
-                                 style="background-color: rgba(255,203,99,0.24); border: 1px solid #ffcb63;">
-                                <button type="button"
-                                        class="btn-qty-minus w-7 h-7 rounded-full flex items-center justify-center
-                                               font-bold text-lg leading-none hover:opacity-70 transition-opacity"
-                                        style="background-color: #ffcb63; color: #525252;">&#8722;</button>
-                                <span class="item-qty w-7 text-center font-bold text-sm"
-                                      style="color: #3d3d3d;">1</span>
-                                <button type="button"
-                                        class="btn-qty-plus w-7 h-7 rounded-full flex items-center justify-center
-                                               font-bold text-lg leading-none hover:opacity-70 transition-opacity"
-                                        style="background-color: var(--color-primary); color: white;">+</button>
-                            </div>
-                            <span class="item-total font-bold text-base sm:text-lg"
-                                  style="color: var(--color-primary);">Rp 15.000</span>
-                        </div>
-                    </div>
-                </div>{{-- /ITEM 2 --}}
-
-                {{-- ── ITEM 3 ── --}}
-                <div class="cart-item flex items-start gap-3 p-4 rounded-[15px] border"
-                     style="border-color: #d2d2d2;"
-                     data-id="3" data-price="20000">
-
-                    <div class="flex items-center pt-1 flex-none">
-                        <input type="checkbox" class="item-check w-5 h-5 rounded cursor-pointer"
-                               style="accent-color: var(--color-primary);" checked>
-                    </div>
-
-                    <img src="{{ asset('assets/img/CA_SQUID_NORI.png') }}"
-                         alt="Spicy BBQ"
-                         class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-full border flex-none"
-                         style="border-color: #d2d2d2;">
-
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between gap-2">
-                            <div>
-                                <h3 class="font-bold text-base sm:text-lg leading-tight"
-                                    style="color: var(--color-black);">Spicy BBQ</h3>
-                                <p class="text-xs sm:text-sm mt-1 leading-snug"
-                                   style="color: #9c9c9c;">
-                                    Corndog with smoky BBQ sauce and a jalapeño kick inside.
-                                </p>
-                                <p class="text-xs mt-1 font-medium" style="color: #9c9c9c;">
-                                    Rp 20.000 / pcs
-                                </p>
-                            </div>
-                            <button type="button"
-                                    class="btn-remove-item flex-none hover:opacity-60 transition-opacity"
-                                    style="color: #9c9c9c;" aria-label="Hapus item">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0
-                                             01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0
-                                             00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
-                            <div class="flex items-center gap-2 px-2 py-1.5 rounded-[10px]"
-                                 style="background-color: rgba(255,203,99,0.24); border: 1px solid #ffcb63;">
-                                <button type="button"
-                                        class="btn-qty-minus w-7 h-7 rounded-full flex items-center justify-center
-                                               font-bold text-lg leading-none hover:opacity-70 transition-opacity"
-                                        style="background-color: #ffcb63; color: #525252;">&#8722;</button>
-                                <span class="item-qty w-7 text-center font-bold text-sm"
-                                      style="color: #3d3d3d;">3</span>
-                                <button type="button"
-                                        class="btn-qty-plus w-7 h-7 rounded-full flex items-center justify-center
-                                               font-bold text-lg leading-none hover:opacity-70 transition-opacity"
-                                        style="background-color: var(--color-primary); color: white;">+</button>
-                            </div>
-                            <span class="item-total font-bold text-base sm:text-lg"
-                                  style="color: var(--color-primary);">Rp 60.000</span>
-                        </div>
-                    </div>
-                </div>{{-- /ITEM 3 --}}
+                </div>
+                @endforeach
 
                 {{-- ── Empty state ── --}}
                 <div id="cart-empty" class="hidden py-14 flex flex-col items-center gap-4 text-center">
@@ -388,6 +273,11 @@
 <script>
 $(function () {
 
+    /* ── CSRF header for all AJAX requests ───────────────── */
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
+
     var TAX_RATE = 0.11;
 
     function fmtRp(n) {
@@ -399,10 +289,10 @@ $(function () {
         var itemCount = 0;
 
         $('.cart-item').each(function () {
-            var $item    = $(this);
-            var price    = parseInt($item.data('price'), 10) || 0;
-            var qty      = parseInt($item.find('.item-qty').text(), 10) || 1;
-            var checked  = $item.find('.item-check').prop('checked');
+            var $item     = $(this);
+            var price     = parseInt($item.data('price'), 10) || 0;
+            var qty       = parseInt($item.find('.item-qty').text(), 10) || 1;
+            var checked   = $item.find('.item-check').prop('checked');
             var lineTotal = price * qty;
 
             $item.find('.item-total').text(fmtRp(lineTotal));
@@ -442,21 +332,41 @@ $(function () {
         if (q > 1) { $qty.text(q - 1); recalc(); }
     });
 
-    /* ── Remove single item ─────────────────────────────── */
+    /* ── Remove single item — AJAX then DOM ─────────────── */
     $(document).on('click', '.btn-remove-item', function () {
-        $(this).closest('.cart-item').fadeOut(200, function () {
-            $(this).remove();
-            checkEmpty();
-            recalc();
+        var $item      = $(this).closest('.cart-item');
+        var productId  = $item.data('id');
+
+        $.ajax({
+            url:    '{{ route("cart.remove") }}',
+            method: 'POST',
+            data:   { product_id: productId },
+            success: function (response) {
+                if (response.success) {
+                    $item.fadeOut(200, function () {
+                        $(this).remove();
+                        checkEmpty();
+                        recalc();
+                    });
+                }
+            }
         });
     });
 
-    /* ── Delete all ─────────────────────────────────────── */
+    /* ── Delete all — AJAX then DOM ─────────────────────── */
     $('#btn-delete-all').on('click', function () {
-        $('.cart-item').fadeOut(200, function () {
-            $(this).remove();
-            checkEmpty();
-            recalc();
+        $.ajax({
+            url:    '{{ route("cart.clear") }}',
+            method: 'POST',
+            success: function (response) {
+                if (response.success) {
+                    $('.cart-item').fadeOut(200, function () {
+                        $(this).remove();
+                        checkEmpty();
+                        recalc();
+                    });
+                }
+            }
         });
     });
 
@@ -476,6 +386,7 @@ $(function () {
 
     /* ── Init ───────────────────────────────────────────── */
     recalc();
+    checkEmpty();
 
 });
 </script>

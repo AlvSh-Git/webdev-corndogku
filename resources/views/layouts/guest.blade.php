@@ -23,9 +23,11 @@
 
         {{-- Circular logo — top-left --}}
         <div class="absolute top-6 left-6 z-20">
-            <img src="{{ asset('assets/img/logo.png') }}"
-                 alt="Corndog-Ku"
-                 class="w-14 h-14 rounded-full object-cover border-2 border-white">
+            <a href="{{ url('/') }}" class="inline-block">
+                <img src="{{ asset('assets/img/logo.png') }}"
+                     alt="Corndog-Ku"
+                     class="w-14 h-14 rounded-full object-cover border-2 border-white">
+            </a>
         </div>
 
         {{-- Red chevron — back layer --}}

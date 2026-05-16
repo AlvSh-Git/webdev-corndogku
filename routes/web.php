@@ -8,12 +8,18 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CartController;
 
 // ── Public customer catalog ─────────────────────────────────────
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/menu',      fn () => view('menu.index'))->name('menu');
-Route::get('/cart',      fn () => view('cart.index'))->name('cart');
 Route::get('/customize', fn () => view('customize'))->name('customize');
+
+// ── Cart ────────────────────────────────────────────────────────
+Route::get('/cart',          [CartController::class, 'index'])->name('cart');
+Route::post('/cart/add',     [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/remove',  [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear',   [CartController::class, 'clear'])->name('cart.clear');
 
 // ── Customer profile ────────────────────────────────────────────
 Route::get('/profile', function () {

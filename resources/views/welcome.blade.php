@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Corndog-Ku — Beranda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&display=swap">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -11,7 +15,7 @@
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        .ticker-track { animation: ticker 24s linear infinite; }
+        .ticker-track { animation: ticker 28s linear infinite; }
         .ticker-track:hover { animation-play-state: paused; }
 
         .product-card {
@@ -22,32 +26,65 @@
             transform: translateY(-2px);
         }
 
-        /* Hero decorative wave pattern (approximates Figma "Pattern 08") */
+        /* Hero Pattern 08 — wave overlay */
         .hero-pattern::before {
             content: '';
             position: absolute;
             inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='320' height='200' viewBox='0 0 320 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q80 20 160 60 Q240 100 320 60' stroke='rgba(255,190,84,0.10)' stroke-width='4' fill='none'/%3E%3Cpath d='M0 120 Q80 80 160 120 Q240 160 320 120' stroke='rgba(255,190,84,0.08)' stroke-width='4' fill='none'/%3E%3Cpath d='M0 180 Q80 140 160 180 Q240 220 320 180' stroke='rgba(255,190,84,0.06)' stroke-width='4' fill='none'/%3E%3Ccircle cx='30' cy='40' r='3' fill='rgba(255,190,84,0.15)'/%3E%3Ccircle cx='290' cy='80' r='2' fill='rgba(255,190,84,0.12)'/%3E%3Ccircle cx='160' cy='20' r='2.5' fill='rgba(255,190,84,0.12)'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='400' height='250' viewBox='0 0 400 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q100 20 200 60 Q300 100 400 60' stroke='rgba(255,190,84,0.08)' stroke-width='3' fill='none'/%3E%3Cpath d='M0 120 Q100 80 200 120 Q300 160 400 120' stroke='rgba(255,190,84,0.06)' stroke-width='3' fill='none'/%3E%3Cpath d='M0 180 Q100 140 200 180 Q300 220 400 180' stroke='rgba(255,190,84,0.05)' stroke-width='3' fill='none'/%3E%3Ccircle cx='40' cy='40' r='3' fill='rgba(255,190,84,0.10)'/%3E%3Ccircle cx='360' cy='100' r='2' fill='rgba(255,190,84,0.10)'/%3E%3Ccircle cx='200' cy='20' r='2' fill='rgba(255,190,84,0.08)'/%3E%3Ccircle cx='80' cy='200' r='1.5' fill='rgba(255,190,84,0.08)'/%3E%3Ccircle cx='320' cy='230' r='2.5' fill='rgba(255,190,84,0.07)'/%3E%3C/svg%3E");
             background-repeat: repeat;
+            opacity: 0.9;
             pointer-events: none;
+            z-index: 0;
         }
+
+        /* Promo card "CORNDOG-KU" watermark */
+        .font-londrina { font-family: 'Londrina Shadow', cursive; }
+        .font-helvetica { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+        /* Promo card hover lift */
+        .promo-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .promo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 6px 8px 32px rgba(0,0,0,0.18);
+        }
+
+        /* ── Marquee category rail ── */
+        @keyframes marquee-rail {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: marquee-rail 24s linear infinite;
+            white-space: nowrap;
+        }
+        .marquee-track:hover { animation-play-state: paused; }
+
+        /* ── Horizontal scroll — no visible scrollbar ── */
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
 
 {{-- ══════════════════════════════════════════════════════════════
-     1. NAVBAR
+     1. NAVBAR — edge-to-edge with wide inner container
 ══════════════════════════════════════════════════════════════ --}}
-<header class="sticky top-0 z-30 bg-white border-b"
+<header class="sticky top-0 z-30 w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
 
         {{-- Brand --}}
         <a href="{{ route('welcome') }}" class="flex items-center gap-2 flex-none">
             <img src="{{ asset('assets/img/logo.png') }}"
                  alt="Corndog-Ku"
                  class="w-10 h-10 rounded-full object-cover">
-            <span class="font-bold text-lg tracking-tight" style="color: var(--color-black);">Corndog-Ku</span>
+            <span class="font-bold text-lg tracking-tight font-helvetica" style="color: var(--color-black);">Corndog-Ku</span>
         </a>
 
         {{-- Desktop nav links --}}
@@ -63,6 +100,26 @@
         {{-- Right: cart + auth actions --}}
         <div class="flex items-center gap-2 flex-none">
 
+            {{-- Lovers avatar group (desktop only) --}}
+            <div class="hidden lg:flex items-center gap-2 mr-2">
+                <div class="flex -space-x-1.5 flex-none">
+                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
+                                text-white text-[9px] font-bold"
+                         style="background-color: #60A5FA; border-color: #f8f8f8;">A</div>
+                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
+                                text-white text-[9px] font-bold"
+                         style="background-color: #A855F7; border-color: #f8f8f8;">D</div>
+                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
+                                text-white text-[9px] font-bold"
+                         style="background-color: #F472B6; border-color: #f8f8f8;">B</div>
+                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
+                                text-white text-[9px] font-bold"
+                         style="background-color: #4ADE80; border-color: #f8f8f8;">C</div>
+                </div>
+                <span class="text-xs font-semibold whitespace-nowrap"
+                      style="color: var(--color-black);">2.5k+ lovers</span>
+            </div>
+
             {{-- Cart --}}
             <a href="{{ route('cart') }}"
                class="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
@@ -72,9 +129,9 @@
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
                              1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
+                <span id="cart-badge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
                              flex items-center justify-center"
-                      style="background-color: var(--color-accent); color: var(--color-black);">0</span>
+                      style="background-color: var(--color-accent); color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
 
             @auth
@@ -114,101 +171,158 @@
 </header>
 
 {{-- ══════════════════════════════════════════════════════════════
-     2. HERO SECTION
+     2. HERO SECTION — full-width, min-h-[680px], matches Figma
 ══════════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden hero-pattern"
+<section class="relative w-full overflow-hidden hero-pattern"
          style="background-color: #A6171C;
-                background-image: radial-gradient(ellipse at 65% 45%, #7A0D10 0%, #A6171C 60%);">
+                background-image: radial-gradient(ellipse at 65% 45%, #7A0D10 0%, #A6171C 60%);
+                min-height: 680px;">
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 relative z-10">
-        <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+    {{-- ── Decorative corndogs (absolute, z-0, desktop only) ── --}}
+    <div class="absolute bottom-0 left-0 z-0 hidden lg:block pointer-events-none"
+         style="width: clamp(180px, 20vw, 300px); opacity: 0.72; transform: rotate(-6deg); transform-origin: bottom left;">
+        <img src="{{ asset('assets/img/CA_MOZZA_POTATO.png') }}" alt=""
+             class="w-full object-contain object-bottom" draggable="false">
+    </div>
 
-            {{-- Left: text content --}}
-            <div class="flex-1 text-white text-center lg:text-left">
+    <div class="absolute z-0 hidden lg:block pointer-events-none"
+         style="right: 36%; top: 6%; width: 110px; opacity: 0.38; transform: rotate(18deg);">
+        <img src="{{ asset('assets/img/CA_DOUBLE_CHEESE.png') }}" alt=""
+             class="w-full object-contain" draggable="false">
+    </div>
 
-                {{-- Top quote badge --}}
-                <div class="hidden lg:inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full text-xs text-white/80"
-                     style="background-color: rgba(255,255,255,0.12);">
-                    <span>⭐</span>
-                    <span>"Pelayanannya cepat, corndognya fresh, toppingnya gak pelit. Auto order lagi!"</span>
+    <div class="absolute z-0 hidden xl:block pointer-events-none"
+         style="right: 2%; bottom: 8%; width: 90px; opacity: 0.35; transform: rotate(-14deg);">
+        <img src="{{ asset('assets/img/CA_CHEETOS.png') }}" alt=""
+             class="w-full object-contain" draggable="false">
+    </div>
+
+    {{-- ── Floating review card (z-20, sits on top of corndog) ── --}}
+    <div class="absolute z-20 hidden lg:block pointer-events-none"
+         style="right: 4%; top: 18%;">
+        <div class="bg-white rounded-2xl px-4 py-3"
+             style="min-width: 200px; max-width: 240px; box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center
+                            text-white text-xs font-bold flex-none"
+                     style="background-color: #F472B6;">S</div>
+                <div>
+                    <p class="text-xs font-bold leading-none" style="color: #1a1a1a;">Sarah K.</p>
+                    <p class="text-[10px] mt-0.5" style="color: #888;">Pelanggan Setia</p>
                 </div>
+            </div>
+            <p class="text-[10px] leading-relaxed" style="color: #444;">
+                "Corndognya gak ada tandingannya! Crispy di luar, lumer di dalam. Wajib coba!"
+            </p>
+            <div class="flex items-center gap-0.5 mt-2">
+                @for($i=0;$i<5;$i++)<span style="color: var(--color-accent); font-size: 10px;">★</span>@endfor
+            </div>
+        </div>
+    </div>
 
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
-                    Crispy Corndog,<br>Happy Mood
-                </h1>
-                <p class="text-sm sm:text-base opacity-80 mb-8 max-w-md mx-auto lg:mx-0 leading-relaxed">
-                    Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap gigitan.
-                    Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
-                </p>
+    <div class="relative z-10 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16
+                flex flex-col lg:flex-row items-center lg:items-stretch
+                gap-8 lg:gap-0 py-16 lg:py-0"
+         style="min-height: 680px;">
 
-                {{-- CTA + Social proof row --}}
-                <div class="flex flex-col sm:flex-row items-center lg:items-start gap-5 mb-6">
+        {{-- LEFT: text content — mirrors Figma left-[231px] start --}}
+        <div class="flex-1 text-white flex flex-col justify-center
+                    text-center lg:text-left lg:py-24 lg:pr-8">
 
-                    {{-- TRY NOW — white outlined pill (matches Figma) --}}
-                    <a href="#menu"
-                       class="inline-flex px-8 py-3 rounded-full font-bold text-sm tracking-widest
-                              border-2 transition-all hover:bg-white"
-                       style="border-color: var(--color-white); color: var(--color-white);"
-                       onmouseover="this.style.color='var(--color-primary)'"
-                       onmouseout="this.style.color='var(--color-white)'">
-                        TRY NOW
-                    </a>
+            {{-- Top review badge --}}
+            <div class="hidden lg:inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full
+                        text-xs text-white/80 self-start"
+                 style="background-color: rgba(255,255,255,0.12);">
+                <span>⭐</span>
+                <span>"Pelayanannya cepat, corndognya fresh, toppingnya gak pelit. Auto order lagi!"</span>
+            </div>
 
-                    {{-- Social proof --}}
-                    <div class="flex items-center gap-3">
-                        <div class="flex -space-x-2 flex-none">
-                            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center
-                                        text-white text-xs font-bold" style="background-color: #60A5FA;">A</div>
-                            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center
-                                        text-white text-xs font-bold" style="background-color: #A855F7;">D</div>
-                            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center
-                                        text-white text-xs font-bold" style="background-color: #F472B6;">B</div>
-                            <div class="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center
-                                        text-white text-xs font-bold" style="background-color: #4ADE80;">C</div>
-                        </div>
-                        <div class="text-xs text-white/80 leading-snug">
-                            <p class="font-semibold text-white text-sm">2,500+ Happy Corndog-Ku Lovers</p>
-                            <p class="flex items-center gap-1 mt-0.5">
-                                <span style="color: var(--color-accent);">★★★★★</span>
-                                <span>4.8</span>
-                            </p>
-                        </div>
+            <h1 class="font-helvetica leading-[1.05] mb-5
+                        text-4xl sm:text-5xl lg:text-[64px] xl:text-[70px]"
+                style="font-weight: 900; color: white;">
+                Crispy Corndog,<br>Happy Mood
+            </h1>
+
+            <p class="text-base sm:text-lg lg:text-[22px] leading-relaxed mb-8
+                      max-w-md mx-auto lg:mx-0 lg:max-w-[580px]"
+               style="opacity: 0.82;">
+                Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap
+                gigitan. Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
+            </p>
+
+            {{-- CTA + Social proof row --}}
+            <div class="flex flex-col sm:flex-row items-center lg:items-start gap-5 mb-6">
+
+                {{-- TRY NOW — white outlined pill --}}
+                <a href="#menu"
+                   class="inline-flex px-8 py-3.5 rounded-full font-bold text-sm tracking-widest
+                          border-2 transition-all duration-200 hover:bg-white font-helvetica"
+                   style="border-color: white; color: white;"
+                   onmouseover="this.style.color='var(--color-primary)'"
+                   onmouseout="this.style.color='white'">
+                    TRY NOW
+                </a>
+
+                {{-- Social proof --}}
+                <div class="flex items-center gap-3">
+                    <div class="flex -space-x-2 flex-none">
+                        <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center
+                                    text-white text-xs font-bold" style="background-color: #60A5FA;">A</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center
+                                    text-white text-xs font-bold" style="background-color: #A855F7;">D</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center
+                                    text-white text-xs font-bold" style="background-color: #F472B6;">B</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center
+                                    text-white text-xs font-bold" style="background-color: #4ADE80;">C</div>
+                    </div>
+                    <div class="text-xs text-white/80 leading-snug">
+                        <p class="font-semibold text-white text-sm">2,500+ Happy Corndog-Ku Lovers</p>
+                        <p class="flex items-center gap-1 mt-0.5">
+                            <span style="color: var(--color-accent);">★★★★★</span>
+                            <span>4.8</span>
+                        </p>
                     </div>
                 </div>
-
-                {{-- Social icons --}}
-                <div class="flex items-center gap-3 justify-center lg:justify-start opacity-70">
-                    <span class="text-xs text-white">Ikuti kami:</span>
-                    @foreach(['IG','TK','YT'] as $s)
-                        <span class="w-7 h-7 rounded-full border border-white/50 flex items-center
-                                     justify-center text-[10px] font-bold text-white cursor-pointer
-                                     hover:border-white transition-colors">{{ $s }}</span>
-                    @endforeach
-                </div>
             </div>
 
-            {{-- Right: hero corndog image --}}
-            <div class="flex-none flex items-end justify-center w-48 lg:w-64 self-stretch">
-                <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}"
-                     alt="Corndog-Ku"
-                     class="w-full max-h-96 object-contain object-bottom drop-shadow-2xl">
+            {{-- Social icons --}}
+            <div class="flex items-center gap-3 justify-center lg:justify-start opacity-70">
+                <span class="text-xs text-white">Ikuti kami:</span>
+                @foreach(['IG','TK','YT'] as $s)
+                    <span class="w-7 h-7 rounded-full border border-white/50 flex items-center
+                                 justify-center text-[10px] font-bold text-white cursor-pointer
+                                 hover:border-white transition-colors">{{ $s }}</span>
+                @endforeach
             </div>
-
         </div>
+
+        {{-- RIGHT: hero corndog image — anchored to bottom, overflows naturally --}}
+        <div class="flex-none flex items-end justify-center
+                    w-full lg:w-[42%] xl:w-[40%]
+                    lg:self-stretch">
+            <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}"
+                 alt="Corndog-Ku"
+                 class="w-64 sm:w-80 lg:w-full lg:max-w-[520px]
+                        object-contain object-bottom drop-shadow-2xl
+                        lg:max-h-[720px]"
+                 style="margin-bottom: -1px;">
+        </div>
+
     </div>
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     3. SCROLLING TICKER
+     3. SCROLLING TICKER — full width, 100px tall, 40px bold text
 ══════════════════════════════════════════════════════════════ --}}
-<div class="overflow-hidden py-3.5" style="background-color: var(--color-primary);">
-    <div class="ticker-track flex whitespace-nowrap">
+<div class="w-full overflow-hidden flex items-center" style="background-color: var(--color-primary); height: 100px;">
+    <div class="ticker-track flex whitespace-nowrap items-center">
         @for ($i = 0; $i < 2; $i++)
-            <div class="flex items-center gap-0">
-                @foreach(array_fill(0, 7, 'ISI HARI MU DENGAN CORNDOG') as $t)
-                    <span class="flex items-center gap-6 px-6">
-                        <span class="w-3 h-3 rounded-full bg-white flex-none"></span>
-                        <span class="text-white font-bold text-sm tracking-widest">{{ $t }}</span>
+            <div class="flex items-center">
+                @foreach(array_fill(0, 8, 'ISI HARI MU DENGAN CORNDOG') as $t)
+                    <span class="flex items-center gap-8 px-8">
+                        <span class="w-4 h-4 rounded-full bg-white flex-none opacity-80"></span>
+                        <span class="text-white font-bold tracking-widest font-helvetica"
+                              style="font-size: clamp(24px, 2.5vw, 40px); font-weight: 900;">{{ $t }}</span>
                     </span>
                 @endforeach
             </div>
@@ -217,94 +331,150 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════
-     4. PROMO CARDS  (2-column: left=2 stacked, right=1 large)
+     4. PROMO BANNERS — full-width section, dynamic asymmetric grid
 ══════════════════════════════════════════════════════════════ --}}
-<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-hidden">
-    <div class="flex flex-col md:flex-row gap-4 min-h-[380px]">
+<section class="w-full" style="background-color: var(--color-light);">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-10 lg:py-14">
 
-        {{-- Left: two stacked cards --}}
-        <div class="flex flex-col gap-4 flex-1">
+        {{-- Two-column grid: left 2-stack + right 1 large --}}
+        <div class="flex flex-col lg:flex-row gap-5 lg:gap-6" style="min-height: 570px;">
 
-            {{-- Card A: Sweet & Chilly — Korean Bingsu --}}
-            <div class="relative rounded-2xl overflow-hidden flex-1 min-h-[170px] flex flex-col justify-between p-5"
-                 style="background-color: var(--color-accent);">
-                {{-- Food photo (right) --}}
-                <img src="{{ asset('assets/img/BS_STRAWBERRY_CREAMY.png') }}"
-                     alt="Korean Bingsu"
-                     class="absolute right-3 bottom-0 h-36 object-contain pointer-events-none">
-                {{-- Tag overlay --}}
+            {{-- LEFT COLUMN: two stacked cards --}}
+            <div class="flex flex-col gap-5 lg:gap-6 lg:w-[44%] lg:flex-none">
+
+                {{-- Card A: Korean Bingsu (TOP) — amber/yellow bg --}}
+                <div class="promo-card relative rounded-[32px] lg:rounded-[40px] overflow-hidden
+                            flex-1 min-h-[200px] lg:min-h-0 flex flex-col justify-between p-6 sm:p-8"
+                     style="background-color: var(--color-accent);
+                            box-shadow: var(--shadow-card);">
+
+                    {{-- Decorative dots pattern --}}
+                    <div class="absolute inset-0 opacity-20 pointer-events-none"
+                         style="background-image: radial-gradient(circle, #A6171C 1px, transparent 1px);
+                                background-size: 24px 24px;"></div>
+
+                    {{-- Food image (absolute right) --}}
+                    <img src="{{ asset('assets/img/BS_STRAWBERRY_CREAMY.png') }}"
+                         alt="Korean Bingsu"
+                         class="absolute right-4 bottom-0 h-40 sm:h-48 object-contain pointer-events-none
+                                drop-shadow-lg z-10">
+
+                    {{-- Tag --}}
+                    <div class="relative z-10">
+                        <p class="text-xs font-semibold uppercase tracking-widest mb-1"
+                           style="color: rgba(0,0,0,0.5);">Sweet &amp; Chilly</p>
+                        <p class="font-helvetica leading-tight" style="font-size: clamp(26px, 3vw, 36px); font-weight: 900; color: var(--color-black);">
+                            KOREAN<br>BINGSU
+                        </p>
+                    </div>
+
+                    {{-- Bottom: button + discount --}}
+                    <div class="relative z-10 flex items-end justify-between mt-4 pr-48 sm:pr-52">
+                        <button class="text-xs font-bold px-5 py-2 rounded-full hover:opacity-80 transition-opacity"
+                                style="background-color: var(--color-primary); color: white;">
+                            Order Now 🔥
+                        </button>
+                        <div class="text-right">
+                            <p class="text-xs font-medium" style="color: rgba(0,0,0,0.5);">Up to</p>
+                            <p class="font-helvetica leading-none" style="font-size: clamp(32px, 4vw, 48px); font-weight: 900; color: var(--color-primary);">40%</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card B: Cheesy Bites (BOTTOM) — red bg --}}
+                <div class="promo-card relative rounded-[32px] lg:rounded-[40px] overflow-hidden
+                            flex-1 min-h-[200px] lg:min-h-0 flex flex-col justify-between p-6 sm:p-8"
+                     style="background-color: var(--color-primary);
+                            box-shadow: var(--shadow-card);">
+
+                    {{-- Decorative dots --}}
+                    <div class="absolute inset-0 opacity-10 pointer-events-none"
+                         style="background-image: radial-gradient(circle, #FFBE54 1px, transparent 1px);
+                                background-size: 24px 24px;"></div>
+
+                    {{-- Food image --}}
+                    <img src="{{ asset('assets/img/CM_CHOCO_CHRUNCH_CHEESE.png') }}"
+                         alt="Cheesy Bites"
+                         class="absolute right-4 bottom-0 h-44 sm:h-52 object-contain pointer-events-none
+                                drop-shadow-lg z-10">
+
+                    {{-- Tag --}}
+                    <div class="relative z-10">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-white/60 mb-1">SUPER</p>
+                        <p class="font-helvetica text-white leading-tight" style="font-size: clamp(26px, 3vw, 36px); font-weight: 900;">
+                            CHEESY BITES
+                        </p>
+                    </div>
+
+                    {{-- Bottom --}}
+                    <div class="relative z-10 flex items-end justify-between mt-4 pr-48 sm:pr-56">
+                        <button class="text-xs font-bold px-5 py-2 rounded-full hover:opacity-80 transition-opacity"
+                                style="background-color: white; color: var(--color-primary);">
+                            Order Now 🔥
+                        </button>
+                        <div class="text-right">
+                            <p class="text-xs font-medium text-white/60">Up to</p>
+                            <p class="font-helvetica text-white leading-none" style="font-size: clamp(32px, 4vw, 48px); font-weight: 900;">50%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- RIGHT: Korean Corndogs large card --}}
+            <div class="promo-card relative rounded-[32px] lg:rounded-[40px] overflow-hidden
+                        flex-1 flex flex-col justify-between p-7 sm:p-10
+                        min-h-[340px] lg:min-h-0"
+                 style="background-color: #ffebc3;
+                        box-shadow: var(--shadow-card);">
+
+                {{-- Diagonal CORNDOG-KU watermark text (Londrina Shadow) --}}
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
+                     style="transform: rotate(-14deg); transform-origin: center;">
+                    <div class="font-londrina whitespace-nowrap leading-[1.1] select-none"
+                         style="color: rgba(255,190,84,0.45); font-size: clamp(80px, 10vw, 128px);">
+                        <div>CORNDOG-KU CORNDOG-KU</div>
+                        <div>CORNDOG-KU CORNDOG-KU</div>
+                        <div>CORNDOG-KU CORNDOG-KU</div>
+                        <div>CORNDOG-KU CORNDOG-KU</div>
+                    </div>
+                </div>
+
+                {{-- Food image — large, centered --}}
+                <img src="{{ asset('assets/img/CA_MOZZA_POTATO.png') }}"
+                     alt="Loaded Korean Corndogs"
+                     class="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                     style="opacity: 0.5; mix-blend-mode: multiply;">
+
+                {{-- Top label --}}
                 <div class="relative z-10">
-                    <p class="text-xs font-semibold" style="color: rgba(0,0,0,0.55);">Sweet &amp; Chilly</p>
-                    <p class="text-2xl font-black leading-tight mt-0.5" style="color: var(--color-black);">
-                        KOREAN<br>BINGSU
+                    <p class="text-xs font-bold tracking-[0.2em] uppercase"
+                       style="color: rgba(0,0,0,0.55);">LOADED</p>
+                    <p class="font-helvetica leading-tight mt-1"
+                       style="font-size: clamp(30px, 3.5vw, 42px); font-weight: 900; color: #1a1a1a;">
+                        KOREAN<br>CORNDOGS
                     </p>
                 </div>
-                <div class="relative z-10 flex items-end justify-between">
-                    <button class="text-xs font-bold px-4 py-1.5 rounded-full hover:opacity-80"
-                            style="background-color: var(--color-primary); color: white;">
-                        Order Now 🔥
-                    </button>
-                    <div class="text-right pr-40">
-                        <p class="text-xs font-medium" style="color: rgba(0,0,0,0.5);">Up to</p>
-                        <p class="text-3xl font-black leading-none" style="color: var(--color-primary);">40%</p>
+
+                {{-- Bottom BUY NOW stamp --}}
+                <div class="relative z-10 flex justify-end">
+                    <div class="w-28 h-28 lg:w-32 lg:h-32 rounded-full bg-white shadow-xl
+                                flex flex-col items-center justify-center
+                                transition-transform duration-200 hover:scale-105">
+                        <p class="font-helvetica leading-none" style="font-size: 26px; font-weight: 900; color: var(--color-black);">BUY</p>
+                        <p class="font-helvetica leading-none" style="font-size: 26px; font-weight: 900; color: var(--color-black);">NOW</p>
                     </div>
                 </div>
             </div>
 
-            {{-- Card B: Super Cheesy Bites --}}
-            <div class="relative rounded-2xl overflow-hidden flex-1 min-h-[170px] flex flex-col justify-between p-5"
-                 style="background-color: var(--color-primary);">
-                <img src="{{ asset('assets/img/CM_CHOCO_CHRUNCH_CHEESE.png') }}"
-                     alt="Cheesy Bites"
-                     class="absolute right-3 bottom-0 h-40 object-contain pointer-events-none">
-                <div class="relative z-10">
-                    <p class="text-xs font-semibold text-white/60">SUPER</p>
-                    <p class="text-2xl font-black text-white leading-tight mt-0.5">CHEESY BITES</p>
-                </div>
-                <div class="relative z-10 flex items-end justify-between">
-                    <button class="text-xs font-bold px-4 py-1.5 rounded-full hover:opacity-80"
-                            style="background-color: var(--color-white); color: var(--color-primary);">
-                        Order Now 🔥
-                    </button>
-                    <div class="text-right pr-40">
-                        <p class="text-xs font-medium text-white/60">Up to</p>
-                        <p class="text-3xl font-black text-white leading-none">50%</p>
-                    </div>
-                </div>
-            </div>
         </div>
-
-        {{-- Right: Loaded Korean Corndogs (large card) --}}
-        <div class="relative rounded-2xl overflow-hidden md:flex-1 min-h-[380px] flex flex-col justify-between p-6"
-             style="background-color: #FFF3D6;">
-            <img src="{{ asset('assets/img/CA_MOZZA_POTATO.png') }}"
-                 alt="Loaded Korean Corndogs"
-                 class="absolute inset-0 w-full h-full object-cover"
-                 style="opacity: 0.55;">
-            {{-- Text overlay --}}
-            <div class="relative z-10">
-                <p class="text-xs font-bold tracking-widest text-gray-800/70">LOADED</p>
-                <p class="text-3xl font-black leading-tight text-gray-900 mt-1">
-                    KOREAN<br>CORNDOGS
-                </p>
-            </div>
-            {{-- BUY NOW badge --}}
-            <div class="relative z-10 flex justify-end">
-                <div class="w-28 h-28 rounded-full bg-white shadow-lg flex flex-col items-center justify-center">
-                    <p class="text-2xl font-black leading-none" style="color: var(--color-black);">BUY</p>
-                    <p class="text-2xl font-black leading-none" style="color: var(--color-black);">NOW</p>
-                </div>
-            </div>
-        </div>
-
     </div>
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     5. CUSTOMIZE CORNDOG — CTA BANNER
+     5. CUSTOMIZE CORNDOG — full-width CTA banner
 ══════════════════════════════════════════════════════════════ --}}
-<section class="py-8 sm:py-10" style="background-color: var(--color-light);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="w-full py-8 sm:py-10" style="background-color: var(--color-light);">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
 
         <a href="{{ route('customize') }}"
            class="group relative flex flex-col sm:flex-row items-center justify-between gap-0 sm:gap-6
@@ -344,27 +514,23 @@
 
                 {{-- Big title --}}
                 <div class="leading-none tracking-tight mb-1">
-                    <span class="block text-5xl sm:text-6xl font-black"
-                          style="color: var(--color-black);">CUSTOM</span>
-                    <span class="block text-5xl sm:text-6xl font-black"
-                          style="color: var(--color-primary);">CORNDOG</span>
+                    <span class="block font-helvetica" style="font-size: clamp(40px, 5vw, 64px); font-weight: 900; color: var(--color-black);">CUSTOM</span>
+                    <span class="block font-helvetica" style="font-size: clamp(40px, 5vw, 64px); font-weight: 900; color: var(--color-primary);">CORNDOG</span>
                 </div>
 
-                {{-- Wavy underline SVG --}}
+                {{-- Wavy underline --}}
                 <svg class="mt-1 mb-4 mx-auto sm:mx-0" width="200" height="12"
                      viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2 6 Q25 2 48 6 Q71 10 94 6 Q117 2 140 6 Q163 10 186 6 Q194 4 198 6"
                           stroke="#A6171C" stroke-width="3" stroke-linecap="round" fill="none"/>
                 </svg>
 
-                {{-- Subtitle --}}
                 <p class="text-sm sm:text-base font-semibold mb-7 max-w-xs mx-auto sm:mx-0"
                    style="color: rgba(0,0,0,0.60);">
                     Buat Corndog Kustom-mu Sendiri —
                     pilih isi, varian, dan saos sesuai seleramu!
                 </p>
 
-                {{-- CTA button --}}
                 <div class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full
                             font-bold text-sm text-white
                             transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg"
@@ -381,12 +547,10 @@
             <div class="relative z-10 flex-none flex items-end justify-center
                         px-8 sm:px-10 pb-0 sm:pb-0 pt-4 sm:pt-0">
 
-                {{-- Organic peach blob behind image --}}
                 <div class="relative w-52 h-52 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-end justify-center"
                      style="border-radius: 58% 42% 46% 54% / 52% 44% 56% 48%;
                             background-color: #FDECD8;">
 
-                    {{-- Spark accent --}}
                     <span class="absolute top-2 right-3 text-2xl pointer-events-none"
                           style="color: var(--color-primary);">✦</span>
 
@@ -396,7 +560,6 @@
                                 transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-2">
                 </div>
 
-                {{-- Small sparkle outside blob --}}
                 <span class="absolute bottom-8 right-4 sm:right-8 text-base pointer-events-none opacity-50"
                       style="color: var(--color-primary);">✦</span>
             </div>
@@ -406,105 +569,117 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     6. MENU CATEGORIES + PRODUCT GRID  (id="menu")
+     6. MENU CATEGORIES + PER-CATEGORY PRODUCT MARQUEES (id="menu")
 ══════════════════════════════════════════════════════════════ --}}
-<section id="menu" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+<section id="menu" class="w-full" style="background-color: var(--color-light);">
 
-    <h2 class="text-2xl font-bold text-center mb-6" style="color: var(--color-black);">
-        Menu Categories
-    </h2>
+    {{-- Section heading --}}
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 pt-12 pb-0">
+        <h2 class="font-helvetica text-center mb-8"
+            style="font-size: clamp(28px, 3vw, 40px); font-weight: 900; color: var(--color-black);">
+            Menu Categories
+        </h2>
+    </div>
 
-    {{-- Category pills — horizontally scrollable on mobile --}}
-    <div class="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div class="flex gap-2 min-w-max sm:min-w-0 sm:flex-wrap justify-center">
+    {{-- ── Category tab buttons (static, DB-driven) ──────────────── --}}
+    <div class="flex flex-row overflow-x-auto justify-center gap-4 w-full hide-scrollbar px-4 pb-6">
+        @foreach ($categories as $category)
             <button type="button"
-                    class="cat-tab px-5 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-all hover:opacity-80 active"
-                    data-cat="Semua"
-                    style="background-color: var(--color-primary); color: white; border-color: var(--color-primary);">
-                Semua
+                    class="category-btn relative flex-none px-8 py-2.5 font-bold whitespace-nowrap
+                           transition-all hover:opacity-90
+                           {{ $loop->first ? 'cat-btn-active' : 'cat-btn-inactive' }}"
+                    data-target="marquee-{{ $category->id }}"
+                    style="{{ $loop->first
+                        ? 'background-color: white; color: var(--color-primary); border-radius: 9999px; box-shadow: 0 4px 20px rgba(0,0,0,0.14);'
+                        : 'background-color: var(--color-primary); color: white; border-radius: 9999px;' }}">
+                {{ $category->name }}
+                {{-- Speech-bubble triangle tail (visible only on active) --}}
+                <span class="active-tail pointer-events-none absolute left-1/2 {{ $loop->first ? '' : 'hidden' }}"
+                      style="bottom: -9px; width: 16px; height: 16px;
+                             background-color: white;
+                             transform: translateX(-50%) rotate(45deg);
+                             clip-path: polygon(100% 0%, 100% 100%, 0% 100%);
+                             border-radius: 0 0 3px 0;"></span>
             </button>
-            @foreach ($categories as $cat)
-                <button type="button"
-                        class="cat-tab px-5 py-2 rounded-full text-sm font-semibold border whitespace-nowrap transition-all hover:opacity-80"
-                        data-cat="{{ $cat }}"
-                        style="background-color: white; color: var(--color-black); border-color: var(--color-border);">
-                    {{ $cat }}
-                </button>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- Active label + result count --}}
-    <div class="flex items-center justify-between mt-5 mb-4">
-        <div>
-            <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Menampilkan</span>
-            <span id="active-cat-label" class="ml-1 text-xs font-bold" style="color: var(--color-primary);">Semua</span>
-        </div>
-        <span id="result-count" class="text-xs text-gray-400 font-medium">
-            {{ $products->count() }} produk
-        </span>
-    </div>
-
-    {{-- Product grid --}}
-    <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-        @foreach ($products as $product)
-            <div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer
-                        hover:shadow-xl transition-all duration-200"
-                 data-category="{{ $product->category->name }}"
-                 data-price="{{ $product->price }}"
-                 data-name="{{ strtolower($product->name) }}"
-                 style="box-shadow: var(--shadow-card);">
-
-                {{-- Image: uniform crop locked into card top --}}
-                <div class="overflow-hidden rounded-t-2xl">
-                    <img src="{{ asset($product->image) }}"
-                         alt="{{ $product->name }}"
-                         class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300 hover:scale-105"
-                         onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
-                </div>
-
-                {{-- Text area --}}
-                <div class="px-4 pt-3 pb-4 flex flex-col flex-1">
-                    <p class="font-bold text-sm leading-snug" style="color: var(--color-primary);">
-                        {{ $product->name }}
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">
-                        {{ $product->description }}
-                    </p>
-                    <div class="flex items-center justify-between mt-3 gap-2">
-                        <p class="text-sm font-black" style="color: var(--color-primary);">
-                            Rp {{ number_format($product->price, 0, ',', '.') }}
-                        </p>
-                        <button type="button"
-                                class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
-                                style="background-color: var(--color-accent); color: var(--color-black);"
-                                data-id="{{ $product->id }}"
-                                data-name="{{ $product->name }}"
-                                data-price="{{ $product->price }}"
-                                data-description="{{ $product->description }}"
-                                data-image="{{ asset($product->image) }}">
-                            Pesan
-                        </button>
-                    </div>
-                </div>
-            </div>
         @endforeach
     </div>
 
-    {{-- Empty state --}}
-    <div id="empty-state" class="hidden py-20 text-center">
-        <div class="text-5xl mb-4">🌽</div>
-        <p class="font-bold text-lg" style="color: var(--color-black);">Produk tidak ditemukan</p>
-        <p class="text-sm text-gray-400 mt-1">Coba pilih kategori lain.</p>
-    </div>
+    {{-- ── One marquee container per category ──────────────────────── --}}
+    @foreach ($categories as $category)
+        @php $catProducts = $products->where('category_id', $category->id); @endphp
+
+        <div id="marquee-{{ $category->id }}"
+             class="category-marquee-container overflow-hidden w-full py-10 {{ $loop->first ? '' : 'hidden' }}">
+
+            @if ($catProducts->isEmpty())
+                <div class="py-16 text-center">
+                    <div class="text-4xl mb-3">🌽</div>
+                    <p class="font-bold text-base" style="color: var(--color-black);">Belum ada produk di kategori ini.</p>
+                </div>
+            @else
+                <div class="marquee-track hover:[animation-play-state:paused]">
+                    @for ($r = 0; $r < 2; $r++)
+                        @foreach ($catProducts as $product)
+                            <div class="product-card relative bg-white rounded-3xl shadow-sm p-4 pt-14
+                                         w-[240px] md:w-[260px] shrink-0 mx-3 flex flex-col justify-between
+                                         cursor-pointer hover:-translate-y-1 transition-all duration-200"
+                                 data-category="{{ $product->category->name }}"
+                                 data-price="{{ $product->price }}"
+                                 data-name="{{ strtolower($product->name) }}"
+                                 style="box-shadow: var(--shadow-card);">
+
+                                {{-- Image pops out of card top --}}
+                                <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full
+                                            flex items-center justify-center"
+                                     style="background-color: #FDECD8;">
+                                    <img src="{{ asset($product->image) }}"
+                                         alt="{{ $product->name }}"
+                                         class="w-16 h-16 object-contain drop-shadow-md"
+                                         onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
+                                </div>
+
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-center mb-1"
+                                       style="color: var(--color-accent);">{{ $product->category->name }}</p>
+                                    <p class="font-bold text-sm text-center leading-snug mb-1"
+                                       style="color: var(--color-primary);">{{ $product->name }}</p>
+                                    <p class="text-[11px] text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
+                                        {{ $product->description }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-1 mt-auto">
+                                    <p class="text-sm font-black" style="color: var(--color-primary);">
+                                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                                    </p>
+                                    <button type="button"
+                                            class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold
+                                                   transition-opacity hover:opacity-80"
+                                            style="background-color: var(--color-accent); color: var(--color-black);"
+                                            data-id="{{ $product->id }}"
+                                            data-name="{{ $product->name }}"
+                                            data-price="{{ $product->price }}"
+                                            data-description="{{ $product->description }}"
+                                            data-image="{{ asset($product->image) }}">
+                                        Pesan
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endfor
+                </div>
+            @endif
+
+        </div>
+    @endforeach
 
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     7. LOCATION & HOURS
+     7. LOCATION & HOURS — full-width section
 ══════════════════════════════════════════════════════════════ --}}
-<section class="py-16" style="background-color: var(--color-white);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="w-full py-16" style="background-color: var(--color-white);">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
             {{-- Map embed --}}
@@ -557,12 +732,11 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     8. TESTIMONIALS — "Your trust in us"
+     8. TESTIMONIALS — full-width "Your trust in us"
 ══════════════════════════════════════════════════════════════ --}}
-<section class="py-16" style="background-color: #FFF9E6;">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="w-full py-16" style="background-color: #FFF9E6;">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
 
-        {{-- Title: white pill badge, left-aligned (matches Figma) --}}
         <div class="mb-8">
             <span class="inline-block bg-white font-bold text-lg px-5 py-2 rounded-full shadow-sm"
                   style="color: var(--color-black);">Your trust in us</span>
@@ -582,7 +756,6 @@
                 <div class="bg-white rounded-2xl p-5 flex flex-col gap-3"
                      style="box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
 
-                    {{-- Header row: avatar + name/date + Google G --}}
                     <div class="flex items-start justify-between gap-2">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center text-white
@@ -596,7 +769,6 @@
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $review['date'] }}</p>
                             </div>
                         </div>
-                        {{-- Google G icon --}}
                         <svg class="w-5 h-5 flex-none mt-0.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -605,14 +777,12 @@
                         </svg>
                     </div>
 
-                    {{-- Gold stars --}}
                     <div class="flex gap-0.5">
                         @for ($i = 0; $i < 5; $i++)
                             <span class="text-base" style="color: var(--color-accent);">★</span>
                         @endfor
                     </div>
 
-                    {{-- Review text --}}
                     <p class="text-xs leading-relaxed text-gray-600 flex-1">{{ $review['text'] }}</p>
                 </div>
             @endforeach
@@ -621,10 +791,10 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     9. FOOTER
+     9. FOOTER — full-width
 ══════════════════════════════════════════════════════════════ --}}
-<footer style="background-color: var(--color-primary);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<footer class="w-full" style="background-color: var(--color-primary);">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
             {{-- Brand column --}}
@@ -632,11 +802,10 @@
                 <img src="{{ asset('assets/img/logo.png') }}"
                      alt="Corndog-Ku"
                      class="w-14 h-14 rounded-full object-cover border-2 border-white/30 mb-4">
-                <p class="text-white font-bold text-2xl leading-snug mb-1">
+                <p class="text-white font-bold text-2xl leading-snug mb-1 font-helvetica">
                     Beli dimana saja,<br>pesan kapan saja
                 </p>
                 <p class="text-white/70 text-sm font-semibold mt-3 mb-3">Tersedia Order Online</p>
-                {{-- Delivery app badges --}}
                 <div class="flex gap-3">
                     <div class="flex items-center gap-2 bg-white rounded-xl px-3 py-2 shadow-sm">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
@@ -665,7 +834,6 @@
             <div>
                 <h4 class="text-white font-bold mb-4 text-sm">Follow Us</h4>
                 <div class="flex items-center gap-3">
-                    {{-- WhatsApp --}}
                     <a href="#"
                        class="w-9 h-9 rounded-full border border-white/40 flex items-center justify-center
                               hover:border-white transition-colors"
@@ -674,7 +842,6 @@
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                         </svg>
                     </a>
-                    {{-- Instagram --}}
                     <a href="#"
                        class="w-9 h-9 rounded-full border border-white/40 flex items-center justify-center
                               hover:border-white transition-colors"
@@ -687,7 +854,6 @@
             </div>
         </div>
 
-        {{-- Bottom bar --}}
         <div class="mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3
                     text-xs text-white/40"
              style="border-top: 1px solid rgba(255,255,255,0.15);">
@@ -704,15 +870,16 @@
 {{-- ══════════════════════════════════════════════════════════════
      PRODUCT DETAIL MODAL
 ══════════════════════════════════════════════════════════════ --}}
-<div id="product-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden transition-opacity duration-300" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+<div id="product-modal"
+     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden"
+     style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
 
-    {{-- Modal box --}}
-    <div id="product-modal-box" class="bg-white rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.5)] border border-gray-700 w-full max-w-md flex flex-col relative transform scale-100">
+    <div id="product-modal-box"
+         class="bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-3xl flex flex-col md:flex-row relative">
 
-        {{-- X close button --}}
+        {{-- Close button --}}
         <button type="button" id="modal-close"
-                class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center
-                       rounded-full bg-white/80 hover:bg-gray-100 transition-colors"
+                class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-gray-100 transition-colors"
                 aria-label="Tutup">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -720,21 +887,27 @@
             </svg>
         </button>
 
-        {{-- Product image --}}
-        <img id="modal-image" src="" alt="" class="w-full h-56 object-cover">
+        {{-- LEFT: Product image on warm peach background --}}
+        <div class="w-full md:w-1/2 flex justify-center items-center p-6 md:p-10"
+             style="background-color: #FDECD8; min-height: 280px;">
+            <img id="modal-image" src="" alt=""
+                 class="w-full max-w-[240px] md:max-w-none h-56 md:h-72 object-contain drop-shadow-xl">
+        </div>
 
-        {{-- Content --}}
-        <div class="p-6 flex flex-col gap-4">
+        {{-- RIGHT: Details --}}
+        <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between gap-5">
 
+            {{-- Name + price --}}
             <div>
                 <h3 id="modal-title"
-                    class="text-xl font-bold leading-tight"
+                    class="text-xl font-bold leading-snug mb-2"
                     style="color: var(--color-black);"></h3>
                 <p id="modal-price"
-                   class="text-base font-semibold mt-1"
+                   class="text-xl font-black"
                    style="color: var(--color-primary);"></p>
             </div>
 
+            {{-- Description --}}
             <p id="modal-description"
                class="text-sm leading-relaxed"
                style="color: #525252;"></p>
@@ -745,81 +918,178 @@
                 <div class="flex items-center gap-2 px-2 py-1.5 rounded-[8px]"
                      style="background-color: rgba(255,203,99,0.24); border: 1px solid #ffcb63;">
                     <button type="button" id="modal-qty-minus"
-                            class="w-7 h-7 rounded-full flex items-center justify-center
-                                   font-bold text-base leading-none hover:opacity-70"
-                            style="background-color: #ffcb63; color: #525252;">
-                        &#8722;
-                    </button>
-                    <span id="modal-qty"
-                          class="w-7 text-center font-bold text-sm"
-                          style="color: #3d3d3d;">1</span>
+                            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-base leading-none hover:opacity-70"
+                            style="background-color: #ffcb63; color: #525252;">&#8722;</button>
+                    <span id="modal-qty" class="w-7 text-center font-bold text-sm" style="color: #3d3d3d;">1</span>
                     <button type="button" id="modal-qty-plus"
-                            class="w-7 h-7 rounded-full flex items-center justify-center
-                                   font-bold text-base leading-none hover:opacity-70"
-                            style="background-color: var(--color-primary); color: white;">
-                        +
-                    </button>
+                            class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-base leading-none hover:opacity-70"
+                            style="background-color: var(--color-primary); color: white;">+</button>
                 </div>
             </div>
 
-            {{-- CTA button --}}
-            <button type="button" id="modal-btn-cart"
-                    class="w-full py-3 font-bold text-sm text-white hover:opacity-90 transition-opacity"
-                    style="border-radius: 12px; background-color: var(--color-primary);">
-                Tambah ke Keranjang
-            </button>
+            {{-- Action buttons --}}
+            <div class="flex flex-col gap-3">
+                {{-- Outline: add to cart, stay on page --}}
+                <button type="button"
+                        class="btn-add-only w-full py-3 rounded-xl text-sm font-bold
+                               flex items-center justify-center gap-2 border-2 transition-opacity hover:opacity-80"
+                        style="border-color: var(--color-primary); color: var(--color-primary); background-color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-none" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Masukan Ke Keranjang
+                </button>
 
-        </div>{{-- /.content --}}
+                {{-- Solid: add then redirect to cart --}}
+                <button type="button"
+                        class="btn-order-now w-full py-3 rounded-xl text-sm font-bold
+                               text-white transition-opacity hover:opacity-85"
+                        style="background-color: var(--color-primary);">
+                    Pesan Sekarang
+                </button>
+            </div>
+        </div>
 
     </div>{{-- /#product-modal-box --}}
-
 </div>{{-- /#product-modal --}}
 
 <script>
 $(function () {
-    var activeCat = 'Semua';
 
-    function applyFilters() {
-        var visible = 0;
-        $('#product-grid .product-card').each(function () {
-            var cat  = $(this).data('category');
-            var show = (activeCat === 'Semua') || (cat === activeCat);
-            $(this).toggleClass('hidden', !show);
-            if (show) visible++;
-        });
-        $('#result-count').text(visible + ' produk');
-        $('#empty-state').toggleClass('hidden', visible > 0);
-    }
-
-    $(document).on('click', '.cat-tab', function () {
-        activeCat = $(this).data('cat');
-        $('.cat-tab').removeClass('active')
-                     .css({ 'background-color': 'white', 'color': 'var(--color-black)', 'border-color': 'var(--color-border)' });
-        $(this).addClass('active')
-               .css({ 'background-color': 'var(--color-primary)', 'color': 'white', 'border-color': 'var(--color-primary)' });
-        $('#active-cat-label').text(activeCat);
-        applyFilters();
+    /* ── CSRF header for all AJAX requests ───────────────── */
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
-    applyFilters();
+    /* ── Current modal product data ─────────────────────── */
+    var currentProductId    = null;
+    var currentProductPrice = 0;
+    var currentProductImage = '';
+    var currentProductDesc  = '';
 
-    /* ══════════════════════════════════════════════════════════
-       PRODUCT DETAIL MODAL
-    ══════════════════════════════════════════════════════════ */
+    /* ── Category tab → marquee switcher ───────────────────── */
+    $('.category-btn').on('click', function () {
+        var target = $(this).data('target');
+
+        // Reset all buttons to inactive
+        $('.category-btn')
+            .removeClass('cat-btn-active')
+            .addClass('cat-btn-inactive')
+            .css({ 'background-color': 'var(--color-primary)', 'color': 'white', 'box-shadow': 'none' });
+        $('.category-btn .active-tail').addClass('hidden');
+
+        // Activate the clicked button
+        $(this)
+            .removeClass('cat-btn-inactive')
+            .addClass('cat-btn-active')
+            .css({ 'background-color': 'white', 'color': 'var(--color-primary)', 'box-shadow': '0 4px 20px rgba(0,0,0,0.14)' });
+        $(this).find('.active-tail').removeClass('hidden');
+
+        // Swap marquee containers
+        $('.category-marquee-container').addClass('hidden');
+        $('#' + target).removeClass('hidden');
+    });
+
     function fmtRp(n) {
         return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
     $(document).on('click', '.btn-pesan', function () {
         var $b = $(this);
+        currentProductId    = $b.data('id');
+        currentProductPrice = parseInt($b.data('price'), 10) || 0;
+        currentProductImage = $b.data('image');
+        currentProductDesc  = $b.data('description');
+
         $('#modal-title').text($b.data('name'));
-        $('#modal-price').text(fmtRp(parseInt($b.data('price'), 10) || 0) + ' / pcs');
-        $('#modal-description').text($b.data('description'));
-        $('#modal-image').attr({ src: $b.data('image'), alt: $b.data('name') });
+        $('#modal-price').text(fmtRp(currentProductPrice) + ' / pcs');
+        $('#modal-description').text(currentProductDesc);
+        $('#modal-image').attr({ src: currentProductImage, alt: $b.data('name') });
         $('#modal-qty').text('1');
         $('#product-modal').removeClass('hidden').addClass('flex');
         $('body').css('overflow', 'hidden');
     });
+
+    /* ── Add to cart (outline button) — stay on page ────── */
+    $(document).on('click', '.btn-add-only', function () {
+        var $btn     = $(this);
+        var origHtml = $btn.html();
+        var qty      = parseInt($('#modal-qty').text(), 10) || 1;
+
+        $btn.prop('disabled', true).text('Menambahkan...');
+
+        $.ajax({
+            url:    '{{ route("cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id:  currentProductId,
+                name:        $('#modal-title').text(),
+                price:       currentProductPrice,
+                qty:         qty,
+                image:       currentProductImage,
+                description: currentProductDesc,
+            },
+            success: function (response) {
+                if (response.success) {
+                    closeModal();
+                    showCartToast('Ditambahkan ke keranjang!');
+                    $('#cart-badge').text(response.count);
+                }
+            },
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html(origHtml);
+            }
+        });
+    });
+
+    /* ── Pesan Sekarang (solid button) — add then redirect ─ */
+    $(document).on('click', '.btn-order-now', function () {
+        var $btn = $(this);
+        var qty  = parseInt($('#modal-qty').text(), 10) || 1;
+
+        $btn.prop('disabled', true).text('Memproses...');
+
+        $.ajax({
+            url:    '{{ route("cart.add") }}',
+            method: 'POST',
+            data: {
+                product_id:  currentProductId,
+                name:        $('#modal-title').text(),
+                price:       currentProductPrice,
+                qty:         qty,
+                image:       currentProductImage,
+                description: currentProductDesc,
+            },
+            success: function (response) {
+                if (response.success) {
+                    window.location.href = '{{ route("cart") }}';
+                }
+            },
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
+                $btn.prop('disabled', false).text('Pesan Sekarang');
+            }
+        });
+    });
+
+    function showCartToast(msg, isError) {
+        var bg = isError ? '#c00f0c' : '#A6171C';
+        var $t = $('<div>').text(msg).css({
+            position: 'fixed', bottom: '28px', left: '50%',
+            transform: 'translateX(-50%)',
+            background: bg, color: '#fff',
+            padding: '11px 28px', borderRadius: '999px',
+            fontWeight: '700', fontSize: '14px',
+            zIndex: 99999, boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+            whiteSpace: 'nowrap'
+        }).appendTo('body');
+        setTimeout(function () { $t.fadeOut(300, function () { $(this).remove(); }); }, 2500);
+    }
 
     $('#modal-qty-plus').on('click', function () {
         var q = parseInt($('#modal-qty').text(), 10);

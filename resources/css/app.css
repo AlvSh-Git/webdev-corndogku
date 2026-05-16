@@ -1,18 +1,27 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+:root {
+    /* Core Brand Palette — from "Color Pallete" frame in Figma */
+    --color-primary:         #A6171C; /* Red Blood — header, active states */
+    --color-accent:          #FFBE54; /* Pastel Orange — sidebar background */
+    --color-light:           #FFFDDB; /* Cornsilk — page background */
+    --color-black:           #000000;
+    --color-white:           #FFFFFF;
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Derived component tokens */
+    --color-danger:          #C00F0C; /* Log Out / destructive actions */
+    --color-primary-surface: #FFF7F8; /* Active card / tab tint */
+    --color-accent-surface:  rgba(255, 248, 238, 0.47); /* Active nav item highlight */
+    --color-border:          #DBDBDB; /* Input & card borders */
+    --color-text-on-brand:   #F5F5F5; /* Text on coloured buttons */
 
-    /* Color Palette */
-    --color-black: #000000;
-    --color-red-blood: #A6171C;
-    --color-pastel-orange: #FFBE54;
-    --color-cornsilk: #FFFDDB;
-    --color-white: #FFFFFF;
+    /* Status badge colours */
+    --color-status-active-bg:   #DCFCE7;
+    --color-status-active-text: #34A853;
+    --color-status-inactive-bg:   #FCE8E6;
+    --color-status-inactive-text: #EA4335;
+
+    /* Shadow */
+    --shadow-card: 3px 4px 20px 0px rgba(0, 0, 0, 0.25);
 }
+

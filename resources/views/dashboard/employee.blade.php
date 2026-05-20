@@ -489,6 +489,13 @@ $(function () {
             $(this).css('color', 'var(--color-primary)');
             $(this).find('.w-2').css('background-color', 'var(--color-primary)');
         }
+
+        $.post('{{ route('cashier.store.status') }}', {
+            status: status,
+            _token: '{{ csrf_token() }}'
+        }).fail(function () {
+            console.warn('Gagal menyimpan status toko.');
+        });
     });
 
 

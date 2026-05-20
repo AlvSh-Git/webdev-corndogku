@@ -54,6 +54,7 @@ Route::prefix('owner')->name('owner.')->group(function () {
 
 // ── Cashier routes — operational access ─────────────────────────
 Route::prefix('cashier')->name('cashier.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/purchase',  [PurchaseController::class,  'index'])->name('purchase');
+    Route::get('/dashboard',    [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/store-status', [DashboardController::class, 'updateStatus'])->name('store.status');
+    Route::get('/purchase',     [PurchaseController::class,  'index'])->name('purchase');
 });

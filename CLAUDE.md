@@ -11,7 +11,7 @@
 
 ## 2. RESPONSIVE UI/UX & FIGMA DIRECTIVES
 - **Figma for Design Intent, NOT Fixed Sizes:** Use the Figma MCP tool to read colors, typography, component styles (shadows, borders), and general layout structure. However, the final output **MUST BE FULLY RESPONSIVE**. 
-- **Fluid Layouts:** Do NOT hardcode fixed pixel widths/heights that break on mobile screens. Translate the static Figma design into fluid, responsive layouts using Tailwind's grid, flexbox, and breakpoints (`sm:`, `md:`, `lg:`, `xl:`). Cards should stack on mobile and form grids on desktop.
+- **Fluid Layouts:** Do NOT hardcode fixed pixel widths/heights that break on mobile screns. Translate the static Figma design into fluid, responsive layouts using Tailwind's grid, flexbox, and breakpoints (`sm:`, `md:`, `lg:`, `xl:`). Cards should stack on mobile and form grids on desktop.
 - **NO Hallucinated Layouts:** Do not invent UI components. Mirror the visual aesthetics of the Figma frames, but adapt them intelligently for responsive web behavior.
 - **NO "Label" Placeholders:** Never output raw "Label" text. Use realistic mock data or actual data.
 - **Asset Management:** All product images, raw ingredients, and UI assets are stored in `public/assets/img/` and `public/assets/ui`

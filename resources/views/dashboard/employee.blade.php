@@ -59,7 +59,7 @@
         <div class="relative flex-none">
             <div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center"
                  style="background-color: var(--color-accent);">
-                <img src="{{ asset('assets/img/CB_01.png') }}" alt="Corndog-Ku"
+                <img src="{{ asset('assets/img/logo.png') }}" alt="Corndog-Ku"
                      class="w-10 h-10 object-cover rounded-full">
             </div>
             {{-- Badge BAR merah --}}
@@ -501,70 +501,88 @@ $(function () {
 
     /* ── 3. ORDER DETAIL DRAWER ────────────────────────────────── */
 
+    const stepOrder    = ['Pending', 'Preparing', 'Ready', 'Completed'];
+    const typeMap      = { 'takeaway': 'Take Away', 'dine-in': 'Dine In', 'online': 'Online Order' };
+    const payMap       = { 'QRIS': 'QRIS', 'Cash': 'Cash', 'Debit': 'Debit Card' };
+    /* persentase fill line per step (index 0–3) */
+    const stepFillPct  = ['0%', '33.33%', '66.66%', '100%'];
+    const stepFillColor = { 0: '#FF9E00', 1: '#FF9E00', 2: '#22C55E', 3: '#6366F1' };
+
     function openDrawer(order) {
-        /* populasi data ke dalam drawer */
+        /* ── Isi field teks ── */
         const name     = order.customer || 'Customer';
-        const initial  = name.charAt(0).toUpperCase();
-        const typeMap  = { 'takeaway': 'Take Away', 'dine-in': 'Dine In', 'online': 'Online Order' };
-        const payMap   = { 'QRIS': 'QRIS', 'Cash': 'Cash', 'Debit': 'Debit Card' };
-        const srcLabel = order.source === 'online' ? 'Online Order' : 'Cashier';
+        const srcLabel = order.source === 'online' ? 'Online Order' : 'Kasir';
 
         $('#drawer-order-id').text(order.id);
-        $('#drawer-subtitle').text('Detail pesanan ' + order.id);
-        $('#drawer-avatar').text(initial);
         $('#drawer-customer-name').text(name);
         $('#drawer-order-type').text(typeMap[order.order_type] || order.order_type || '-');
         $('#drawer-payment').text(payMap[order.payment] || order.payment || '-');
         $('#drawer-source').text(srcLabel);
-        $('#drawer-time').text(order.time);
+        $('#drawer-time').text(order.time || '-');
+        $('#drawer-date').text(new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }));
         $('#drawer-total').text('Rp ' + Number(order.total).toLocaleString('id-ID'));
+        $('#drawer-item-count').text('x1'); /* placeholder; ganti dengan qty real */
 
-        /* update stepper berdasarkan status */
-        const stepOrder = ['Pending', 'Preparing', 'Ready', 'Completed'];
+        /* badge NEW: tampilkan hanya jika pesanan baru */
+        if (order.is_new) {
+            $('#drawer-new-badge').show();
+        } else {
+            $('#drawer-new-badge').hide();
+        }
+
+        /* ── Update horizontal stepper ── */
         const currentIdx = stepOrder.indexOf(order.status);
+        const fillColor  = stepFillColor[currentIdx] || '#E5E7EB';
+
+        /* fill line panjangnya sesuai progress */
+        $('#stepper-fill').css({
+            'width': stepFillPct[currentIdx] || '0%',
+            'background-color': fillColor
+        });
+
         $('#drawer-stepper .step-item').each(function (i) {
-            const $dot   = $(this).find('.step-dot');
-            const $inner = $(this).find('.step-dot-inner');
-            const $check = $(this).find('.step-check');
-            if (i < currentIdx) {
-                /* sudah lewat — tampilkan checkmark */
-                $check.removeClass('hidden');
-                $inner.hide();
-            } else if (i === currentIdx) {
-                /* status aktif — dot menyala */
-                $check.addClass('hidden');
-                $inner.show();
+            const $circle = $(this).find('.step-circle');
+            const $badge  = $(this).find('.step-badge');
+            const aColor  = $circle.data('active-color');
+            const aBg     = $badge.data('active-bg');
+            const aBorder = $badge.data('active-border');
+
+            if (i <= currentIdx) {
+                /* langkah yang sudah dilalui atau aktif saat ini */
+                $circle.css({ 'border-color': aColor, 'color': aColor, 'background-color': '#fff' });
+                $badge.css({ 'border-color': aBorder, 'color': aColor, 'background-color': aBg });
             } else {
-                /* belum — abu-abu */
-                $check.addClass('hidden');
-                $inner.show().css('background-color', '#D1D5DB');
+                /* langkah mendatang — abu-abu */
+                $circle.css({ 'border-color': '#E5E7EB', 'color': '#D1D5DB', 'background-color': '#F9FAFB' });
+                $badge.css({ 'border-color': '#E5E7EB', 'color': '#D1D5DB', 'background-color': '#F9FAFB' });
             }
         });
 
-        /* buka drawer */
+        /* ── Buka panel: hapus translate-x-full ── */
         $('#drawer-backdrop').removeClass('hidden');
         $('#order-detail-drawer').removeClass('translate-x-full');
     }
 
     function closeDrawer() {
+        /* tutup panel: tambahkan kembali translate-x-full ── */
         $('#order-detail-drawer').addClass('translate-x-full');
         $('#drawer-backdrop').addClass('hidden');
     }
 
-    /* klik tombol "View Detail" di setiap baris */
+    /* Buka saat "View Detail" diklik */
     $(document).on('click', '.view-detail-btn', function () {
         let order = {};
-        try { order = JSON.parse($(this).attr('data-order') || '{}'); } catch(e) {}
+        try { order = JSON.parse($(this).attr('data-order') || '{}'); } catch (e) {}
         openDrawer(order);
     });
 
-    /* tutup drawer lewat tombol X */
-    $('#drawer-close-btn').on('click', closeDrawer);
+    /* Tutup lewat tombol X di drawer */
+    $(document).on('click', '#close-drawer-btn', closeDrawer);
 
-    /* tutup drawer lewat backdrop */
+    /* Tutup lewat klik backdrop */
     $('#drawer-backdrop').on('click', closeDrawer);
 
-    /* tutup drawer dengan tombol Escape */
+    /* Tutup dengan tombol Escape */
     $(document).on('keydown', function (e) {
         if (e.key === 'Escape') closeDrawer();
     });

@@ -1,194 +1,276 @@
 {{--
-    Order Detail Drawer — slide-in panel dari kanan
-    Dipanggil dari: resources/views/dashboard/employee.blade.php
-    Dikontrol oleh jQuery: #order-detail-drawer, #drawer-close-btn
+    Order Detail Drawer — slide-in panel kanan
+    Referensi Figma: node 327:14694
+    Dikontrol jQuery: #order-detail-drawer, #close-drawer-btn, #drawer-backdrop
 --}}
+
+{{-- ── BACKDROP ────────────────────────────────────────────────── --}}
+<div id="drawer-backdrop"
+     class="fixed inset-0 z-40 hidden"
+     style="background-color: rgba(0,0,0,0.4);"></div>
+
+{{-- ── PANEL ───────────────────────────────────────────────────── --}}
 <div id="order-detail-drawer"
      class="fixed top-0 right-0 h-full z-50 flex flex-col
             transition-transform duration-300 ease-in-out translate-x-full"
-     style="width: min(400px, 95vw);
-            background-color: var(--color-white);
-            box-shadow: -6px 0 32px rgba(0,0,0,0.18);">
+     style="width: min(460px, 96vw);
+            background-color: #fff;
+            box-shadow: -8px 0 40px rgba(0,0,0,0.15);">
 
-    {{-- ── HEADER ────────────────────────────────────────────── --}}
-    <div class="flex items-center justify-between px-5 py-4 flex-none"
-         style="border-bottom: 1px solid var(--color-border);">
-        <div>
-            <h2 class="text-base font-bold" style="color: var(--color-black);">Order Detail</h2>
-            <p class="text-xs mt-0.5" style="color: #9CA3AF;" id="drawer-subtitle">Informasi pesanan lengkap</p>
+    {{-- ════════════════════════════════════════════════════════════
+         HEADER
+    ════════════════════════════════════════════════════════════ --}}
+    <div class="flex items-center justify-between px-6 py-4 flex-none"
+         style="border-bottom: 1px solid #F1F1F1;">
+        <div class="flex items-center gap-2.5">
+            {{-- Clipboard icon merah --}}
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-none"
+                 style="background-color: var(--color-primary-surface);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" style="width:18px;height:18px;"
+                     fill="none" viewBox="0 0 24 24" stroke="var(--color-primary)" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+                             M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <h2 class="font-bold text-base" style="color: var(--color-black);">Order Detail</h2>
         </div>
-        <button id="drawer-close-btn" type="button"
+        {{-- Tombol close X --}}
+        <button id="close-drawer-btn" type="button" aria-label="Tutup panel"
                 class="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100"
-                style="color: #6B7280;">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                style="color: #9CA3AF;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
     </div>
 
-    {{-- ── SCROLLABLE BODY ────────────────────────────────────── --}}
-    <div class="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+    {{-- ════════════════════════════════════════════════════════════
+         SCROLLABLE BODY
+    ════════════════════════════════════════════════════════════ --}}
+    <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
 
-        {{-- Order ID + NEW badge --}}
-        <div class="flex items-center gap-2">
-            <span class="font-mono font-bold text-lg" style="color: var(--color-black);"
-                  id="drawer-order-id">#12353</span>
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                  style="background-color: var(--color-primary); color: #fff;">NEW</span>
-        </div>
+        {{-- ── Order ID + Customer Info Card ─────────────────── --}}
+        <div class="grid grid-cols-2 rounded-xl overflow-hidden"
+             style="border: 1px solid #EFEFEF;">
 
-        {{-- Customer Info --}}
-        <div class="flex items-center gap-3 p-3 rounded-xl"
-             style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-none"
-                 style="background-color: var(--color-primary);" id="drawer-avatar">G</div>
-            <div>
-                <p class="font-semibold text-sm" style="color: var(--color-black);" id="drawer-customer-name">Gabriella</p>
-                <p class="text-xs" style="color: #9CA3AF;" id="drawer-order-type">Take Away</p>
-            </div>
-        </div>
-
-        {{-- 3-box Info Grid --}}
-        <div class="grid grid-cols-3 gap-2">
-            {{-- Payment --}}
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
-                 style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style="background-color: #DCFCE7;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                         viewBox="0 0 24 24" stroke="#15803D" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
+            {{-- Order ID side --}}
+            <div class="px-4 py-4" style="border-right: 1px solid #EFEFEF;">
+                <p class="text-[10px] font-semibold tracking-widest uppercase mb-1.5"
+                   style="color: #B0B0B0;">Order ID</p>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xl font-black" style="color: var(--color-black);"
+                          id="drawer-order-id">#12353</span>
+                    <span id="drawer-new-badge"
+                          class="text-[10px] font-black px-2 py-0.5 rounded-md"
+                          style="background-color: var(--color-primary); color: #fff;">NEW</span>
                 </div>
-                <p class="text-[10px] font-medium" style="color: #9CA3AF;">Payment</p>
-                <p class="text-xs font-bold" style="color: var(--color-black);" id="drawer-payment">QRIS</p>
             </div>
+
+            {{-- Customer side --}}
+            <div class="px-4 py-4">
+                <p class="text-[10px] font-semibold tracking-widest uppercase mb-1.5"
+                   style="color: #B0B0B0;">Customer</p>
+                <div class="flex items-center gap-2">
+                    {{-- Person icon --}}
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center flex-none"
+                         style="background-color: #F3F4F6;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none"
+                             viewBox="0 0 24 24" stroke="#9CA3AF" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold leading-tight" style="color: var(--color-black);"
+                           id="drawer-customer-name">Gabriella</p>
+                        <p class="text-[11px]" style="color: #9CA3AF;"
+                           id="drawer-order-type">Take Away</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ── Payment / Source / Time Row Card ───────────────── --}}
+        <div class="grid grid-cols-3 rounded-xl overflow-hidden"
+             style="border: 1px solid #EFEFEF;">
+
+            {{-- Payment Method --}}
+            <div class="flex flex-col gap-0.5 px-3 py-3" style="border-right: 1px solid #EFEFEF;">
+                <p class="text-[9px] font-semibold tracking-wider uppercase" style="color: #B0B0B0;">
+                    Payment Method
+                </p>
+                <p class="text-sm font-bold mt-0.5" style="color: var(--color-black);"
+                   id="drawer-payment">QRIS</p>
+            </div>
+
             {{-- Source --}}
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
-                 style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style="background-color: #EEF2FF;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                         viewBox="0 0 24 24" stroke="#4F46E5" stroke-width="2">
+            <div class="flex flex-col gap-0.5 px-3 py-3" style="border-right: 1px solid #EFEFEF;">
+                <p class="text-[9px] font-semibold tracking-wider uppercase" style="color: #B0B0B0;">
+                    Source
+                </p>
+                <div class="flex items-center gap-1 mt-0.5">
+                    {{-- Delivery bag icon merah --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;"
+                         fill="none" viewBox="0 0 24 24" stroke="var(--color-primary)" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
+                    <p class="text-sm font-bold" style="color: var(--color-black);"
+                       id="drawer-source">Online Order</p>
                 </div>
-                <p class="text-[10px] font-medium" style="color: #9CA3AF;">Source</p>
-                <p class="text-xs font-bold" style="color: var(--color-black);" id="drawer-source">Online</p>
             </div>
+
             {{-- Time --}}
-            <div class="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
-                 style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style="background-color: #FEF3C7;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                         viewBox="0 0 24 24" stroke="#D97706" stroke-width="2">
+            <div class="flex flex-col gap-0.5 px-3 py-3">
+                <p class="text-[9px] font-semibold tracking-wider uppercase" style="color: #B0B0B0;">
+                    Time
+                </p>
+                <div class="flex items-center gap-1 mt-0.5">
+                    {{-- Clock icon kuning --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;flex-shrink:0;"
+                         fill="none" viewBox="0 0 24 24" stroke="#D97706" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                </div>
-                <p class="text-[10px] font-medium" style="color: #9CA3AF;">Time</p>
-                <p class="text-xs font-bold" style="color: var(--color-black);" id="drawer-time">11:27 AM</p>
-            </div>
-        </div>
-
-        {{-- Status Stepper --}}
-        <div>
-            <p class="text-xs font-bold mb-3" style="color: #555;">Update Status</p>
-            <div class="relative" id="drawer-stepper">
-                {{-- Connector line --}}
-                <div class="absolute left-[15px] top-4 bottom-4 w-0.5" style="background-color: #E5E7EB;"></div>
-
-                @php
-                    $steps = [
-                        ['key' => 'Pending',   'label' => 'Pending',   'sub' => 'Pesanan masuk',       'color' => '#9CA3AF', 'bg' => '#F3F4F6'],
-                        ['key' => 'Preparing', 'label' => 'Preparing', 'sub' => 'Sedang diproses',     'color' => '#FF9E00', 'bg' => '#FEF3C7'],
-                        ['key' => 'Ready',     'label' => 'Ready',     'sub' => 'Siap diambil',        'color' => '#22C55E', 'bg' => '#DCFCE7'],
-                        ['key' => 'Completed', 'label' => 'Completed', 'sub' => 'Pesanan selesai',     'color' => '#4F46E5', 'bg' => '#EEF2FF'],
-                    ];
-                @endphp
-
-                <div class="space-y-3">
-                    @foreach ($steps as $i => $step)
-                        <div class="relative flex items-start gap-3 step-item"
-                             data-step="{{ $step['key'] }}">
-                            {{-- Dot --}}
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-none relative z-10 step-dot"
-                                 style="background-color: {{ $step['bg'] }}; border: 2px solid {{ $step['color'] }};">
-                                @if ($i === 0)
-                                    {{-- Checkmark for first (active by default in mock) --}}
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 step-check hidden" fill="none"
-                                         viewBox="0 0 24 24" stroke="{{ $step['color'] }}" stroke-width="3">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                    <span class="w-2 h-2 rounded-full step-dot-inner"
-                                          style="background-color: {{ $step['color'] }};"></span>
-                                @else
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 step-check hidden" fill="none"
-                                         viewBox="0 0 24 24" stroke="{{ $step['color'] }}" stroke-width="3">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                    <span class="w-2 h-2 rounded-full step-dot-inner" style="background-color: #D1D5DB;"></span>
-                                @endif
-                            </div>
-                            {{-- Label --}}
-                            <div class="pt-1">
-                                <p class="text-xs font-bold step-label" style="color: {{ $step['color'] }};">{{ $step['label'] }}</p>
-                                <p class="text-[10px]" style="color: #9CA3AF;">{{ $step['sub'] }}</p>
-                            </div>
-                        </div>
-                    @endforeach
+                    <div>
+                        <p class="text-sm font-bold leading-tight" style="color: var(--color-black);"
+                           id="drawer-time">11:27 AM</p>
+                        <p class="text-[9px]" style="color: #B0B0B0;"
+                           id="drawer-date">18 Nov 2025</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Divider --}}
-        <div style="border-top: 1px dashed var(--color-border);"></div>
-
-        {{-- Items List --}}
+        {{-- ── Update Status — Horizontal Stepper ─────────────── --}}
         <div>
-            <p class="text-xs font-bold mb-3" style="color: #555;">Items Ordered</p>
-            <div class="space-y-3" id="drawer-items">
-                {{-- Mock items —rendered statically, replaced by JS when real data available --}}
-                <div class="flex items-start gap-3 p-3 rounded-xl"
-                     style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-                    <div class="w-10 h-10 rounded-lg overflow-hidden flex-none"
-                         style="background-color: var(--color-accent);">
-                        <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}" alt="Mozza Cheese"
+            <div class="flex items-start justify-between mb-1">
+                <div>
+                    <p class="text-sm font-bold" style="color: var(--color-black);">Update Status</p>
+                    <p class="text-[11px]" style="color: #9CA3AF;">Pilih status sesuai progress order</p>
+                </div>
+                <button type="button"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-opacity hover:opacity-80 whitespace-nowrap"
+                        style="border-color: var(--color-primary); color: var(--color-primary); background: transparent;">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/>
+                    </svg>
+                    Batalkan Order
+                </button>
+            </div>
+
+            @php
+                $stepDefs = [
+                    ['key' => 'Pending',   'num' => 1, 'label' => 'Pending',   'sub' => 'Order diterima', 'active_color' => '#FF9E00', 'active_bg' => '#FFF7ED', 'active_border' => '#FF9E00'],
+                    ['key' => 'Preparing', 'num' => 2, 'label' => 'Preparing', 'sub' => 'Sedang disiapkan', 'active_color' => '#FF9E00', 'active_bg' => '#FFF7ED', 'active_border' => '#FF9E00'],
+                    ['key' => 'Ready',     'num' => 3, 'label' => 'Ready',     'sub' => 'Siap diambil', 'active_color' => '#22C55E', 'active_bg' => '#F0FDF4', 'active_border' => '#22C55E'],
+                    ['key' => 'Completed', 'num' => 4, 'label' => 'Completed', 'sub' => 'Selesai', 'active_color' => '#6366F1', 'active_bg' => '#EEF2FF', 'active_border' => '#A5B4FC'],
+                ];
+            @endphp
+
+            {{-- Stepper track --}}
+            <div class="relative flex items-start justify-between mt-4 pb-2" id="drawer-stepper">
+                {{-- Connecting line background --}}
+                <div class="absolute top-[15px] left-4 right-4 h-0.5 z-0"
+                     style="background-color: #E5E7EB;"></div>
+                {{-- Connecting line filled (orange up to step 2 for mock) --}}
+                <div id="stepper-fill" class="absolute top-[15px] left-4 h-0.5 z-0"
+                     style="background-color: #FF9E00; width: 33.33%;"></div>
+
+                @foreach ($stepDefs as $step)
+                    <div class="relative z-10 flex flex-col items-center gap-2 flex-1 step-item"
+                         data-step="{{ $step['key'] }}">
+                        {{-- Numbered circle --}}
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center
+                                    text-sm font-black border-2 step-circle bg-white"
+                             data-active-color="{{ $step['active_color'] }}"
+                             style="border-color: #E5E7EB; color: #D1D5DB;">
+                            {{ $step['num'] }}
+                        </div>
+
+                        {{-- Status badge pill --}}
+                        <div class="px-2 py-1 rounded-lg text-[11px] font-bold text-center w-full
+                                    border step-badge leading-tight"
+                             data-active-color="{{ $step['active_color'] }}"
+                             data-active-bg="{{ $step['active_bg'] }}"
+                             data-active-border="{{ $step['active_border'] }}"
+                             style="border-color: #E5E7EB; color: #D1D5DB; background-color: #F9FAFB;">
+                            {{ $step['label'] }}
+                        </div>
+
+                        {{-- Sublabel + time --}}
+                        <div class="text-center">
+                            <p class="text-[10px] font-medium step-sub" style="color: #9CA3AF;">
+                                {{ $step['sub'] }}
+                            </p>
+                            <p class="text-[9px] step-time" style="color: #C4C4C4;"></p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ── Divider ─────────────────────────────────────────── --}}
+        <div style="border-top: 1px solid #F1F1F1;"></div>
+
+        {{-- ── Items List ──────────────────────────────────────── --}}
+        <div>
+            <p class="text-sm font-bold mb-4" style="color: var(--color-black);">Items</p>
+            <div id="drawer-items" class="space-y-5">
+                {{-- ── Item mock 1 (template structure untuk loop database) --}}
+                <div class="flex items-start gap-3 drawer-item">
+                    {{-- Product thumbnail --}}
+                    <div class="w-14 h-14 rounded-xl overflow-hidden flex-none"
+                         style="background-color: #F3F4F6; border: 1px solid #EFEFEF;">
+                        <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}" alt=""
                              class="w-full h-full object-cover">
                     </div>
+                    {{-- Detail --}}
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold" style="color: var(--color-black);">Mozza Cheese Corndog</p>
-                        <p class="text-[10px] mt-0.5" style="color: #9CA3AF;">Sosis · Full Mozza · Original</p>
-                        <div class="flex items-center justify-between mt-1">
-                            <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                                  style="background-color: var(--color-primary-surface); color: var(--color-primary);">
-                                × 3
-                            </span>
-                            <span class="text-xs font-bold" style="color: var(--color-black);">Rp 54.000</span>
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="text-sm font-bold leading-snug" style="color: var(--color-black);">
+                                Mix Mozzarella
+                            </p>
+                            <p class="text-sm font-bold whitespace-nowrap flex-none"
+                               style="color: var(--color-black);">Rp 18.000</p>
+                        </div>
+                        <p class="text-[11px] mt-0.5" style="color: #9CA3AF;">Sosis, Mozzarella</p>
+                        <ul class="mt-1 space-y-0.5">
+                            <li class="text-[11px]" style="color: #6B7280;">• Ketchup</li>
+                            <li class="text-[11px]" style="color: #6B7280;">• Crispy Onion</li>
+                        </ul>
+                        <div class="flex justify-end mt-1.5">
+                            <span class="text-sm font-black" style="color: var(--color-primary);">x2</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-start gap-3 p-3 rounded-xl"
-                     style="background-color: #F9FAFB; border: 1px solid var(--color-border);">
-                    <div class="w-10 h-10 rounded-lg overflow-hidden flex-none"
-                         style="background-color: var(--color-accent);">
-                        <img src="{{ asset('assets/img/CA_SQUID_NORI.png') }}" alt="Squid Nori"
+                {{-- ── Item mock 2 --}}
+                <div class="flex items-start gap-3 drawer-item">
+                    <div class="w-14 h-14 rounded-xl overflow-hidden flex-none"
+                         style="background-color: #F3F4F6; border: 1px solid #EFEFEF;">
+                        <img src="{{ asset('assets/img/CA_SQUID_NORI.png') }}" alt=""
                              class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold" style="color: var(--color-black);">Squid Nori Corndog</p>
-                        <p class="text-[10px] mt-0.5" style="color: #9CA3AF;">Cumi · Nori · Ramen Mix</p>
-                        <div class="flex items-center justify-between mt-1">
-                            <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                                  style="background-color: var(--color-primary-surface); color: var(--color-primary);">
-                                × 1
-                            </span>
-                            <span class="text-xs font-bold" style="color: var(--color-black);">Rp 20.000</span>
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="text-sm font-bold leading-snug" style="color: var(--color-black);">
+                                Mix Mozzarella
+                            </p>
+                            <p class="text-sm font-bold whitespace-nowrap flex-none"
+                               style="color: var(--color-black);">Rp 18.000</p>
+                        </div>
+                        <p class="text-[11px] mt-0.5" style="color: #9CA3AF;">Sosis, Mozzarella</p>
+                        <ul class="mt-1 space-y-0.5">
+                            <li class="text-[11px]" style="color: #6B7280;">• Ketchup</li>
+                            <li class="text-[11px]" style="color: #6B7280;">• Crispy Onion</li>
+                        </ul>
+                        <div class="flex justify-end mt-1.5">
+                            <span class="text-sm font-black" style="color: var(--color-primary);">x2</span>
                         </div>
                     </div>
                 </div>
@@ -196,23 +278,19 @@
         </div>
     </div>
 
-    {{-- ── FOOTER — Grand Total ───────────────────────────────── --}}
-    <div class="flex-none px-5 py-4" style="border-top: 1px solid var(--color-border);">
-        <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-semibold" style="color: #555;">Grand Total</span>
-            <span class="text-lg font-bold" style="color: var(--color-black);" id="drawer-total">Rp 74.000</span>
+    {{-- ════════════════════════════════════════════════════════════
+         FOOTER — Total
+    ════════════════════════════════════════════════════════════ --}}
+    <div class="flex-none px-6 py-4" style="border-top: 1px solid #F1F1F1;">
+        <div class="flex items-center justify-between mb-0.5">
+            <span class="text-xs" style="color: #9CA3AF;">Items</span>
+            <span class="text-xs font-semibold" style="color: #9CA3AF;" id="drawer-item-count">x3</span>
         </div>
-        <button type="button"
-                class="w-full py-2.5 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90"
-                style="background-color: var(--color-primary);">
-            Konfirmasi Pembayaran
-        </button>
+        <div class="flex items-center justify-between">
+            <span class="text-base font-bold" style="color: var(--color-black);">Total</span>
+            <span class="text-xl font-black" style="color: var(--color-primary);"
+                  id="drawer-total">Rp 36.000</span>
+        </div>
     </div>
 
-</div>
-
-{{-- Backdrop --}}
-<div id="drawer-backdrop"
-     class="fixed inset-0 z-40 hidden"
-     style="background-color: rgba(0,0,0,0.35);">
 </div>

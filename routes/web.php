@@ -20,6 +20,7 @@ Route::get('/menu', function () {
 })->name('menu');
 Route::get('/customize', fn () => view('customize'))->name('customize');
 Route::get('/store-status', [\App\Http\Controllers\JadwalController::class, 'getStatus'])->name('store.status');
+Route::get('/api/products', [ProductController::class, 'catalog'])->name('api.products');
 
 // ── Cart ────────────────────────────────────────────────────────
 Route::get('/cart',          [CartController::class, 'index'])->name('cart');

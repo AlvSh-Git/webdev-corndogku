@@ -11,7 +11,8 @@ class WelcomeController extends Controller
     {
         $products   = Product::with('category')->orderBy('category_id')->get();
         $categories = Category::orderBy('id')->get();
+        $storeInfo  = $this->calcStoreStatus();
 
-        return view('welcome', compact('products', 'categories'));
+        return view('welcome', compact('products', 'categories', 'storeInfo'));
     }
 }

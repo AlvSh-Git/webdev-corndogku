@@ -14,6 +14,19 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
+        $status = $this->calcStoreStatus();
+        if (!$status['is_open']) {
+            $reopen = ($status['reopen_day'] && $status['reopen_time'])
+                ? ' Toko akan buka kembali pada ' . $status['reopen_day'] . ' pukul ' . $status['reopen_time'] . '.'
+                : '';
+            return response()->json([
+                'success'    => false,
+                'error'      => 'store_closed',
+                'message'    => 'Maaf, toko sedang tutup.' . $reopen,
+                'store_info' => $status,
+            ], 422);
+        }
+
         $productId = (string) $request->input('product_id');
 
         $cart = session()->get('cart', []);

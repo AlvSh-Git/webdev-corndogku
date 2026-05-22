@@ -732,14 +732,17 @@ $(function () {
         $(this).addClass('active')
                .css({ 'background-color': 'var(--color-primary)', 'color': 'white', 'border-color': 'var(--color-primary)' });
 
-        $('#active-cat-label').text(activeCat);
-        applyFilters();
+        loadProducts(1);
     });
 
     /* ── Navbar search ─────────────────────────────────────── */
+    var searchDebounce = null;
     $('#navbar-search').on('input', function () {
         searchTerm = $.trim($(this).val()).toLowerCase();
-        applyFilters();
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(function () {
+            loadProducts(1);
+        }, 300);
     });
 
     /* ── Dropdown helpers ──────────────────────────────────── */
@@ -794,7 +797,7 @@ $(function () {
     $('#btn-sort-apply').on('click', function () {
         sortMode = $('input[name="sort-option"]:checked').val() || 'default';
         closeAllDropdowns();
-        applySort();
+        loadProducts(1);
     });
 
     /* ── Sort reset ────────────────────────────────────────── */
@@ -803,7 +806,7 @@ $(function () {
         sortMode = 'default';
         updateSortUI();
         closeAllDropdowns();
-        applySort();
+        loadProducts(1);
     });
 
     /* ── Filter apply ──────────────────────────────────────── */
@@ -811,7 +814,7 @@ $(function () {
         var minVal     = $('#filter-price-min').val();
         var maxVal     = $('#filter-price-max').val();
         filterMinPrice = minVal ? parseInt(minVal, 10) : 0;
-        filterMaxPrice = maxVal ? parseInt(maxVal, 10) : Infinity;
+        filterMaxPrice = maxVal ? parseInt(maxVal, 10) : null;
 
         filterCats = [];
         $('.filter-cat-check:checked').each(function () {
@@ -819,19 +822,19 @@ $(function () {
         });
 
         closeAllDropdowns();
-        applyFilters();
+        loadProducts(1);
     });
 
     /* ── Filter reset ──────────────────────────────────────── */
     $('#btn-filter-reset').on('click', function () {
         filterMinPrice = 0;
-        filterMaxPrice = Infinity;
+        filterMaxPrice = null;
         filterCats     = [];
         $('#filter-price-min, #filter-price-max').val('');
         $('.filter-cat-check').prop('checked', false);
         $('.price-pill').css({ 'border-color': 'var(--color-border)', 'background-color': '', 'color': '#555' });
         closeAllDropdowns();
-        applyFilters();
+        loadProducts(1);
     });
 
     /* ── Price quick-select pills ──────────────────────────── */

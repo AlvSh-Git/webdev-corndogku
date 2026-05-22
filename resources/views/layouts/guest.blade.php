@@ -7,74 +7,40 @@
     <title>@yield('title', 'Corndog-Ku')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased relative overflow-x-hidden" style="background-color: #FFFBEE; min-height: 100vh;">
 
-@php $isLogin = request()->routeIs('login'); @endphp
-
-<div class="flex min-h-screen" style="background-color: var(--color-light);">
-
-    {{-- ════════════════════════════════════════════════════════════
-         LEFT DECORATIVE PANEL  (hidden on mobile)
-         Matches Figma "login page 2" / "daftar" left half:
-         amber background + two stacked red chevron shapes + auth tabs
-    ════════════════════════════════════════════════════════════════ --}}
-    <div class="hidden lg:flex lg:w-5/12 relative overflow-hidden flex-col"
-         style="background-color: var(--color-accent);">
-
-        {{-- Circular logo — top-left --}}
-        <div class="absolute top-6 left-6 z-20">
-            <a href="{{ url('/') }}" class="inline-block">
-                <img src="{{ asset('assets/img/logo.png') }}"
-                     alt="Corndog-Ku"
-                     class="w-14 h-14 rounded-full object-cover border-2 border-white">
-            </a>
-        </div>
-
-        {{-- Red chevron — back layer --}}
-        <div class="absolute inset-0 z-0"
-             style="background-color: var(--color-primary);
-                    clip-path: polygon(38% 0%, 100% 0%, 100% 100%, 38% 100%, 5% 50%);"></div>
-
-        {{-- Red chevron — front layer (slightly inset, lighter overlap) --}}
-        <div class="absolute inset-0 z-0"
-             style="background-color: #8C1217;
-                    clip-path: polygon(52% 0%, 100% 0%, 100% 100%, 52% 100%, 20% 50%);
-                    opacity: 0.85;"></div>
-
-        {{-- Auth tab pills — vertically centred on the amber strip --}}
-        <div class="relative z-10 flex flex-col gap-3 justify-center flex-1"
-             style="padding-left: 14%;">
-
-            <a href="{{ route('login') }}"
-               class="inline-flex items-center justify-center px-8 py-3 rounded-full
-                      font-bold text-base tracking-wide transition-all w-36"
-               style="{{ $isLogin
-                   ? 'background-color: var(--color-white); color: var(--color-black);'
-                   : 'background-color: var(--color-accent);   color: var(--color-black);' }}">
-                LOG IN
-            </a>
-
-            <a href="{{ route('register') }}"
-               class="inline-flex items-center justify-center px-8 py-3 rounded-full
-                      font-bold text-base tracking-wide transition-all w-36"
-               style="{{ !$isLogin
-                   ? 'background-color: var(--color-white); color: var(--color-black);'
-                   : 'background-color: var(--color-accent);   color: var(--color-black);' }}">
-                DAFTAR
-            </a>
-        </div>
+    {{-- Red blob — top-right decorative --}}
+    <div class="absolute top-0 right-0 pointer-events-none select-none hidden lg:block" style="z-index:0; overflow:hidden; width:160px; height:160px;">
+        <div style="position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:var(--color-primary); border-radius:50%;"></div>
+        <div style="position:absolute; top:80px; right:-10px; width:70px; height:50px; background:var(--color-primary); border-radius:0 0 40px 40px; transform:rotate(-20deg);"></div>
     </div>
 
-    {{-- ════════════════════════════════════════════════════════════
-         RIGHT CONTENT AREA — white card centred
-    ════════════════════════════════════════════════════════════════ --}}
-    <div class="flex-1 flex items-center justify-center p-6 sm:p-10">
+    {{-- Amber accent — bottom-left --}}
+    <div class="absolute bottom-0 left-0 pointer-events-none select-none hidden lg:block"
+         style="z-index:0; width:200px; height:160px; background:var(--color-accent); border-radius:0 60% 0 0; opacity:0.7;"></div>
+
+    {{-- Decorative corndog images — left side (desktop only) --}}
+    <div class="absolute hidden lg:flex flex-col pointer-events-none select-none"
+         style="z-index:1; left:-0.5rem; top:18%; gap:0;">
+        <img src="{{ asset('assets/img/CA_CHEETOS.png') }}" alt=""
+             style="width:140px; transform:rotate(8deg); filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.15));">
+        <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}" alt=""
+             style="width:110px; transform:rotate(8deg); margin-top:-2.5rem; margin-left:3rem; opacity:0.85; filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.12));">
+    </div>
+
+    {{-- Kembali link --}}
+    <a href="@yield('kembali_href', url('/'))"
+       class="absolute top-6 left-6 flex items-center gap-1 text-sm font-semibold z-10 hover:opacity-80 transition-opacity hidden sm:flex"
+       style="color:#B20000;">
+        ← Kembali
+    </a>
+
+    {{-- Page content — centred --}}
+    <div class="relative flex min-h-screen items-center justify-center px-4 py-20 sm:py-16" style="z-index:2;">
         <div class="w-full max-w-sm">
             @yield('content')
         </div>
     </div>
-
-</div>
 
 </body>
 </html>

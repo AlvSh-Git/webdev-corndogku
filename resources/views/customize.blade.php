@@ -55,6 +55,10 @@
         }
         .step-line { min-width: 36px; }
 
+        /* Hide scrollbar cross-browser */
+        .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+
         /* Sauce chip badges */
         .sauce-chip {
             border: 2px solid #A6171C;
@@ -67,7 +71,7 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased h-screen overflow-hidden flex flex-col">
 
 {{-- ══════════════════════════════════════════════════════════════
      NAVBAR
@@ -147,7 +151,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      MAIN — CUSTOM CORNDOG WIZARD
 ══════════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden min-h-screen">
+<section class="relative overflow-hidden flex-1 flex flex-col">
 
     {{-- Decorative large circles --}}
     <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none"
@@ -169,10 +173,10 @@
     <div class="absolute bottom-48 right-[10%] w-3 h-3 rounded-full pointer-events-none"
          style="background-color: #FFBE54; opacity:0.5;"></div>
 
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 relative z-10">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-5 pb-0 relative z-10 flex-1 flex flex-col overflow-hidden">
 
         {{-- ── Top row: Title + Stepper ──────────────────────── --}}
-        <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 mb-8 lg:mb-10">
+        <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-4 mb-4 lg:mb-5 flex-none">
 
             {{-- CUSTOM CORNDOG title --}}
             <div class="flex-none">
@@ -208,10 +212,10 @@
         </div>
 
         {{-- ── Carousel + Instruction layout ─────────────────── --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch flex-1 overflow-hidden">
 
             {{-- LEFT: Carousel --}}
-            <div class="flex items-center gap-4 justify-center">
+            <div class="flex items-center gap-4 justify-center overflow-hidden">
 
             {{-- Left arrow --}}
             <button id="btn-prev"
@@ -265,82 +269,87 @@
 
             </div>{{-- /.carousel left column --}}
 
-            {{-- RIGHT: Step instruction card --}}
-            <div id="step-card"
-                 class="bg-white rounded-2xl p-8 md:p-10 shadow-lg self-center">
-                <div class="flex items-start gap-4">
-                    <div id="step-card-num"
-                         class="w-12 h-12 rounded-full flex items-center justify-center
-                                text-white font-bold text-xl flex-none"
-                         style="background-color: var(--color-primary);">1</div>
-                    <div>
-                        <p id="step-card-title" class="font-bold text-xl lg:text-2xl" style="color: var(--color-black);">
-                            Pilih Isi Corndog
-                        </p>
-                        <p id="step-card-desc" class="text-base text-gray-500 mt-2 leading-relaxed">
-                            Geser atau gunakan tombol untuk memilih isi favoritemu
-                        </p>
+            {{-- RIGHT: scrollable column containing step card + review + buttons --}}
+            <div class="h-full overflow-y-auto hide-scrollbar flex flex-col gap-4 py-2 pb-24">
+
+                {{-- Step instruction card --}}
+                <div id="step-card"
+                     class="bg-white rounded-2xl p-8 md:p-10 shadow-lg">
+                    <div class="flex items-start gap-4">
+                        <div id="step-card-num"
+                             class="w-12 h-12 rounded-full flex items-center justify-center
+                                    text-white font-bold text-xl flex-none"
+                             style="background-color: var(--color-primary);">1</div>
+                        <div>
+                            <p id="step-card-title" class="font-bold text-xl lg:text-2xl" style="color: var(--color-black);">
+                                Pilih Isi Corndog
+                            </p>
+                            <p id="step-card-desc" class="text-base text-gray-500 mt-2 leading-relaxed">
+                                Geser atau gunakan tombol untuk memilih isi favoritemu
+                            </p>
+                        </div>
+                    </div>
+                    {{-- Sauce add button (step 3 only) --}}
+                    <div id="add-sauce-wrap" class="hidden mt-5 pt-5 border-t border-gray-100">
+                        <p class="text-sm text-right mb-3 font-semibold" style="color: var(--color-primary);">Max 2 sauce*</p>
+                        <button id="add-sauce-btn"
+                                type="button"
+                                class="w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                                       text-base font-bold border-2 transition-colors hover:opacity-80"
+                                style="border-color: var(--color-primary); color: var(--color-primary);">
+                            <span>+</span> Add Sauce
+                        </button>
                     </div>
                 </div>
-                {{-- Sauce add button (step 3 only) --}}
-                <div id="add-sauce-wrap" class="hidden mt-5 pt-5 border-t border-gray-100">
-                    <p class="text-sm text-right mb-3 font-semibold" style="color: var(--color-primary);">Max 2 sauce*</p>
-                    <button id="add-sauce-btn"
+
+                {{-- Review panel (step 4 only) --}}
+                <div id="review-panel" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg mb-5" style="color: var(--color-black);">Ringkasan Pesananmu</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="review-items"></div>
+                    <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Harga Dasar</span>
+                            <span id="review-base" class="font-medium text-gray-800">Rp 16.000</span>
+                        </div>
+                        <div class="flex justify-between text-gray-500" id="review-extra-row">
+                            <span>Varian Tambahan</span>
+                            <span id="review-extra" class="font-medium text-gray-800">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-100">
+                            <span style="color: var(--color-black);">Total</span>
+                            <span id="review-total" style="color: var(--color-primary);">Rp 16.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Next / Back buttons --}}
+                <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                    <button id="btn-back"
                             type="button"
-                            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                                   text-base font-bold border-2 transition-colors hover:opacity-80"
+                            class="hidden sm:inline-flex items-center justify-center px-10 py-5 rounded-2xl
+                                   font-bold text-base border-2 transition-opacity hover:opacity-70"
                             style="border-color: var(--color-primary); color: var(--color-primary);">
-                        <span>+</span> Add Sauce
+                        &#8592; Kembali
+                    </button>
+                    <button id="btn-next-step"
+                            type="button"
+                            class="flex-1 max-w-4xl mx-auto w-full py-5 rounded-2xl font-bold
+                                   text-xl md:text-2xl tracking-wide
+                                   transition-opacity hover:opacity-85 active:scale-[0.99]"
+                            style="background-color: var(--color-primary); color: var(--color-white);">
+                        Next Pilih Varian
                     </button>
                 </div>
-            </div>
-        </div>
 
-        {{-- ── Review panel (step 4 only) ─────────────────────── --}}
-        <div id="review-panel" class="hidden mt-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 class="font-bold text-lg mb-5" style="color: var(--color-black);">Ringkasan Pesananmu</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="review-items"></div>
-            <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                <div class="flex justify-between text-gray-500">
-                    <span>Harga Dasar</span>
-                    <span id="review-base" class="font-medium text-gray-800">Rp 16.000</span>
-                </div>
-                <div class="flex justify-between text-gray-500" id="review-extra-row">
-                    <span>Varian Tambahan</span>
-                    <span id="review-extra" class="font-medium text-gray-800">Rp 0</span>
-                </div>
-                <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-100">
-                    <span style="color: var(--color-black);">Total</span>
-                    <span id="review-total" style="color: var(--color-primary);">Rp 16.000</span>
-                </div>
-            </div>
-        </div>
-
-        {{-- ── Next / Back buttons ─────────────────────────────── --}}
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-            <button id="btn-back"
-                    type="button"
-                    class="hidden sm:inline-flex items-center justify-center px-10 py-5 rounded-2xl
-                           font-bold text-base border-2 transition-opacity hover:opacity-70"
-                    style="border-color: var(--color-primary); color: var(--color-primary);">
-                &#8592; Kembali
-            </button>
-            <button id="btn-next-step"
-                    type="button"
-                    class="flex-1 max-w-4xl mx-auto w-full py-5 rounded-2xl font-bold
-                           text-xl md:text-2xl tracking-wide
-                           transition-opacity hover:opacity-85 active:scale-[0.99]"
-                    style="background-color: var(--color-primary); color: var(--color-white);">
-                Next Pilih Varian
-            </button>
-        </div>
-    </div>
+            </div>{{-- /.right scrollable column --}}
+        </div>{{-- /.grid --}}
+    </div>{{-- /.container --}}
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
      FOOTER
 ══════════════════════════════════════════════════════════════ --}}
-<footer style="background-color: var(--color-primary);">
+<footer class="hidden" style="background-color: var(--color-primary);">
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
@@ -716,14 +725,12 @@ $(function () {
         }
         state.step++;
         renderAll(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     function prevStep() {
         if (state.step <= 0) return;
         state.step--;
         renderAll(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     /* ─── jQuery event bindings ─────────────────────────────── */

@@ -216,8 +216,8 @@
             {{-- Left arrow --}}
             <button id="btn-prev"
                     type="button"
-                    class="flex-none w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-2xl md:text-4xl hover:shadow-lg transition-shadow active:scale-95"
+                    class="flex-none w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-md flex items-center justify-center
+                           font-bold text-xl md:text-3xl hover:shadow-lg transition-shadow active:scale-95"
                     style="color: var(--color-primary);">
                 &#8249;
             </button>
@@ -225,40 +225,51 @@
             {{-- Center: blob + image + label + dots --}}
             <div id="carousel-center" class="flex-1 flex flex-col items-center justify-center relative">
 
-                {{-- Peach blob --}}
-                <div class="corndog-blob w-80 h-80 sm:w-96 sm:h-96 lg:w-[500px] lg:h-[500px]
-                            flex items-center justify-center relative">
-                    <img id="carousel-img"
+                {{-- Peach blob — NO overflow-hidden: corndog stick extends below --}}
+                <div class="corndog-blob w-[min(55vw,460px)] h-[min(55vw,460px)] relative">
+
+                    {{-- LAYER 0: base corndog (filling / variant) --}}
+                    <img id="base-corndog"
                          src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
                          alt="Corndog preview"
-                         class="h-[280px] sm:h-[380px] lg:h-[560px] w-auto object-contain drop-shadow-xl">
-                    {{-- Spark accent near image --}}
-                    <div class="absolute top-3 right-3 text-3xl pointer-events-none"
+                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                                h-[42vh] w-auto object-contain z-0 select-none">
+
+                    {{-- LAYER 1: sauce overlay — sits on top, instant swap --}}
+                    <img id="overlay-sauce"
+                         src=""
+                         alt=""
+                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                                h-[42vh] w-auto object-contain z-10
+                                pointer-events-none select-none">
+
+                    {{-- Spark accent --}}
+                    <div class="absolute top-3 right-3 text-2xl pointer-events-none z-20"
                          style="color: #A6171C;">✦</div>
                 </div>
 
                 {{-- Selection name pill --}}
-                <div class="selection-pill mt-5 px-8 py-3 rounded-full text-center min-w-[220px]"
+                <div class="selection-pill mt-3 px-6 py-2 rounded-full text-center min-w-[160px]"
                      id="carousel-label">
-                    <span class="font-black text-xl tracking-widest"
+                    <span class="font-black text-base tracking-widest"
                           id="carousel-label-text"
                           style="color: var(--color-primary);">SOSIS &amp; MOZZA</span>
-                    <div id="carousel-label-price" class="text-sm font-semibold mt-1 hidden"
+                    <div id="carousel-label-price" class="text-xs font-semibold mt-0.5 hidden"
                          style="color: var(--color-primary);"></div>
                 </div>
 
                 {{-- Dot indicators --}}
-                <div id="carousel-dots" class="flex items-center gap-3 mt-5"></div>
+                <div id="carousel-dots" class="flex items-center gap-2 mt-3"></div>
 
                 {{-- Step 3 sauce chips (hidden except step 3) --}}
-                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center mt-4 max-w-sm"></div>
+                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center mt-2 max-w-xs"></div>
             </div>
 
             {{-- Right arrow --}}
             <button id="btn-next"
                     type="button"
-                    class="flex-none w-16 h-16 md:w-20 md:h-20 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-2xl md:text-4xl hover:shadow-lg transition-shadow active:scale-95"
+                    class="flex-none w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-md flex items-center justify-center
+                           font-bold text-xl md:text-3xl hover:shadow-lg transition-shadow active:scale-95"
                     style="color: var(--color-primary);">
                 &#8250;
             </button>

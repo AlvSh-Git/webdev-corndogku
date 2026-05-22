@@ -605,17 +605,17 @@ $(function () {
 
     function buildProductCard(p) {
         var fallback = '{{ asset('assets/img/CA_ORIGINAL.png') }}';
-        var safeName = p.name ? p.name.replace(/"/g, '&quot;') : '';
-        var safeDesc = p.description ? p.description.replace(/"/g, '&quot;') : '';
+        var safeName = htmlEscape(p.name);
+        var safeDesc = htmlEscape(p.description);
         var safeImageUrl = p.image_url ? p.image_url.replace(/"/g, '&quot;') : '';
         return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"' +
                ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
-               ' data-category="' + (p.category ? p.category.name : '') + '"' +
+               ' data-category="' + htmlEscape(p.category ? p.category.name : '') + '"' +
                ' data-price="' + p.price + '"' +
                ' data-name="' + safeName.toLowerCase() + '"' +
                ' data-id="' + p.id + '">' +
                '<div class="overflow-hidden rounded-t-2xl">' +
-               '<img src="' + p.image_url + '"' +
+               '<img src="' + safeImageUrl + '"' +
                ' alt="' + safeName + '"' +
                ' class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300 hover:scale-105"' +
                ' onerror="this.src=\'' + fallback + '\'">' +

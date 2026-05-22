@@ -534,16 +534,24 @@ $(function () {
         var idx = currentIdx();
         var item = items[idx];
 
-        // Image with fade transition
-        var imgEl = document.getElementById('carousel-img');
+        // Update base image (steps 1 & 2: filling/variant)
         if (animate) {
-            imgEl.classList.add('fading');
+            $('#base-corndog').addClass('fading');
             setTimeout(function () {
-                imgEl.src = item.image;
-                imgEl.classList.remove('fading');
+                $('#base-corndog').attr('src', item.image).removeClass('fading');
             }, 180);
         } else {
-            imgEl.src = item.image;
+            $('#base-corndog').attr('src', item.image);
+        }
+
+        // Update sauce overlay (step 3 only — show last-added sauce)
+        if (step.multiSelect) {
+            var lastSauce = state.sauces.length
+                ? STEPS[2].items[state.sauces[state.sauces.length - 1]].image
+                : '';
+            $('#overlay-sauce').attr('src', lastSauce);
+        } else {
+            $('#overlay-sauce').attr('src', '');
         }
 
         // Label
@@ -749,7 +757,7 @@ $(function () {
 
     /* ─── Touch/swipe support ───────────────────────────────── */
     var touchStartX = 0;
-    $('#carousel-img').on('touchstart', function (e) {
+    $('#carousel-center').on('touchstart', function (e) {
         touchStartX = e.originalEvent.touches[0].clientX;
     }).on('touchend', function (e) {
         var dx = e.originalEvent.changedTouches[0].clientX - touchStartX;

@@ -579,8 +579,11 @@ $(function () {
     var searchTerm     = '';
     var sortMode       = 'default';
     var filterMinPrice = 0;
-    var filterMaxPrice = Infinity;
+    var filterMaxPrice = null;
     var filterCats     = [];
+    var currentPage    = 1;
+
+    var $grid = $('#product-grid');
 
     /* ── Current modal product data ─────────────────────── */
     var currentProductId    = null;
@@ -588,54 +591,123 @@ $(function () {
     var currentProductImage = '';
     var currentProductDesc  = '';
 
-    /* Store original order --*/
-    var $grid    = $('#product-grid');
-    var $origCards = $grid.children('.product-card').clone(true);
-
     /* ── Helpers ──────────────────────────────────────────── */
-    function applyFilters() {
-        var visible = 0;
-
-        $grid.children('.product-card').each(function () {
-            var $card  = $(this);
-            var cat    = $card.data('category');
-            var name   = $card.data('name');
-            var price  = parseInt($card.data('price'), 10) || 0;
-
-            var catMatch       = (activeCat === 'Semua') || (cat === activeCat);
-            var nameMatch      = (searchTerm === '') || name.includes(searchTerm);
-            var priceMatch     = (price >= filterMinPrice) && (price <= filterMaxPrice);
-            var filterCatMatch = (filterCats.length === 0) || (filterCats.indexOf(cat) !== -1);
-
-            if (catMatch && nameMatch && priceMatch && filterCatMatch) {
-                $card.removeClass('hidden');
-                visible++;
-            } else {
-                $card.addClass('hidden');
-            }
-        });
-
-        $('#result-count').text(visible + ' produk');
-        $('#empty-state').toggleClass('hidden', visible > 0);
+    function fmtRp(n) {
+        return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
-    function applySort() {
-        var $cards = $grid.children('.product-card').detach();
+    function buildProductCard(p) {
+        var fallback = '{{ asset('assets/img/CA_ORIGINAL.png') }}';
+        var safeName = p.name ? p.name.replace(/"/g, '&quot;') : '';
+        var safeDesc = p.description ? p.description.replace(/"/g, '&quot;') : '';
+        return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"' +
+               ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
+               ' data-category="' + (p.category ? p.category.name : '') + '"' +
+               ' data-price="' + p.price + '"' +
+               ' data-name="' + safeName.toLowerCase() + '"' +
+               ' data-id="' + p.id + '">' +
+               '<div class="overflow-hidden rounded-t-2xl">' +
+               '<img src="' + p.image_url + '"' +
+               ' alt="' + safeName + '"' +
+               ' class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300 hover:scale-105"' +
+               ' onerror="this.src=\'' + fallback + '\'">' +
+               '</div>' +
+               '<div class="px-4 pt-3 pb-4 flex flex-col flex-1">' +
+               '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + p.name + '</p>' +
+               '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + (p.description || '') + '</p>' +
+               '<div class="flex items-center justify-between mt-3 gap-2">' +
+               '<p class="text-sm font-black" style="color:var(--color-primary);">' + fmtRp(p.price) + '</p>' +
+               '<button type="button"' +
+               ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
+               ' style="background-color:var(--color-accent);color:var(--color-black);"' +
+               ' data-id="' + p.id + '"' +
+               ' data-name="' + safeName + '"' +
+               ' data-price="' + p.price + '"' +
+               ' data-description="' + safeDesc + '"' +
+               ' data-image="' + p.image_url + '">Pesan</button>' +
+               '</div></div></div>';
+    }
 
-        if (sortMode === 'price-asc') {
-            $cards.sort(function (a, b) {
-                return parseInt($(a).data('price'), 10) - parseInt($(b).data('price'), 10);
-            });
-        } else if (sortMode === 'price-desc') {
-            $cards.sort(function (a, b) {
-                return parseInt($(b).data('price'), 10) - parseInt($(a).data('price'), 10);
-            });
-        } else {
-            $cards = $origCards.clone(true);
+    function renderCards(data) {
+        $grid.empty();
+        $.each(data, function (_, p) {
+            $grid.append(buildProductCard(p));
+        });
+    }
+
+    function renderPagination(res) {
+        var $nav = $('#pagination-nav').empty();
+        if (res.last_page <= 1) { return; }
+
+        var cur  = res.current_page;
+        var last = res.last_page;
+        var html = '<div class="flex items-center justify-center gap-1 mt-8 flex-wrap">';
+
+        // Prev button
+        var prevDisabled = (cur === 1) ? 'disabled' : '';
+        var prevClass    = (cur === 1) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
+        html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + prevClass + '"' +
+                ' data-page="' + (cur - 1) + '" ' + prevDisabled +
+                ' style="border-color:var(--color-border);">&#8592; Prev</button>';
+
+        // Page number window: first, last, and current ±2
+        var pages = [];
+        for (var i = 1; i <= last; i++) {
+            if (i === 1 || i === last || (i >= cur - 2 && i <= cur + 2)) {
+                pages.push(i);
+            }
         }
+        var prev = 0;
+        $.each(pages, function (_, p) {
+            if (prev && p - prev > 1) {
+                html += '<span class="px-2 py-1.5 text-sm text-gray-400">&hellip;</span>';
+            }
+            var isActive = (p === cur);
+            var btnStyle = isActive
+                ? 'background-color:var(--color-primary);color:white;border-color:var(--color-primary);'
+                : 'border-color:var(--color-border);';
+            html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors' +
+                    (isActive ? '' : ' hover:bg-gray-50') + '"' +
+                    ' data-page="' + p + '" style="' + btnStyle + '">' + p + '</button>';
+            prev = p;
+        });
 
-        $grid.append($cards);
-        applyFilters();
+        // Next button
+        var nextDisabled = (cur === last) ? 'disabled' : '';
+        var nextClass    = (cur === last) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
+        html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + nextClass + '"' +
+                ' data-page="' + (cur + 1) + '" ' + nextDisabled +
+                ' style="border-color:var(--color-border);">Next &#8594;</button>';
+
+        html += '</div>';
+        $nav.html(html);
+    }
+
+    function loadProducts(page) {
+        currentPage = page || 1;
+        var params = {
+            page:     currentPage,
+            category: activeCat,
+            search:   searchTerm,
+            sort:     sortMode,
+            min:      filterMinPrice || 0,
+        };
+        if (filterMaxPrice) { params.max = filterMaxPrice; }
+        if (filterCats.length) { params['cats[]'] = filterCats; }
+
+        $grid.css({ opacity: '0.5', 'pointer-events': 'none' });
+
+        $.get('/api/products', params)
+            .done(function (res) {
+                renderCards(res.data);
+                renderPagination(res);
+                $('#result-count').text(res.total + ' produk');
+                $('#active-cat-label').text(activeCat);
+                $('#empty-state').toggleClass('hidden', res.data.length > 0);
+            })
+            .always(function () {
+                $grid.css({ opacity: '1', 'pointer-events': '' });
+            });
     }
 
     /* ── Category tabs ────────────────────────────────────── */
@@ -759,16 +831,20 @@ $(function () {
         $('#filter-price-max').val($(this).data('max') || '');
     });
 
+    /* ── Pagination click ─────────────────────────────────── */
+    $(document).on('click', '.pg-btn:not([disabled])', function () {
+        var page = parseInt($(this).data('page'), 10);
+        if (!page) { return; }
+        loadProducts(page);
+        $('html, body').animate({ scrollTop: $grid.offset().top - 80 }, 200);
+    });
+
     /* ── Init ──────────────────────────────────────────────── */
-    applyFilters();
+    loadProducts(1);
 
     /* ══════════════════════════════════════════════════════════
        PRODUCT DETAIL MODAL
     ══════════════════════════════════════════════════════════ */
-    function fmtRp(n) {
-        return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-
     $(document).on('click', '.btn-pesan', function () {
         var $b = $(this);
         currentProductId    = $b.data('id');

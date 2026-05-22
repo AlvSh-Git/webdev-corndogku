@@ -34,23 +34,21 @@
         /* Carousel dot size */
         #carousel-dots > div { width: 0.875rem; height: 0.875rem; }
 
-        /* Carousel transition */
-        #carousel-img {
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        #carousel-img.fading {
-            opacity: 0;
-            transform: scale(0.95);
-        }
+        /* Corndog base transition */
+        #base-corndog { transition: opacity 0.2s ease, transform 0.2s ease; }
+        #base-corndog.fading { opacity: 0; transform: scale(0.95); }
 
-        /* Stepper override — circles rendered by JS use these sizes */
+        /* Overlay: instant sauce swap */
+        #overlay-sauce { transition: none; }
+
+        /* Stepper override — compact for viewport fit */
         #stepper > div > div:first-child {
-            width: 3rem !important;
-            height: 3rem !important;
-            font-size: 1.25rem !important;
+            width: 2rem !important;
+            height: 2rem !important;
+            font-size: 0.875rem !important;
         }
         #stepper > div > span {
-            font-size: 0.8rem !important;
+            font-size: 0.7rem !important;
             font-weight: 600 !important;
         }
         .step-line { min-width: 36px; }

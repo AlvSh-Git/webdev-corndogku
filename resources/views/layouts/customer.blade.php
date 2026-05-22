@@ -16,7 +16,7 @@
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16
                 flex items-center justify-between gap-6">
 
         {{-- Brand --}}
@@ -106,7 +106,7 @@
 
         </div>{{-- /.right --}}
 
-    </div>{{-- /.max-w-6xl --}}
+    </div>{{-- /.navbar-container --}}
 
 </header>{{-- /.navbar --}}
 
@@ -123,7 +123,7 @@
      FOOTER
 ══════════════════════════════════════════════════════════════ --}}
 <footer style="background-color: var(--color-primary);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
@@ -198,7 +198,7 @@
             </div>
         </div>
 
-    </div>{{-- /.max-w-6xl --}}
+    </div>{{-- /.footer-container --}}
 </footer>
 
 

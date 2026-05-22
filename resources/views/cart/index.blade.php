@@ -8,7 +8,7 @@
      HERO HEADER
 ══════════════════════════════════════════════════════════════ --}}
 <section class="relative overflow-hidden" style="background-color: var(--color-light);">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 flex items-center justify-between">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 flex items-center justify-between">
         <div>
             <h1 class="text-4xl sm:text-5xl font-bold leading-tight" style="color: var(--color-black);">
                 Keranjang Saya
@@ -28,7 +28,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      MAIN CONTENT  (two-column on desktop)
 ══════════════════════════════════════════════════════════════ --}}
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8">
+<div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8">
 
     {{-- ════════════════════
          LEFT — Cart Items

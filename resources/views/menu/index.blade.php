@@ -596,10 +596,18 @@ $(function () {
         return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
 
+    function htmlEscape(s) {
+        return (s || '').replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;');
+    }
+
     function buildProductCard(p) {
         var fallback = '{{ asset('assets/img/CA_ORIGINAL.png') }}';
         var safeName = p.name ? p.name.replace(/"/g, '&quot;') : '';
         var safeDesc = p.description ? p.description.replace(/"/g, '&quot;') : '';
+        var safeImageUrl = p.image_url ? p.image_url.replace(/"/g, '&quot;') : '';
         return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"' +
                ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
                ' data-category="' + (p.category ? p.category.name : '') + '"' +
@@ -613,8 +621,8 @@ $(function () {
                ' onerror="this.src=\'' + fallback + '\'">' +
                '</div>' +
                '<div class="px-4 pt-3 pb-4 flex flex-col flex-1">' +
-               '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + p.name + '</p>' +
-               '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + (p.description || '') + '</p>' +
+               '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + htmlEscape(p.name) + '</p>' +
+               '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + htmlEscape(p.description) + '</p>' +
                '<div class="flex items-center justify-between mt-3 gap-2">' +
                '<p class="text-sm font-black" style="color:var(--color-primary);">' + fmtRp(p.price) + '</p>' +
                '<button type="button"' +
@@ -624,7 +632,7 @@ $(function () {
                ' data-name="' + safeName + '"' +
                ' data-price="' + p.price + '"' +
                ' data-description="' + safeDesc + '"' +
-               ' data-image="' + p.image_url + '">Pesan</button>' +
+               ' data-image="' + safeImageUrl + '">Pesan</button>' +
                '</div></div></div>';
     }
 
@@ -704,6 +712,9 @@ $(function () {
                 $('#result-count').text(res.total + ' produk');
                 $('#active-cat-label').text(activeCat);
                 $('#empty-state').toggleClass('hidden', res.data.length > 0);
+            })
+            .fail(function () {
+                showCartToast('Gagal memuat produk. Silakan coba lagi.', true);
             })
             .always(function () {
                 $grid.css({ opacity: '1', 'pointer-events': '' });

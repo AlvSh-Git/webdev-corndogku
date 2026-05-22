@@ -53,10 +53,6 @@
         }
         .step-line { min-width: 36px; }
 
-        /* Hide scrollbar cross-browser */
-        .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-
         /* Sauce chip badges */
         .sauce-chip {
             border: 2px solid #A6171C;

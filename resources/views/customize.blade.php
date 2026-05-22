@@ -277,21 +277,21 @@
             </div>{{-- /.carousel left column --}}
 
             {{-- RIGHT: scrollable column containing step card + review + buttons --}}
-            <div class="h-full overflow-y-auto hide-scrollbar flex flex-col gap-4 py-2 pb-24">
+            <div class="h-full flex flex-col justify-center gap-3 py-2">
 
                 {{-- Step instruction card --}}
                 <div id="step-card"
-                     class="bg-white rounded-2xl p-8 md:p-10 shadow-lg">
+                     class="bg-white rounded-2xl p-6 shadow-lg">
                     <div class="flex items-start gap-4">
                         <div id="step-card-num"
-                             class="w-12 h-12 rounded-full flex items-center justify-center
-                                    text-white font-bold text-xl flex-none"
+                             class="w-10 h-10 rounded-full flex items-center justify-center
+                                    text-white font-bold text-base flex-none"
                              style="background-color: var(--color-primary);">1</div>
                         <div>
-                            <p id="step-card-title" class="font-bold text-xl lg:text-2xl" style="color: var(--color-black);">
+                            <p id="step-card-title" class="font-bold text-lg lg:text-xl" style="color: var(--color-black);">
                                 Pilih Isi Corndog
                             </p>
-                            <p id="step-card-desc" class="text-base text-gray-500 mt-2 leading-relaxed">
+                            <p id="step-card-desc" class="text-sm text-gray-500 mt-1 leading-relaxed">
                                 Geser atau gunakan tombol untuk memilih isi favoritemu
                             </p>
                         </div>
@@ -333,15 +333,15 @@
                 <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                     <button id="btn-back"
                             type="button"
-                            class="hidden sm:inline-flex items-center justify-center px-10 py-5 rounded-2xl
+                            class="hidden sm:inline-flex items-center justify-center px-8 py-4 rounded-2xl
                                    font-bold text-base border-2 transition-opacity hover:opacity-70"
                             style="border-color: var(--color-primary); color: var(--color-primary);">
                         &#8592; Kembali
                     </button>
                     <button id="btn-next-step"
                             type="button"
-                            class="flex-1 max-w-4xl mx-auto w-full py-5 rounded-2xl font-bold
-                                   text-xl md:text-2xl tracking-wide
+                            class="flex-1 max-w-4xl mx-auto w-full py-4 rounded-2xl font-bold
+                                   text-lg tracking-wide
                                    transition-opacity hover:opacity-85 active:scale-[0.99]"
                             style="background-color: var(--color-primary); color: var(--color-white);">
                         Next Pilih Varian

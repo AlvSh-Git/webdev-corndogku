@@ -127,14 +127,16 @@ class ProductController extends Controller
 
         // Map each product to include a pre-resolved image_url
         $data = $paginated->getCollection()->map(fn ($p) => [
-            'id'          => $p->id,
-            'name'        => $p->name,
-            'description' => $p->description ?? '',
-            'price'       => (int) $p->price,
-            'image_url'   => $p->image
-                                ? asset($p->image)
-                                : asset('assets/img/CA_ORIGINAL.png'),
-            'category'    => ['name' => $p->category?->name ?? ''],
+            'id'           => $p->id,
+            'name'         => $p->name,
+            'description'  => $p->description ?? '',
+            'price'        => (int) $p->price,
+            'image_url'    => $p->image
+                                 ? asset($p->image)
+                                 : asset('assets/img/CA_ORIGINAL.png'),
+            'is_available' => (bool) $p->is_available,
+            'stock'        => (int) $p->stock,
+            'category'     => ['name' => $p->category?->name ?? ''],
         ]);
 
         return response()->json([

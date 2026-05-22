@@ -75,6 +75,6 @@ it('includes image_url and category name in each item', function () {
 
     $response->assertOk();
     $first = $response->json('data.0');
-    expect($first)->toHaveKeys(['id', 'name', 'description', 'price', 'image_url', 'category']);
+    expect($first)->toHaveKeys(['id', 'name', 'description', 'price', 'image_url', 'is_available', 'stock', 'category']);
     expect($first['category'])->toHaveKey('name');
 });

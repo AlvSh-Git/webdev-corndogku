@@ -360,8 +360,7 @@
      CATEGORY FILTER + PRODUCT GRID
 ══════════════════════════════════════════════════════════════ --}}
 @php
-    $menuProducts = \App\Models\Product::with('category')->orderBy('category_id')->get();
-    $categories   = ['Semua', 'Corndog Asin', 'Corndog Manis', 'Toppoki', 'Combo', 'Es Teler Kwentel', 'Bingsoo'];
+    $categories = ['Semua', 'Corndog Asin', 'Corndog Manis', 'Toppoki', 'Combo', 'Es Teler Kwentel', 'Bingsoo'];
 @endphp
 
 <section class="w-full">
@@ -386,58 +385,13 @@
             <span id="active-cat-label" class="ml-1 text-xs font-bold" style="color: var(--color-primary);">Semua</span>
         </div>
         <span id="result-count" class="text-xs text-gray-400 font-medium">
-            {{ $menuProducts->count() }} produk
+            — produk
         </span>
     </div>
 
-    {{-- Product grid --}}
+    {{-- Product grid — populated by AJAX --}}
     <div id="product-grid"
          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-
-        @foreach ($menuProducts as $p)
-            <div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"
-                 style="box-shadow: 0 2px 12px rgba(0,0,0,0.08);"
-                 data-category="{{ $p->category->name }}"
-                 data-price="{{ $p->price }}"
-                 data-name="{{ strtolower($p->name) }}"
-                 data-id="{{ $p->id }}">
-
-                {{-- Image: uniform crop locked into card top --}}
-                <div class="overflow-hidden rounded-t-2xl">
-                    <img src="{{ asset($p->image) }}"
-                         alt="{{ $p->name }}"
-                         class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300 hover:scale-105"
-                         onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
-                </div>
-
-                {{-- Text area --}}
-                <div class="px-4 pt-3 pb-4 flex flex-col flex-1">
-                    <p class="font-bold text-sm leading-snug" style="color: var(--color-primary);">
-                        {{ $p->name }}
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">
-                        {{ $p->description }}
-                    </p>
-                    <div class="flex items-center justify-between mt-3 gap-2">
-                        <p class="text-sm font-black" style="color: var(--color-primary);">
-                            Rp {{ number_format($p->price, 0, ',', '.') }}
-                        </p>
-                        <button type="button"
-                                class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
-                                style="background-color: var(--color-accent); color: var(--color-black);"
-                                data-id="{{ $p->id }}"
-                                data-name="{{ $p->name }}"
-                                data-price="{{ $p->price }}"
-                                data-description="{{ $p->description }}"
-                                data-image="{{ asset($p->image) }}">
-                            Pesan
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        @endforeach
-
     </div>
 
     {{-- Empty state --}}
@@ -446,6 +400,9 @@
         <p class="font-bold text-lg" style="color: var(--color-black);">Produk tidak ditemukan</p>
         <p class="text-sm text-gray-400 mt-1">Coba kata kunci lain atau pilih kategori berbeda.</p>
     </div>
+
+    {{-- Pagination nav — rendered by JS --}}
+    <div id="pagination-nav"></div>
 
     </div>{{-- /.inner container --}}
 </section>

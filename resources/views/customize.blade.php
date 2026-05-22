@@ -180,24 +180,22 @@
             <div class="flex-none">
                 {{-- Squiggly underline decoration (SVG) --}}
                 <div class="relative leading-none">
-                    <div class="text-6xl sm:text-7xl lg:text-[90px] xl:text-[108px] font-black leading-none tracking-tight">
+                    <div class="text-4xl sm:text-5xl font-black leading-none tracking-tight">
                         <span style="color: #1a1a1a;">CUSTOM</span>
-                        {{-- Spark accent --}}
-                        <span class="inline-block ml-1 text-3xl lg:text-4xl" style="color: #FFBE54;">✦</span>
+                        <span class="inline-block ml-1 text-xl sm:text-2xl" style="color: #FFBE54;">✦</span>
                     </div>
-                    <div class="text-6xl sm:text-7xl lg:text-[90px] xl:text-[108px] font-black leading-none tracking-tight"
+                    <div class="text-4xl sm:text-5xl font-black leading-none tracking-tight"
                          style="color: var(--color-primary);">CORNDOG</div>
-                    {{-- Wavy underline --}}
-                    <svg class="mt-1" width="340" height="14" viewBox="0 0 340 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 7 Q28 2 54 7 Q80 12 106 7 Q132 2 158 7 Q184 12 210 7 Q236 2 262 7 Q288 12 314 7 Q327 4 338 7"
-                              stroke="#A6171C" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                    <svg class="mt-1" width="200" height="10" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 5 Q18 1 34 5 Q50 9 66 5 Q82 1 98 5 Q114 9 130 5 Q146 1 162 5 Q178 9 194 5"
+                              stroke="#A6171C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
                     </svg>
                 </div>
                 {{-- Subtitle pill --}}
-                <div class="mt-5 inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-bold text-base lg:text-lg"
+                <div class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm"
                      style="background-color: #FFBE54; color: #1a1a1a;">
                     Buat Corndog Favoritemu Sesuai Seleramu
-                    <svg class="w-5 h-5 flex-none" viewBox="0 0 24 24" fill="#A6171C">
+                    <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="#A6171C">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                 </div>

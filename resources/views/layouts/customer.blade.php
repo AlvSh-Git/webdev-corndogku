@@ -7,6 +7,7 @@
     <title>@yield('title', 'Corndog-Ku')</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
 
@@ -16,8 +17,8 @@
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
-    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16
-                flex items-center justify-between gap-6">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16 h-16
+                flex items-center justify-between gap-4">
 
         {{-- Brand --}}
         <a href="{{ route('welcome') }}" class="flex items-center gap-2 flex-none">
@@ -28,27 +29,30 @@
                   style="color: var(--color-black);">Corndog-Ku</span>
         </a>
 
-        {{-- Desktop nav links (hidden on mobile) --}}
-        <nav class="hidden md:flex items-center gap-7 flex-1 justify-center">
-            @php $cur = Route::currentRouteName(); @endphp
+        {{-- Search bar (center) — submits to menu; menu page prevents submit for live filtering --}}
+        <form action="{{ route('menu') }}" method="GET" id="navbar-search-form"
+              class="flex-1 max-w-md mx-auto">
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+                </svg>
+                <input id="navbar-search"
+                       type="search"
+                       name="q"
+                       placeholder="Cari produk…"
+                       value="{{ request('q') }}"
+                       autocomplete="off"
+                       class="w-full pl-9 pr-4 py-2 rounded-full text-sm border
+                              focus:outline-none focus:ring-2 focus:ring-red-200"
+                       style="border-color: var(--color-border); background-color: #f9f9f9;">
+            </div>
+        </form>
 
-            @foreach([
-                ['route' => 'welcome',   'label' => 'Beranda'],
-                ['route' => 'menu',      'label' => 'Menu'],
-                ['route' => 'customize', 'label' => 'Kustom Corndog'],
-                ['route' => 'profile',   'label' => 'Profil Saya'],
-            ] as $nav)
-                @php $active = ($cur === $nav['route']); @endphp
-                <a href="{{ route($nav['route']) }}"
-                   class="text-sm transition-colors hover:opacity-70 {{ $active ? 'font-bold' : 'font-medium' }}"
-                   style="color: {{ $active ? 'var(--color-primary)' : 'var(--color-black)' }};">
-                    {{ $nav['label'] }}
-                </a>
-            @endforeach
-        </nav>
-
-        {{-- Right: cart + auth actions --}}
-        <div class="flex items-center gap-2 flex-none">
+        {{-- Right: Cart → Avatar → Greeting → Logout --}}
+        <div class="flex items-center gap-4 flex-none">
 
             {{-- Cart button --}}
             <a href="{{ route('cart') }}"
@@ -61,18 +65,14 @@
                              2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100
                              4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px]
+                <span id="cart-badge"
+                      class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px]
                              font-bold flex items-center justify-center"
                       style="background-color: var(--color-accent);
                              color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
 
             @auth
-                {{-- Logged-in: greeting + avatar + logout --}}
-                <span class="hidden sm:block text-sm font-semibold"
-                      style="color: var(--color-black);">
-                    Halo, {{ auth()->user()->name }}
-                </span>
                 <a href="{{ route('profile') }}"
                    class="w-9 h-9 rounded-full flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
@@ -80,6 +80,10 @@
                    title="{{ auth()->user()->name }}">
                     {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
                 </a>
+                <span class="hidden sm:block text-sm font-semibold"
+                      style="color: var(--color-black);">
+                    Halo, {{ auth()->user()->name }}
+                </span>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit"

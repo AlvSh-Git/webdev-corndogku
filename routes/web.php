@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Customer\WelcomeController;
 use App\Http\Controllers\Customer\MenuController;
 use App\Http\Controllers\Customer\CartController;
@@ -50,6 +51,9 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/login',   [AuthController::class, 'login'])->name('login.post');
     Route::post('/register', fn () => back())->name('register.post');
+
+    Route::get('auth/google',          [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

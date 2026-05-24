@@ -19,13 +19,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|string',
+            'login'    => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $identifier = $request->input('email');
-
-        // Accept both email and username in the same field
+        $identifier = $request->input('login');
         $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         if (Auth::attempt([$field => $identifier, 'password' => $request->password], $request->boolean('remember'))) {
@@ -34,8 +32,8 @@ class AuthController extends Controller
         }
 
         return back()
-            ->withInput($request->only('email'))
-            ->with('error', 'Email/username atau password salah.');
+            ->withErrors(['login' => 'Kredensial yang Anda masukkan tidak cocok dengan data kami.'])
+            ->withInput($request->only('login', 'remember'));
     }
 
     public function logout(Request $request)

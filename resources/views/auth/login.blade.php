@@ -46,11 +46,11 @@
                 @csrf
                 <div class="space-y-4">
                     <div>
-                        <input type="email" name="email" placeholder="Email"
-                               value="{{ old('email') }}" required autofocus autocomplete="username"
+                        <input type="text" name="login" placeholder="Email atau Username"
+                               value="{{ old('login') }}" required autofocus autocomplete="username"
                                class="w-full px-4 py-2.5 border rounded-md text-sm outline-none focus:border-red-400 transition-colors
-                                      @error('email') border-red-400 @else border-gray-200 @enderror">
-                        @error('email')
+                                      @error('login') border-red-400 @else border-gray-200 @enderror">
+                        @error('login')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

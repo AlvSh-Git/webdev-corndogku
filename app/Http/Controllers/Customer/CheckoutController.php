@@ -95,6 +95,22 @@ class CheckoutController extends Controller
         $tax      = (int) round($subtotal * 0.11);
         $total    = $subtotal + $tax;
 
+        // Pre-checkout stock guard — abort before touching the DB if any item is insufficient
+        foreach ($cart as $item) {
+            $isCustom  = !empty($item['is_custom']);
+            $productId = (!$isCustom && is_numeric($item['id'])) ? (int) $item['id'] : null;
+            if ($productId) {
+                $product = Product::find($productId);
+                $qty     = (int) ($item['qty'] ?? 1);
+                if ($product && $product->stock < $qty) {
+                    return response()->json([
+                        'error'   => 'stock_insufficient',
+                        'message' => "Stok '{$product->name}' tidak mencukupi. Tersisa: {$product->stock}.",
+                    ], 422);
+                }
+            }
+        }
+
         $createdOrderId = null;
 
         DB::transaction(function () use ($cart, $orderNumber, $total, &$createdOrderId) {

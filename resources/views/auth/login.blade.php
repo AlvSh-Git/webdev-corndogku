@@ -1,94 +1,123 @@
-@extends('layouts.guest')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Masuk — Corndog-Ku</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="font-sans antialiased">
 
-@section('title', 'Log In — Corndog-Ku')
-@section('kembali_href', url('/'))
+<div class="min-h-screen relative text-gray-900 font-sans overflow-hidden bg-[#FEFDF2]">
 
-@section('content')
-
-<div class="bg-white px-8 py-10 w-full"
-     style="border-radius:20px; box-shadow:3px 4px 10px rgba(0,0,0,0.25);">
-
-    <h1 class="text-3xl font-medium text-black mb-8 text-center">Log In</h1>
-
-    @if (session('error'))
-        <div class="mb-4 text-sm text-red-600 bg-red-50 rounded-lg px-4 py-3">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('login.post') }}" class="flex flex-col gap-4">
-        @csrf
-
-        {{-- Email --}}
-        <div>
-            <input type="text"
-                   name="email"
-                   placeholder="Email"
-                   value="{{ old('email') }}"
-                   required autofocus autocomplete="username"
-                   class="w-full px-3 py-2.5 text-sm text-gray-700 outline-none transition-colors focus:border-gray-400 placeholder-[#BDBDBD]"
-                   style="border:1px solid #D9D9D9; border-radius:5px; background:#fff;">
-            @error('email')
-                <p class="mt-1 text-xs" style="color:var(--color-danger);">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Password --}}
-        <div>
-            <input type="password"
-                   name="password"
-                   placeholder="Password"
-                   required
-                   class="w-full px-3 py-2.5 text-sm text-gray-700 outline-none transition-colors focus:border-gray-400 placeholder-[#BDBDBD]"
-                   style="border:1px solid #D9D9D9; border-radius:5px; background:#fff;">
-            @error('password')
-                <p class="mt-1 text-xs" style="color:var(--color-danger);">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Submit --}}
-        <button type="submit"
-                class="w-full py-2.5 text-white text-sm font-bold tracking-widest transition-opacity hover:opacity-90"
-                style="background:var(--color-primary); border-radius:5px;">
-            LOG IN
-        </button>
-    </form>
-
-    {{-- Lupa Password --}}
-    <div class="mt-3">
-        <a href="#" class="text-xs font-medium hover:underline" style="color:#0C2A92;">
-            Lupa Password
-        </a>
+    {{-- Background texture --}}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ asset('assets/img/login-logout_background.png') }}"
+             alt="" class="w-full h-full object-cover" aria-hidden="true">
     </div>
 
-    {{-- ATAU divider --}}
-    <div class="flex items-center gap-3 my-5">
-        <div class="flex-1 h-px bg-[#D9D9D9]"></div>
-        <span class="text-xs font-semibold" style="color:rgba(0,0,0,0.25);">ATAU</span>
-        <div class="flex-1 h-px bg-[#D9D9D9]"></div>
-    </div>
-
-    {{-- Google login --}}
-    <a href="{{ route('auth.google') }}"
-       class="w-full flex items-center justify-center gap-3 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-       style="border:1px solid #D9D9D9; border-radius:5px;">
-        <svg class="w-5 h-5 flex-none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    {{-- Back --}}
+    <a href="{{ url('/') }}"
+       class="absolute top-6 left-6 md:left-10 text-red-700 hover:text-red-900 flex items-center gap-2 z-50 font-bold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7"/>
         </svg>
-        Sign in with Google
+        Kembali
     </a>
 
-    {{-- Register link --}}
-    <p class="text-center text-sm font-medium mt-6 text-black">
-        Baru di Corndog-Ku?&nbsp;
-        <a href="{{ route('register') }}" class="font-semibold hover:underline" style="color:var(--color-primary);">
-            Daftar
-        </a>
-    </p>
+    {{-- Centred card --}}
+    <div class="absolute inset-0 flex flex-col justify-center items-center z-30 px-4">
+        <div class="max-w-md w-full bg-white p-10 rounded-2xl shadow-xl">
+
+            <div class="text-center mb-8">
+                <img src="{{ asset('assets/img/logo.png') }}" alt="Corndog-Ku" class="h-10 w-auto mx-auto mb-4">
+                <h1 class="text-3xl font-extrabold text-gray-900">Log In</h1>
+            </div>
+
+            {{-- Flash error --}}
+            @if (session('error'))
+                <div class="mb-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <form action="{{ route('login.post') }}" method="POST">
+                @csrf
+                <div class="space-y-4">
+                    <div>
+                        <input type="email" name="email" placeholder="Email"
+                               value="{{ old('email') }}" required autofocus autocomplete="username"
+                               class="w-full px-4 py-2.5 border rounded-md text-sm outline-none focus:border-red-400 transition-colors
+                                      @error('email') border-red-400 @else border-gray-200 @enderror">
+                        @error('email')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <input type="password" name="password" placeholder="Password"
+                               required
+                               class="w-full px-4 py-2.5 border rounded-md text-sm outline-none focus:border-red-400 transition-colors
+                                      @error('password') border-red-400 @else border-gray-200 @enderror">
+                        @error('password')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full mt-6 bg-[#B82B21] text-white font-bold py-2.5 px-4 rounded-md
+                               hover:bg-red-800 transition-colors tracking-widest text-sm">
+                    LOG IN
+                </button>
+
+                <div class="text-center mt-4 text-sm">
+                    <a href="#" class="text-red-700 hover:underline">Lupa Password</a>
+                </div>
+            </form>
+
+            <div class="text-center mt-6 text-xs font-semibold text-gray-400">ATAU</div>
+
+            <div class="mt-4 flex justify-center">
+                <a href="{{ route('auth.google') }}"
+                   class="flex items-center gap-2.5 border border-gray-200 bg-white px-5 py-2.5
+                          rounded-full shadow-md hover:shadow-lg transition-all">
+                    {{-- Inline Google G SVG — no external dependency --}}
+                    <svg class="w-5 h-5 flex-none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span class="text-sm font-bold text-gray-700">Google</span>
+                </a>
+            </div>
+
+            <div class="text-center mt-8 text-sm text-gray-600">
+                Baru di Corndog-Ku?
+                <a href="{{ route('register') }}" class="text-red-700 font-bold hover:underline">Daftar</a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Decorative corndog images — large, anchored to bottom corners --}}
+    <div class="absolute bottom-0 left-0 z-20 hidden lg:block origin-bottom-left">
+        <img src="{{ asset('assets/img/login-logout_corndog_01.png') }}"
+             alt="" class="h-[400px] xl:h-[550px] 2xl:h-[650px] w-auto drop-shadow-2xl"
+             aria-hidden="true">
+    </div>
+    <div class="absolute bottom-0 left-12 xl:left-20 z-10 hidden lg:block origin-bottom-left">
+        <img src="{{ asset('assets/img/login-logout_corndog_02.png') }}"
+             alt="" class="h-[300px] xl:h-[450px] 2xl:h-[500px] w-auto drop-shadow-xl opacity-90"
+             aria-hidden="true">
+    </div>
+    <div class="absolute bottom-0 right-0 z-20 hidden lg:block origin-bottom-right">
+        <img src="{{ asset('assets/img/login-logout_corndog_03.png') }}"
+             alt="" class="h-[350px] xl:h-[500px] 2xl:h-[600px] w-auto drop-shadow-2xl"
+             aria-hidden="true">
+    </div>
 
 </div>
 
-@endsection
+</body>
+</html>

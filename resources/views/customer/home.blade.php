@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -112,25 +113,6 @@
         <div class="flex items-center gap-4 flex-none">
 
             {{-- Lovers avatar group (desktop only) --}}
-            <div class="hidden lg:flex items-center gap-2 mr-2">
-                <div class="flex -space-x-1.5 flex-none">
-                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
-                                text-white text-[9px] font-bold"
-                         style="background-color: #60A5FA; border-color: #f8f8f8;">A</div>
-                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
-                                text-white text-[9px] font-bold"
-                         style="background-color: #A855F7; border-color: #f8f8f8;">D</div>
-                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
-                                text-white text-[9px] font-bold"
-                         style="background-color: #F472B6; border-color: #f8f8f8;">B</div>
-                    <div class="w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center
-                                text-white text-[9px] font-bold"
-                         style="background-color: #4ADE80; border-color: #f8f8f8;">C</div>
-                </div>
-                <span class="text-xs font-semibold whitespace-nowrap"
-                      style="color: var(--color-black);">2.5k+ lovers</span>
-            </div>
-
             {{-- Cart --}}
             <a href="{{ route('cart') }}"
                class="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
@@ -640,7 +622,22 @@
 
     {{-- ── One marquee container per category ──────────────────────── --}}
     @foreach ($categories as $category)
-        @php $catProducts = $products->where('category_id', $category->id); @endphp
+        @php
+            $catProducts = $products->where('category_id', $category->id);
+
+            // Guarantee track width ≥ 2 × max-viewport (1440 px) so the -50%
+            // animation never reveals a blank gap on the right side.
+            // Card approx px: w-[260px] + mx-3 (24 px) + flex-gap (12 px) = 296 px.
+            // Copies must be even so translateX(-50%) resets on an identical frame.
+            $count = $catProducts->count();
+            if ($count > 0) {
+                $needed = (int) ceil((2 * 1440) / ($count * 296));
+                if ($needed % 2 !== 0) { $needed++; }
+                $totalCopies = max(2, $needed);
+            } else {
+                $totalCopies = 2;
+            }
+        @endphp
 
         <div id="marquee-{{ $category->id }}"
              class="category-marquee-container overflow-hidden w-full py-10 {{ $loop->first ? '' : 'hidden' }}">
@@ -652,11 +649,12 @@
                 </div>
             @else
                 <div class="marquee-track hover:[animation-play-state:paused]">
-                    @for ($r = 0; $r < 2; $r++)
+                    @for ($r = 0; $r < $totalCopies; $r++)
                         @foreach ($catProducts as $product)
                             <div class="product-card relative bg-white rounded-3xl shadow-sm p-4 pt-14
                                          w-[240px] md:w-[260px] shrink-0 mx-3 flex flex-col justify-between
                                          cursor-pointer hover:-translate-y-1 transition-all duration-200"
+                                 @if($r > 0) aria-hidden="true" @endif
                                  data-category="{{ $product->category->name }}"
                                  data-price="{{ $product->price }}"
                                  data-name="{{ strtolower($product->name) }}"
@@ -686,17 +684,25 @@
                                     <p class="text-sm font-black" style="color: var(--color-primary);">
                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                     </p>
-                                    <button type="button"
-                                            class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold
-                                                   transition-opacity hover:opacity-80"
-                                            style="background-color: var(--color-accent); color: var(--color-black);"
-                                            data-id="{{ $product->id }}"
-                                            data-name="{{ $product->name }}"
-                                            data-price="{{ $product->price }}"
-                                            data-description="{{ $product->description }}"
-                                            data-image="{{ asset($product->image) }}">
-                                        Pesan
-                                    </button>
+                                    @if ($product->is_available && $product->stock > 0)
+                                        <button type="button"
+                                                class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold
+                                                       transition-opacity hover:opacity-80"
+                                                style="background-color: var(--color-accent); color: var(--color-black);"
+                                                data-id="{{ $product->id }}"
+                                                data-name="{{ $product->name }}"
+                                                data-price="{{ $product->price }}"
+                                                data-description="{{ $product->description }}"
+                                                data-image="{{ asset($product->image) }}">
+                                            Pesan
+                                        </button>
+                                    @else
+                                        <button type="button" disabled
+                                                class="flex-none px-3 py-1.5 rounded-full text-xs font-bold cursor-not-allowed"
+                                                style="background-color: #d1d5db; color: #9ca3af;">
+                                            Habis
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -777,49 +783,89 @@
         </div>
 
         @if (!empty($googleReviews))
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                @foreach ($googleReviews as $review)
-                    <div class="bg-white rounded-2xl p-5 flex flex-col gap-3"
-                         style="box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
+            <div class="relative w-full px-4 sm:px-10">
 
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="flex items-center gap-3">
-                                {{-- Use Google avatar if available, otherwise initial --}}
-                                @if (!empty($review['profile_photo_url']))
-                                    <img src="{{ $review['profile_photo_url'] }}"
-                                         alt="{{ $review['author_name'] }}"
-                                         class="w-10 h-10 rounded-full object-cover flex-none">
-                                @else
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white
-                                                font-bold text-sm flex-none"
-                                         style="background-color: var(--color-primary);">
-                                        {{ strtoupper(mb_substr($review['author_name'] ?? '?', 0, 1)) }}
+                {{-- Left arrow — bound to Swiper via JS --}}
+                <button id="swiperPrevBtn"
+                        class="absolute left-0 top-[40%] -translate-y-1/2 z-20
+                               bg-white rounded-full p-2 md:p-3 shadow-lg hover:shadow-xl hover:bg-gray-50
+                               focus:outline-none transition-all hover:scale-110 hidden sm:flex
+                               border border-gray-100" aria-label="Slide sebelumnya">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <div class="swiper reviews-swiper w-full pb-10">
+                    <div class="swiper-wrapper">
+                        @foreach ($googleReviews as $review)
+                            <div class="swiper-slide !w-[280px] sm:!w-[320px] h-auto">
+                                <div class="bg-white rounded-2xl p-6 h-full flex flex-col justify-between
+                                            hover:shadow-md transition-shadow"
+                                     style="box-shadow: 0 2px 12px rgba(0,0,0,0.07); border: 1px solid #f3f4f6;">
+
+                                    <div>
+                                        {{-- Author row + Google logo --}}
+                                        <div class="flex items-start justify-between gap-2 mb-4">
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                @if (!empty($review['profile_photo_url']))
+                                                    <img src="{{ $review['profile_photo_url'] }}"
+                                                         alt="{{ $review['author_name'] }}"
+                                                         class="w-10 h-10 rounded-full object-cover flex-none border border-gray-100">
+                                                @else
+                                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white
+                                                                font-bold text-sm flex-none"
+                                                         style="background-color: var(--color-primary);">
+                                                        {{ strtoupper(mb_substr($review['author_name'] ?? '?', 0, 1)) }}
+                                                    </div>
+                                                @endif
+                                                <div class="min-w-0">
+                                                    <h4 class="font-bold text-sm text-gray-900 truncate">{{ $review['author_name'] ?? '' }}</h4>
+                                                    <p class="text-xs text-gray-400 mt-0.5">{{ $review['formatted_time'] ?? '' }}</p>
+                                                </div>
+                                            </div>
+                                            {{-- Google logo (inline SVG — no external dependency) --}}
+                                            <svg class="w-5 h-5 flex-none mt-0.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                            </svg>
+                                        </div>
+
+                                        {{-- Star rating (filled + unfilled) --}}
+                                        <div class="flex gap-0.5 mb-3">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= ($review['rating'] ?? 5))
+                                                    <span class="text-base" style="color: var(--color-accent);">★</span>
+                                                @else
+                                                    <span class="text-base text-gray-200">★</span>
+                                                @endif
+                                            @endfor
+                                        </div>
+
+                                        {{-- Review text --}}
+                                        <p class="text-sm leading-relaxed text-gray-600 line-clamp-4">"{{ $review['text'] ?? '' }}"</p>
                                     </div>
-                                @endif
-                                <div>
-                                    <p class="font-semibold text-sm leading-tight"
-                                       style="color: var(--color-black);">{{ $review['author_name'] ?? '' }}</p>
-                                    <p class="text-xs text-gray-400 mt-0.5">{{ $review['formatted_time'] ?? '' }}</p>
                                 </div>
                             </div>
-                            {{-- Google logo --}}
-                            <svg class="w-5 h-5 flex-none mt-0.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                        </div>
-
-                        <div class="flex gap-0.5">
-                            @for ($i = 0; $i < ($review['rating'] ?? 5); $i++)
-                                <span class="text-base" style="color: var(--color-accent);">★</span>
-                            @endfor
-                        </div>
-
-                        <p class="text-xs leading-relaxed text-gray-600 flex-1">{{ $review['text'] ?? '' }}</p>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
+
+                {{-- Right arrow — bound to Swiper via JS --}}
+                <button id="swiperNextBtn"
+                        class="absolute right-0 top-[40%] -translate-y-1/2 z-20
+                               bg-white rounded-full p-2 md:p-3 shadow-lg hover:shadow-xl hover:bg-gray-50
+                               focus:outline-none transition-all hover:scale-110 hidden sm:flex
+                               border border-gray-100" aria-label="Slide berikutnya">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
             </div>
         @else
             <p class="text-sm text-gray-400 italic">Belum ada ulasan yang tersedia.</p>
@@ -1168,8 +1214,71 @@ $(function () {
         if (e.key === 'Escape') closeModal();
     });
 
+    /* Reviews navigation is handled by Swiper (see script block below jQuery). */
+
+    /* ── Normalize all marquee speeds to match Corndog Manis pace ─── */
+    (function normalizeMarqueeSpeeds() {
+        var BASE_DURATION = 24; // seconds — the CSS default
+
+        var $manisBtn = $('.category-btn').filter(function () {
+            return $.trim($(this).text()) === 'Corndog Manis';
+        });
+        if (!$manisBtn.length) { return; }
+        var manisId = $manisBtn.data('target');
+
+        // Temporarily show hidden containers off-screen so the browser lays them out
+        var hidden = [];
+        $('.category-marquee-container').each(function () {
+            if ($(this).hasClass('hidden')) {
+                hidden.push(this);
+                $(this).removeClass('hidden')
+                       .css({ visibility: 'hidden', position: 'absolute', pointerEvents: 'none' });
+            }
+        });
+
+        var $manisTrack = $('#' + manisId + ' .marquee-track').first();
+        var manisW = $manisTrack.length ? $manisTrack[0].scrollWidth : 0;
+
+        if (manisW > 0) {
+            // Speed (px/s) that Corndog Manis scrolls: it moves -50% (half its width) in BASE_DURATION s
+            var pxPerSec = (manisW / 2) / BASE_DURATION;
+            $('.marquee-track').each(function () {
+                var w = this.scrollWidth;
+                if (w > 0) {
+                    this.style.animationDuration = ((w / 2) / pxPerSec).toFixed(2) + 's';
+                }
+            });
+        }
+
+        // Restore hidden containers
+        $.each(hidden, function (_, el) {
+            $(el).css({ visibility: '', position: '', pointerEvents: '' }).addClass('hidden');
+        });
+    })();
+
 });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(function () {
+    if (typeof Swiper === 'undefined' || !document.querySelector('.reviews-swiper')) { return; }
+
+    var reviewsSwiper = new Swiper('.reviews-swiper', {
+        slidesPerView: 'auto',
+        spaceBetween: 16,
+        loop: true,
+        grabCursor: true,
+        breakpoints: {
+            640: { spaceBetween: 24 },
+        },
+    });
+
+    var prevBtn = document.getElementById('swiperPrevBtn');
+    var nextBtn = document.getElementById('swiperNextBtn');
+    if (prevBtn) { prevBtn.addEventListener('click', function () { reviewsSwiper.slidePrev(); }); }
+    if (nextBtn) { nextBtn.addEventListener('click', function () { reviewsSwiper.slideNext(); }); }
+})();
+</script>
 </body>
 </html>

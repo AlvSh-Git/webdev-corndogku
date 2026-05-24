@@ -455,31 +455,40 @@ $(function () {
         var safeName = htmlEscape(p.name);
         var safeDesc = htmlEscape(p.description);
         var safeImageUrl = p.image_url ? p.image_url.replace(/"/g, '&quot;') : '';
-        return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden cursor-pointer"' +
+        var inStock = p.is_available !== false && (p.stock === undefined || p.stock > 0);
+
+        var orderBtn = inStock
+            ? '<button type="button"' +
+              ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
+              ' style="background-color:var(--color-accent);color:var(--color-black);"' +
+              ' data-id="' + p.id + '"' +
+              ' data-name="' + safeName + '"' +
+              ' data-price="' + p.price + '"' +
+              ' data-description="' + safeDesc + '"' +
+              ' data-image="' + safeImageUrl + '">Pesan</button>'
+            : '<button type="button" disabled' +
+              ' class="flex-none px-3 py-1 rounded-full text-xs font-bold cursor-not-allowed"' +
+              ' style="background-color:#d1d5db;color:#9ca3af;">Habis</button>';
+
+        return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden' + (inStock ? ' cursor-pointer' : '') + '"' +
                ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
                ' data-category="' + htmlEscape(p.category ? p.category.name : '') + '"' +
                ' data-price="' + p.price + '"' +
                ' data-name="' + safeName.toLowerCase() + '"' +
                ' data-id="' + p.id + '">' +
-               '<div class="overflow-hidden rounded-t-2xl">' +
+               '<div class="overflow-hidden rounded-t-2xl relative">' +
                '<img src="' + safeImageUrl + '"' +
                ' alt="' + safeName + '"' +
-               ' class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300 hover:scale-105"' +
+               ' class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300' + (inStock ? ' hover:scale-105' : ' opacity-60') + '"' +
                ' onerror="this.src=\'' + fallback + '\'">' +
+               (!inStock ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl"><span class="text-white text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(0,0,0,0.55);">Habis</span></div>' : '') +
                '</div>' +
                '<div class="px-4 pt-3 pb-4 flex flex-col flex-1">' +
                '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + htmlEscape(p.name) + '</p>' +
                '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + htmlEscape(p.description) + '</p>' +
                '<div class="flex items-center justify-between mt-3 gap-2">' +
                '<p class="text-sm font-black" style="color:var(--color-primary);">' + fmtRp(p.price) + '</p>' +
-               '<button type="button"' +
-               ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
-               ' style="background-color:var(--color-accent);color:var(--color-black);"' +
-               ' data-id="' + p.id + '"' +
-               ' data-name="' + safeName + '"' +
-               ' data-price="' + p.price + '"' +
-               ' data-description="' + safeDesc + '"' +
-               ' data-image="' + safeImageUrl + '">Pesan</button>' +
+               orderBtn +
                '</div></div></div>';
     }
 

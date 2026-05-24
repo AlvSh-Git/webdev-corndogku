@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -54,12 +57,48 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone'    => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $base     = Str::slug(explode('@', $request->email)[0], '');
+        $username = $base ?: 'user';
+
+        $user = null;
+        do {
+            try {
+                $user = User::create([
+                    'name'     => $request->name,
+                    'username' => $username,
+                    'email'    => $request->email,
+                    'phone'    => $request->phone,
+                    'password' => bcrypt($request->password),
+                    'role'     => 'customer',
+                    'status'   => 'active',
+                ]);
+            } catch (QueryException $e) {
+                if ($e->errorInfo[1] !== 1062) throw $e;
+                $username = ($base ?: 'user') . Str::random(4);
+            }
+        } while ($user === null);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect('/');
+    }
+
     private function redirectByRole($user)
     {
         return match ($user->role) {
-            'owner'   => redirect()->route('owner.dashboard'),
-            'cashier' => redirect()->route('cashier.dashboard'),
-            default   => redirect('/'),
+            'owner'            => redirect()->route('owner.dashboard'),
+            'cashier', 'employee' => redirect()->route('cashier.dashboard'),
+            default            => redirect('/'),
         };
     }
 }

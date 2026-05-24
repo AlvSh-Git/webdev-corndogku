@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -31,15 +32,27 @@ class SocialiteController extends Controller
             if ($user) {
                 $user->update(['google_id' => $googleUser->getId()]);
             } else {
-                $user = User::create([
-                    'name'      => $googleUser->getName(),
-                    'email'     => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'avatar'    => $googleUser->getAvatar(),
-                    'password'  => bcrypt(Str::random(24)),
-                    'role'      => 'customer',
-                    'status'    => 'active',
-                ]);
+                $base     = Str::slug(explode('@', $googleUser->getEmail())[0], '');
+                $username = $base ?: 'user';
+
+                $user = null;
+                do {
+                    try {
+                        $user = User::create([
+                            'name'      => $googleUser->getName(),
+                            'email'     => $googleUser->getEmail(),
+                            'google_id' => $googleUser->getId(),
+                            'avatar'    => $googleUser->getAvatar(),
+                            'password'  => bcrypt(Str::random(24)),
+                            'role'      => 'customer',
+                            'status'    => 'active',
+                            'username'  => $username,
+                        ]);
+                    } catch (QueryException $e) {
+                        if ($e->errorInfo[1] !== 1062) throw $e;
+                        $username = ($base ?: 'user') . Str::random(4);
+                    }
+                } while ($user === null);
             }
         }
 

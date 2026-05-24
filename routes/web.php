@@ -17,6 +17,7 @@ use App\Http\Controllers\Owner\CategoryController;
 use App\Http\Controllers\Owner\JadwalController;
 use App\Http\Controllers\Cashier\DashboardController as CashierDashboard;
 use App\Http\Controllers\Cashier\PurchaseController;
+use App\Http\Controllers\Customer\ChatbotController;
 
 // ── Public customer pages ───────────────────────────────────────
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -26,6 +27,9 @@ Route::get('/store-status', [MenuController::class, 'storeStatus'])->name('store
 Route::get('/api/products', [MenuController::class, 'catalog'])->name('api.products');
 Route::get('/api/orders/{id}', [HistoryController::class, 'show'])->name('api.orders.show');
 Route::post('/orders/{id}/send-whatsapp', [HistoryController::class, 'sendReceipt'])->name('orders.send-whatsapp');
+
+// ── Chatbot ──────────────────────────────────────────────────────
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 
 // ── Cart ────────────────────────────────────────────────────────
 Route::get('/cart',          [CartController::class, 'index'])->name('cart');
@@ -50,7 +54,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/login',   [AuthController::class, 'login'])->name('login.post');
-    Route::post('/register', fn () => back())->name('register.post');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post')->middleware('throttle:10,1');
 
     Route::get('auth/google',          [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);

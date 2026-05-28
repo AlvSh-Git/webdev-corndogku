@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -64,8 +65,9 @@ class CheckoutController extends Controller
                 ];
 
                 $snapToken = \Midtrans\Snap::getSnapToken($params);
+                Log::info('Midtrans Snap token generated', ['order_id' => $orderId]);
             } catch (\Exception $e) {
-                // Snap token unavailable — frontend degrades gracefully
+                Log::error('Midtrans Snap token failed', ['error' => $e->getMessage(), 'order_id' => $orderId]);
             }
         }
 

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WelcomeController extends Controller
 {
@@ -33,10 +34,21 @@ class WelcomeController extends Controller
                     'language' => 'id',
                 ]);
 
-                return $response->successful()
+                Log::info('Google Places API called', [
+                    'status'  => $response->status(),
+                    'success' => $response->successful(),
+                    'body'    => $response->json(),
+                ]);
+
+                $reviews = $response->successful()
                     ? ($response->json('result.reviews') ?? [])
                     : [];
+
+                Log::info('Google reviews fetched', ['count' => count($reviews)]);
+
+                return $reviews;
             } catch (\Exception $e) {
+                Log::error('Google Places API error', ['error' => $e->getMessage()]);
                 return [];
             }
         });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class HistoryController extends Controller
 {
@@ -132,6 +133,13 @@ class HistoryController extends Controller
 
             $body = $response->json();
 
+            Log::info('Fonnte WA receipt (customer)', [
+                'order_id' => $id,
+                'phone'    => $targetPhone,
+                'status'   => $response->status(),
+                'body'     => $body,
+            ]);
+
             if ($response->successful() && ($body['status'] ?? false) === true) {
                 return response()->json(['success' => true, 'message' => 'Struk teks berhasil dikirim.']);
             }
@@ -142,6 +150,7 @@ class HistoryController extends Controller
             ], 500);
 
         } catch (\Exception $e) {
+            Log::error('Fonnte WA receipt error (customer)', ['order_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

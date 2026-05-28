@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Models\Category;
@@ -308,6 +309,13 @@ class PurchaseController extends Controller
 
             $body = $response->json();
 
+            Log::info('Fonnte WA receipt (cashier)', [
+                'order_id' => $id,
+                'phone'    => $phone,
+                'status'   => $response->status(),
+                'body'     => $body,
+            ]);
+
             if (($body['status'] ?? false) === true) {
                 return response()->json(['success' => true]);
             }
@@ -318,6 +326,7 @@ class PurchaseController extends Controller
             ], 422);
 
         } catch (\Exception $e) {
+            Log::error('Fonnte WA receipt error (cashier)', ['order_id' => $id, 'error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal terhubung ke Fonnte: ' . $e->getMessage(),

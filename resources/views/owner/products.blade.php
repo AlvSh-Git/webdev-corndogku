@@ -44,6 +44,24 @@
 {{-- ── Product Grid ─────────────────────────────────────────────── --}}
 <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-5">
 
+    {{-- Add Menu card - Background Merah --}}
+    <button id="btn-add-product" type="button"
+            class="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 transition-all hover:opacity-90"
+            style="background-color: #A6171C; border-color: #A6171C; min-h-[220px];">
+        
+        {{-- Lingkaran Ikon - Dibuat putih transparan agar ikon + terlihat jelas --}}
+        <span class="flex items-center justify-center w-12 h-12 rounded-full"
+            style="background-color: rgba(255, 255, 255, 0.2);">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none"
+                stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+                <path d="M12 4v16M4 12h16"/>
+            </svg>
+        </span>
+        
+        {{-- Teks Putih --}}
+        <span class="text-sm font-bold" style="color: #FFFFFF;">Add Menu</span>
+    </button>
+
     @foreach($products as $product)
     <div class="product-card bg-white rounded-2xl relative overflow-visible {{ !$product->is_available || $product->stock <= 0 ? 'opacity-60' : '' }}"
          data-name="{{ strtolower($product->name) }}"
@@ -133,21 +151,7 @@
     </div>
     @endforeach
 
-    {{-- Add Menu card --}}
-    <button id="btn-add-product" type="button"
-            class="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed
-                   min-h-[220px] transition-opacity hover:opacity-70 bg-white"
-            style="border-color:var(--color-border);">
-        <span class="flex items-center justify-center w-12 h-12 rounded-full"
-              style="background-color:rgba(166,23,28,0.10);">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                 style="color:var(--color-primary);">
-                <path d="M12 4v16M4 12h16"/>
-            </svg>
-        </span>
-        <span class="text-sm font-bold" style="color:var(--color-black);">Add Menu</span>
-    </button>
+   
 
     <p id="no-results" class="hidden col-span-full text-center text-sm text-gray-400 py-10">
         No products match your search.

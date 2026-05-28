@@ -17,6 +17,7 @@
         ['route' => 'owner.products',  'label' => 'Product',          'icon' => 'icon-product.svg'],
         ['route' => 'owner.reports',   'label' => 'Report',           'icon' => 'icon-report.svg'],
         ['route' => 'owner.users',     'label' => 'User Maintenance', 'icon' => 'icon-user.svg'],
+        ['route' => 'owner.jadwal',    'label' => 'Jadwal Operasional', 'icon' => 'icon-schedule.svg'],
     ];
     $cashierNav = [
         ['route' => 'cashier.dashboard', 'label' => 'Dashboard', 'icon' => 'icon-dashboard.svg'],
@@ -103,26 +104,6 @@
             @endforeach
         </nav>
 
-        {{-- Jadwal Operasional (owner only) --}}
-        @if ($role === 'owner')
-            <div class="px-3 pb-1 flex-none">
-                <a href="{{ route('owner.jadwal') }}"
-                   class="sidebar-nav-link relative flex items-center gap-3 px-3 py-3 rounded-xl
-                          transition-colors min-h-[44px] focus:outline-none"
-                   style="{{ Route::currentRouteName() === 'owner.jadwal' ? 'background-color:rgba(0,0,0,0.12);' : '' }}"
-                   aria-current="{{ Route::currentRouteName() === 'owner.jadwal' ? 'page' : 'false' }}">
-                    @if (Route::currentRouteName() === 'owner.jadwal')
-                        <span class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full"
-                              style="background-color:var(--color-white);"></span>
-                    @endif
-                    <img src="{{ asset('assets/ui/icon-order.svg') }}" alt="" class="w-5 h-5 flex-none"
-                         style="{{ Route::currentRouteName() === 'owner.jadwal' ? 'opacity:1;' : 'opacity:0.75;' }}">
-                    <span class="text-xs {{ Route::currentRouteName() === 'owner.jadwal' ? 'font-bold' : 'font-semibold' }} tracking-wide"
-                          style="color:var(--color-black);">JADWAL OPERASIONAL</span>
-                </a>
-            </div>
-        @endif
-
         {{-- Log Out --}}
         <div class="px-4 pb-5 flex-none">
             <form method="POST" action="{{ route('logout') }}">
@@ -172,14 +153,7 @@
             </div>
 
             {{-- Right: page title + role chip --}}
-            <div class="flex items-center gap-3">
-                <span class="text-sm font-semibold hidden md:inline"
-                      style="color: #555;">{{ $pageTitle }}</span>
-                <span class="text-xs font-bold px-3 py-1 rounded-full"
-                      style="background-color: rgba(166,23,28,0.10); color: var(--color-primary);">
-                    {{ strtoupper($role) }}
-                </span>
-            </div>
+            
         </header>
 
         {{-- PAGE CONTENT --}}

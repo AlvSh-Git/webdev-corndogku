@@ -223,10 +223,6 @@
                         Rp {{ number_format($tax, 0, ',', '.') }}
                     </span>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span style="color: #848383;">Ongkos Kirim</span>
-                    <span class="font-semibold text-green-600">Gratis</span>
-                </div>
             </div>
 
             <div class="mt-4 pt-4 border-t flex justify-between items-center"

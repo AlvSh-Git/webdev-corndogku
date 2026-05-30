@@ -8,62 +8,709 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body { background-color: #FFFDDB; }
-
-        /* Organic blob shape behind corndog */
-        .corndog-blob {
-            border-radius: 58% 42% 46% 54% / 52% 44% 56% 48%;
-            background-color: #FDECD8;
+        :root {
+            --custom-bg: #FFFDEB;
+            --custom-red: #A6171C;
+            --custom-yellow: #FFC95E;
+            --custom-yellow-soft: #FFDEA0;
+            --custom-text: #111111;
         }
 
-        /* Dashed pill for selection label */
-        .selection-pill {
-            border: 2.5px dashed #FFBE54;
-            background-color: #fff;
+        body {
+            background-color: var(--custom-bg);
         }
 
-        /* Stepper dot connector */
+        .custom-page {
+            min-height: calc(100vh - 64px);
+            background: var(--custom-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative background */
+        .deco-circle-left,
+        .deco-circle-right {
+            position: absolute;
+            border-radius: 999px;
+            background: var(--custom-yellow-soft);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .deco-circle-left {
+            left: -125px;
+            top: 35%;
+            width: 270px;
+            height: 270px;
+        }
+
+        .deco-circle-right {
+            right: -100px;
+            top: -24px;
+            width: 270px;
+            height: 270px;
+        }
+
+        .deco-dot {
+            position: absolute;
+            border-radius: 999px;
+            background: #FFC14D;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .dot-1 { left: 95px; top: 270px; width: 18px; height: 18px; }
+        .dot-2 { left: 58px; bottom: 270px; width: 27px; height: 27px; }
+        .dot-3 { right: 108px; top: 260px; width: 28px; height: 28px; }
+        .dot-4 { right: 155px; bottom: 250px; width: 17px; height: 17px; }
+        .dot-5 { right: 145px; top: 65px; width: 18px; height: 18px; }
+
+        /* Poster title */
+        .custom-title-wrap {
+            position: absolute;
+            top: 38px;
+            left: 90px;
+            z-index: 20;
+        }
+
+        .custom-title {
+    position: relative;
+    display: inline-block;
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: 1px;
+    transform: rotate(-3deg);
+}
+
+        .custom-title .black {
+            display: block;
+            font-size: clamp(46px, 5vw, 78px);
+            color: #050505;
+        }
+
+        .custom-title .red {
+            display: block;
+            font-size: clamp(46px, 4.9vw, 76px);
+            color: var(--custom-red);
+            margin-left: 88px;
+        }
+
+      .title-brush {
+    width: 360px;
+    height: 28px;
+    margin-top: -2px;
+    margin-left: 34px;
+    opacity: 0.9;
+}
+
+.title-brush img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+    .subtitle-blob {
+    margin-top: 10px;
+    margin-left: 8px;
+    position: relative;
+
+    width: 330px;
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 12px 60px 12px 32px;
+
+    background-image: url('{{ asset('assets/img/Yellow_Custom.png') }}');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+
+    color: #050505;
+    transform: none;
+    overflow: visible;
+}
+
+.subtitle-text {
+    display: block;
+    max-width: 280px;
+    font-weight: 900;
+    font-size: 17px;
+    line-height: 1.08;
+    color: #000000;
+    text-align: left;
+}
+
+.subtitle-heart-img {
+    position: absolute;
+    right: -12px;
+    top: -20px;
+    width: 58px;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+      .title-accent-lines {
+    position: absolute;
+    right: 80px;
+    top: -18px;
+    width: 62px;
+    height: 48px;
+    pointer-events: none;
+    z-index: 25;
+}
+
+        .custom-layout {
+            position: relative;
+            min-height: calc(100vh - 64px);
+            width: 100%;
+            z-index: 10;
+        }
+
+        /* Stepper */
+        #stepper {
+            position: absolute;
+            top: 82px;
+            right: 140px;
+            z-index: 30;
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+        }
+
         .step-line {
             flex: 1;
-            border-top: 2px dashed #d1d5db;
-            min-width: 24px;
+            border-top: 1.8px solid #FFBE54 !important;
+            min-width: 70px !important;
+            margin-top: 17px;
         }
+
         .step-line.done {
-            border-color: #A6171C;
+            border-color: #FFBE54 !important;
         }
 
-        /* Carousel dot size */
-        #carousel-dots > div { width: 0.875rem; height: 0.875rem; }
-
-        /* Corndog base transition */
-        #base-corndog { transition: opacity 0.2s ease, transform 0.2s ease; }
-        #base-corndog.fading { opacity: 0; transform: scale(0.95); }
-
-        /* Overlay: instant sauce swap */
-        #overlay-sauce { transition: none; }
-
-        /* Stepper override — compact for viewport fit */
         #stepper > div > div:first-child {
-            width: 2rem !important;
-            height: 2rem !important;
-            font-size: 0.875rem !important;
+            width: 34px !important;
+            height: 34px !important;
+            font-size: 16px !important;
+            border-width: 1.8px !important;
         }
-        #stepper > div > span {
-            font-size: 0.7rem !important;
-            font-weight: 600 !important;
-        }
-        .step-line { min-width: 36px; }
 
-        /* Sauce chip badges */
-        .sauce-chip {
-            border: 2px solid #A6171C;
-            background: white;
-            color: #A6171C;
+        #stepper > div > span {
+            display: block !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            color: #3b3b3b !important;
+            margin-top: 8px;
         }
-        .sauce-chip.added {
-            background: #A6171C;
-            color: white;
+
+        /* Preview center */
+        .custom-preview-area {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(44vw, 560px);
+            height: min(62vh, 670px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 12;
         }
+
+        .corndog-blob {
+            position: absolute;
+            width: 430px;
+            height: 350px;
+            background: var(--custom-yellow-soft);
+            border-radius: 46% 54% 48% 52% / 52% 45% 55% 48%;
+            transform: rotate(-24deg);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #base-corndog {
+            height: 50vh !important;
+            max-height: 560px !important;
+            width: auto;
+            object-fit: contain;
+            z-index: 5 !important;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        #base-corndog.fading {
+            opacity: 0;
+        }
+
+        #middle-varian {
+            height: 50vh !important;
+            max-height: 560px !important;
+            width: auto;
+            object-fit: contain;
+        }
+
+        #overlay-sauce {
+            height: 52vh !important;
+            max-height: 575px !important;
+            width: auto;
+            object-fit: contain;
+            transition: none;
+        }
+        #overlay-sauce {
+    border: none !important;
+    outline: none !important;
+}
+
+#overlay-sauce:not([src]),
+#overlay-sauce[src=""] {
+    display: none !important;
+}
+
+        .selection-pill {
+    position: absolute;
+    left: 110px;
+    bottom: 135px;
+    min-width: 290px;
+    height: 86px;
+    background: #FFFFFF !important;   /* ini yang bikin putih */
+    border: 2.5px dashed #F0A62B !important;
+    border-radius: 999px !important;
+    padding: 0 30px !important;
+    transform: none !important;
+    z-index: 22;
+    text-align: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+        #carousel-label-text {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+    color: #A62A24 !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+}
+
+        #carousel-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #carousel-dots > div {
+            width: 18px !important;
+            height: 18px !important;
+        }
+
+        #sauce-chips {
+            display:none !important;
+        }
+
+        /* Arrows */
+        #btn-prev,
+        #btn-next {
+            position: absolute;
+            top: 45%;
+            z-index: 40;
+            width: 62px !important;
+            height: 62px !important;
+            border-radius: 14px !important;
+            background: white !important;
+            color: #B94D52 !important;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+            font-size: 48px !important;
+            line-height: 1 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 5px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        #btn-prev:hover,
+        #btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.18) !important;
+        }
+
+        #btn-prev { left: 112px; }
+        #btn-next { right: 112px; }
+
+        /* Step instruction */
+        #step-card {
+    position: absolute;
+    right: 95px;
+    bottom: 120px;
+    width: 390px;
+    background: white !important;
+    border: 1.8px solid #FFBE54 !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    padding: 24px 30px !important;
+    z-index: 25;
+}
+
+        #step-card-num {
+            width: 46px !important;
+            height: 46px !important;
+            font-size: 24px !important;
+            background-color: var(--custom-red) !important;
+        }
+
+        #step-card-title {
+            font-size: 24px !important;
+            line-height: 1.15 !important;
+            color: #333 !important;
+        }
+
+        #step-card-desc {
+    font-size: 16px !important;
+    line-height: 1.22 !important;
+    color: #333 !important;
+    font-weight: 600;
+    margin-top: 12px !important;
+}
+
+        /* Hidden selection cards, but keep DOM for JS logic */
+        #ingredient-grid {
+            display: none !important;
+        }
+
+        #add-sauce-wrap {
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+}
+
+#add-sauce-wrap p {
+    margin-bottom: 10px !important;
+}
+
+#add-sauce-btn {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+    border-radius: 14px !important;
+}
+
+        /* Review */
+        #review-panel {
+    position: absolute;
+    right: 35px;
+    bottom: 120px;
+    width: 430px;
+    max-height: 48vh;
+    overflow: auto;
+    z-index: 45;
+    background: white;
+    padding: 22px !important;
+    border-radius: 18px !important;
+}
+
+        #review-items {
+            gap: 12px !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* Bottom buttons */
+        .button-area-custom {
+            position: absolute;
+    left: 50%;
+    bottom: 38px;
+    transform: translateX(-50%);
+    width: min(70vw, 740px);
+    z-index: 40;
+        }
+
+        #btn-next-step {
+             width: 100% !important;
+    max-width: none !important;
+    border-radius: 14px !important;
+    padding: 14px 28px !important;
+    font-size: 24px !important;
+            line-height: 1.1;
+            background-color: var(--custom-red) !important;
+            color: white !important;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+
+        #btn-next-step:hover {
+            opacity: 0.9;
+        }
+
+        #btn-back {
+            position: absolute;
+            left: -178px;
+            top: 0;
+            height: 100%;
+            border-radius: 14px !important;
+            background: var(--custom-bg) !important;
+            border: 2px solid var(--custom-red) !important;
+            color: var(--custom-red) !important;
+            padding-left: 28px;
+            padding-right: 28px;
+        }
+
+        #btn-back:not(.hidden) {
+            display: flex !important;
+        }
+
+
+        .corndog-red-accent {
+            position: absolute;
+            right: 12%;
+            top: 17%;
+            z-index: 20;
+        }
+
+        /* Keep elements stable after JS display changes */
+        #carousel-center[style*="display: none"] {
+            display: none !important;
+        }
+
+       @media (max-width: 1180px) {
+    .custom-title-wrap {
+        top: 30px;
+        left: 34px;
+        transform: scale(0.88);
+        transform-origin: top left;
+    }
+
+    #stepper {
+        top: 210px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) scale(0.88);
+        transform-origin: top center;
+    }
+
+    .custom-preview-area {
+        top: 60%;
+        width: 460px;
+        height: 520px;
+    }
+
+    .corndog-blob {
+        width: 340px;
+        height: 285px;
+    }
+
+    #base-corndog {
+        height: 390px !important;
+        max-height: none !important;
+    }
+
+    #overlay-sauce {
+        height: 400px !important;
+        max-height: none !important;
+    }
+
+    #btn-prev {
+        left: 38px;
+        top: 58%;
+    }
+
+    #btn-next {
+        right: 38px;
+        top: 58%;
+    }
+
+    .selection-pill {
+        left: 34px;
+        bottom: 170px;
+        min-width: 250px;
+        height: 74px;
+    }
+
+    #carousel-label-text {
+        font-size: 20px !important;
+    }
+
+    #carousel-dots {
+        bottom: 42px;
+    }
+
+    #step-card {
+        right: 34px;
+        bottom: 165px;
+        width: 300px;
+        padding: 20px 22px !important;
+    }
+
+    #step-card-title {
+        font-size: 20px !important;
+    }
+
+    #step-card-desc {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+    }
+
+    #review-panel {
+        right: 34px;
+        bottom: 155px;
+        width: 360px;
+    }
+
+    .button-area-custom {
+        width: 78vw;
+        bottom: 36px;
+    }
+
+    #btn-next-step {
+        font-size: 22px !important;
+        padding: 14px 24px !important;
+    }
+
+    #btn-back {
+        left: -150px;
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .corndog-red-accent {
+        right: 9%;
+        top: 25%;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        overflow: auto !important;
+    }
+
+    .custom-page {
+        min-height: 1080px;
+        overflow: hidden;
+    }
+
+    .custom-title-wrap {
+        top: 24px;
+        left: 22px;
+        transform: scale(0.78);
+        transform-origin: top left;
+    }
+
+    #stepper {
+        top: 190px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) scale(0.78);
+        transform-origin: top center;
+    }
+
+    .custom-preview-area {
+        top: 57%;
+        width: 90vw;
+        height: 470px;
+    }
+
+    .corndog-blob {
+        width: 300px;
+        height: 250px;
+    }
+
+    #base-corndog {
+        height: 350px !important;
+    }
+
+    #overlay-sauce {
+        height: 360px !important;
+    }
+
+    #btn-prev {
+        left: 18px;
+        top: 58%;
+        width: 56px !important;
+        height: 56px !important;
+    }
+
+    #btn-next {
+        right: 18px;
+        top: 58%;
+        width: 56px !important;
+        height: 56px !important;
+    }
+
+    .selection-pill {
+        left: 22px;
+        bottom: 165px;
+        min-width: 220px;
+        height: 68px;
+        padding: 0 20px !important;
+    }
+
+    #carousel-label-text {
+        font-size: 18px !important;
+    }
+
+    #carousel-dots {
+        bottom: 36px;
+    }
+
+    #step-card {
+        right: 22px;
+        bottom: 155px;
+        width: 260px;
+        padding: 18px 18px !important;
+    }
+
+    #step-card-num {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 20px !important;
+    }
+
+    #step-card-title {
+        font-size: 18px !important;
+    }
+
+    #step-card-desc {
+        font-size: 13px !important;
+        line-height: 1.18 !important;
+        margin-top: 8px !important;
+    }
+
+    #review-panel {
+        left: 22px;
+        right: 22px;
+        bottom: 145px;
+        width: auto;
+    }
+
+    .button-area-custom {
+        width: 86vw;
+        bottom: 28px;
+    }
+
+    #btn-back {
+        position: static;
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        justify-content: center;
+        padding: 12px 20px;
+    }
+
+    #btn-next-step {
+        font-size: 20px !important;
+        padding: 13px 20px !important;
+    }
+
+    .corndog-red-accent {
+        right: 8%;
+        top: 26%;
+    }
+}
     </style>
 </head>
 <body class="font-sans antialiased h-screen overflow-hidden flex flex-col">
@@ -146,231 +793,206 @@
 {{-- ══════════════════════════════════════════════════════════════
      MAIN — CUSTOM CORNDOG WIZARD
 ══════════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden flex-1 flex flex-col">
+<section class="custom-page flex-1">
 
-    {{-- Decorative large circles --}}
-    <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none"
-         style="background-color: rgba(253,236,216,0.85);"></div>
-    <div class="absolute top-48 -right-8 w-24 h-24 rounded-full pointer-events-none"
-         style="background-color: rgba(253,236,216,0.6);"></div>
-    <div class="absolute bottom-32 -left-16 w-56 h-56 rounded-full pointer-events-none"
-         style="background-color: rgba(253,236,216,0.5);"></div>
+    {{-- Decorative background --}}
+    <div class="deco-circle-left"></div>
+    <div class="deco-circle-right"></div>
+    <div class="deco-dot dot-1"></div>
+    <div class="deco-dot dot-2"></div>
+    <div class="deco-dot dot-3"></div>
+    <div class="deco-dot dot-4"></div>
+    <div class="deco-dot dot-5"></div>
 
-    {{-- Small amber dots --}}
-    <div class="absolute top-16 left-[12%] w-3 h-3 rounded-full pointer-events-none"
-         style="background-color: #FFBE54;"></div>
-    <div class="absolute top-40 left-[8%] w-2.5 h-2.5 rounded-full pointer-events-none"
-         style="background-color: #FFBE54; opacity:0.7;"></div>
-    <div class="absolute top-72 right-[14%] w-2.5 h-2.5 rounded-full pointer-events-none"
-         style="background-color: #FFBE54;"></div>
-    <div class="absolute top-24 right-[38%] w-2 h-2 rounded-full pointer-events-none"
-         style="background-color: #FFBE54; opacity:0.6;"></div>
-    <div class="absolute bottom-48 right-[10%] w-3 h-3 rounded-full pointer-events-none"
-         style="background-color: #FFBE54; opacity:0.5;"></div>
+    {{-- Title --}}
+    <div class="custom-title-wrap">
+        <div class="custom-title">
+            <span class="black">CUSTOM</span>
+            <span class="red">CORNDOG</span>
+        </div>
 
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-5 pb-0 relative z-10 flex-1 flex flex-col overflow-hidden">
+        <svg class="title-accent-lines" viewBox="0 0 90 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L25 42" stroke="#FFBE54" stroke-width="13" stroke-linecap="round"/>
+            <path d="M62 23L37 49" stroke="#FFBE54" stroke-width="10" stroke-linecap="round"/>
+            <path d="M80 56L45 58" stroke="#FFBE54" stroke-width="8" stroke-linecap="round"/>
+        </svg>
 
-        {{-- ── Top row: Title + Stepper ──────────────────────── --}}
-        <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-4 mb-4 lg:mb-5 flex-none">
+        <div class="title-brush">
+    <img src="{{ asset('assets/img/line_custome.png') }}" alt="Line decoration">
+</div>
 
-            {{-- CUSTOM CORNDOG title --}}
-            <div class="flex-none">
-                {{-- Squiggly underline decoration (SVG) --}}
-                <div class="relative leading-none">
-                    <div class="text-4xl sm:text-5xl font-black leading-none tracking-tight">
-                        <span style="color: #1a1a1a;">CUSTOM</span>
-                        <span class="inline-block ml-1 text-xl sm:text-2xl" style="color: #FFBE54;">✦</span>
-                    </div>
-                    <div class="text-4xl sm:text-5xl font-black leading-none tracking-tight"
-                         style="color: var(--color-primary);">CORNDOG</div>
-                    <svg class="mt-1" width="200" height="10" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 5 Q18 1 34 5 Q50 9 66 5 Q82 1 98 5 Q114 9 130 5 Q146 1 162 5 Q178 9 194 5"
-                              stroke="#A6171C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                    </svg>
+      <div class="subtitle-blob">
+    <span class="subtitle-text">
+        Buat Corndog Favoritemu<br>
+        Sesuai Seleramu
+    </span>
+
+    <img src="{{ asset('assets/img/heart_custom.png') }}"
+         alt="Heart decoration"
+         class="subtitle-heart-img">
+</div>
+
+</div> {{-- TUTUP .custom-title-wrap --}}
+
+{{-- Stepper --}}
+<div id="stepper">
+    {{-- Rendered by JS --}}
+</div>
+
+    {{-- Stepper --}}
+    <div id="stepper">
+        {{-- Rendered by JS --}}
+    </div>
+
+    <div class="custom-layout">
+
+        {{-- Left arrow --}}
+        <button id="btn-prev"
+                type="button"
+                aria-label="Previous item">
+            &#8249;
+        </button>
+
+        {{-- Main corndog preview --}}
+        <div id="carousel-center" class="custom-preview-area">
+
+            <div class="corndog-blob"></div>
+
+            {{-- Base corndog --}}
+            <img id="base-corndog"
+                 src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
+                 alt="Corndog preview"
+                 style="transform: scale(1.15);"
+                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                        select-none pointer-events-none transition-transform duration-300">
+
+            {{-- Varian layer --}}
+            <div id="middle-varian-wrap"
+                 class="absolute inset-0 flex items-center justify-center pointer-events-none"
+                 style="display:none; z-index:6;">
+                <img id="middle-varian"
+                     src=""
+                     alt=""
+                     style="transform: scale(1.0);"
+                     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                            select-none pointer-events-none transition-transform duration-300">
+            </div>
+
+            {{-- Sauce overlay --}}
+            <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <img id="overlay-sauce"
+                     alt=""
+                     style="transform: scale(0.9) translateY(-1rem);"
+                     class="select-none pointer-events-none transition-transform duration-300">
+            </div>
+
+            {{-- Red accent --}}
+            <div class="corndog-red-accent pointer-events-none">
+                <svg width="54" height="54" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 4L7 35" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M36 17L18 39" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                    <path d="M50 38L27 43" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            {{-- Dot indicators --}}
+            <div id="carousel-dots"></div>
+
+            {{-- Step 3 sauce chips --}}
+            <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center max-w-xs"></div>
+        </div>
+
+        {{-- Selection name pill --}}
+        <div class="selection-pill" id="carousel-label">
+            <span class="font-black tracking-widest"
+                  id="carousel-label-text"
+                  style="color: var(--color-primary);">SOSIS &amp; MOZZA</span>
+            <div id="carousel-label-price" class="text-xs font-semibold mt-0.5 hidden"
+                 style="color: var(--color-primary);"></div>
+        </div>
+
+        {{-- Right arrow --}}
+        <button id="btn-next"
+                type="button"
+                aria-label="Next item">
+            &#8250;
+        </button>
+
+        {{-- Step instruction card --}}
+        <div id="step-card">
+            <div class="flex items-start gap-4">
+                <div id="step-card-num"
+                     class="rounded-full flex items-center justify-center text-white font-bold flex-none"
+                     style="background-color: var(--color-primary);">
+                    1
                 </div>
-                {{-- Subtitle pill --}}
-                <div class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm"
-                     style="background-color: #FFBE54; color: #1a1a1a;">
-                    Buat Corndog Favoritemu Sesuai Seleramu
-                    <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="#A6171C">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+                <div>
+                    <p id="step-card-title" class="font-bold">
+                        Pilih Isi Corndog
+                    </p>
+                    <p id="step-card-desc">
+                        Geser atau gunakan tombol untuk memilih isi favoritemu
+                    </p>
                 </div>
             </div>
 
-            {{-- Step stepper --}}
-            <div class="flex items-center gap-0 flex-none" id="stepper">
-                {{-- Rendered by JS --}}
+            {{-- Tetap ada agar logic JS tidak rusak, tapi disembunyikan oleh CSS --}}
+            <div id="ingredient-grid" class="grid gap-2 mt-4"></div>
+
+            {{-- Sauce add button, tetap dipakai di step 3 --}}
+            <div id="add-sauce-wrap" class="hidden mt-5 pt-5 border-t border-gray-100">
+                <p class="text-sm text-right mb-3 font-semibold" style="color: var(--color-primary);">
+                    Max 2 sauce*
+                </p>
+                <button id="add-sauce-btn"
+                        type="button"
+                        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                               text-base font-bold border-2 transition-colors hover:opacity-80"
+                        style="border-color: var(--color-primary); color: var(--color-primary);">
+                    <span>+</span> Add Sauce
+                </button>
             </div>
         </div>
 
-        {{-- ── Carousel + Instruction layout ─────────────────── --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch flex-1 overflow-hidden">
-
-            {{-- LEFT: Carousel --}}
-            <div class="flex items-center gap-4 justify-center overflow-visible">
-
-            {{-- Left arrow --}}
-            <button id="btn-prev"
-                    type="button"
-                    class="flex-none w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-xl md:text-3xl hover:shadow-lg transition-shadow active:scale-95"
-                    style="color: var(--color-primary);">
-                &#8249;
-            </button>
-
-            {{-- Center: blob + image + label + dots --}}
-            <div id="carousel-center" class="flex-1 flex flex-col items-center justify-center relative">
-
-                {{-- Peach blob — NO overflow-hidden: corndog stick extends below --}}
-                <div class="corndog-blob w-[min(55vw,460px)] h-[min(55vw,460px)] relative">
-
-                    {{-- LAYER 0: base corndog (filling / variant) --}}
-                    {{-- Default is SOSIS & MOZZA — seeded at scale(1.6) via inline style; JS overrides on change --}}
-                    <img id="base-corndog"
-                         src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
-                         alt="Corndog preview"
-                         style="transform: scale(1.6);"
-                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                                h-[38vh] max-h-72 w-auto object-contain z-0 select-none
-                                pointer-events-none transition-transform duration-300">
-
-                    {{-- LAYER 0.5: varian/coating (step 4 review — stacked over filling) --}}
-                    <div id="middle-varian-wrap"
-                         class="absolute inset-0 flex items-center justify-center pointer-events-none"
-                         style="display:none; z-index:5;">
-                        <img id="middle-varian"
-                             src=""
-                             alt=""
-                             style="transform: scale(1.0);"
-                             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                                    h-[38vh] max-h-72 w-auto object-contain select-none
-                                    pointer-events-none transition-transform duration-300">
-                    </div>
-
-                    {{-- LAYER 1: sauce overlay — inset wrapper for asymmetric asset centering --}}
-                    <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                        <img id="overlay-sauce"
-                             src=""
-                             alt=""
-                             style="transform: scale(0.9) translateY(-1rem);"
-                             class="h-[42vh] w-auto object-contain select-none pointer-events-none
-                                    transition-transform duration-300">
-                    </div>
-
-                    {{-- Spark accent --}}
-                    <div class="absolute top-3 right-3 text-2xl pointer-events-none z-20"
-                         style="color: #A6171C;">✦</div>
+        {{-- Review panel --}}
+        <div id="review-panel" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 class="font-bold text-lg mb-5" style="color: var(--color-black);">
+                Ringkasan Pesananmu
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="review-items"></div>
+            <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
+                <div class="flex justify-between text-gray-500">
+                    <span>Harga Dasar</span>
+                    <span id="review-base" class="font-medium text-gray-800">Rp 16.000</span>
                 </div>
-
-                {{-- Selection name pill --}}
-                <div class="selection-pill mt-3 px-6 py-2 rounded-full text-center min-w-[160px]"
-                     id="carousel-label">
-                    <span class="font-black text-base tracking-widest"
-                          id="carousel-label-text"
-                          style="color: var(--color-primary);">SOSIS &amp; MOZZA</span>
-                    <div id="carousel-label-price" class="text-xs font-semibold mt-0.5 hidden"
-                         style="color: var(--color-primary);"></div>
+                <div class="flex justify-between text-gray-500" id="review-extra-row">
+                    <span>Varian Tambahan</span>
+                    <span id="review-extra" class="font-medium text-gray-800">Rp 0</span>
                 </div>
-
-                {{-- Dot indicators --}}
-                <div id="carousel-dots" class="flex items-center gap-2 mt-3"></div>
-
-                {{-- Step 3 sauce chips (hidden except step 3) --}}
-                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center mt-2 max-w-xs"></div>
+                <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-100">
+                    <span style="color: var(--color-black);">Total</span>
+                    <span id="review-total" style="color: var(--color-primary);">Rp 16.000</span>
+                </div>
             </div>
+        </div>
 
-            {{-- Right arrow --}}
-            <button id="btn-next"
+        {{-- Next / Back buttons --}}
+        <div class="button-area-custom">
+            <button id="btn-back"
                     type="button"
-                    class="flex-none w-12 h-12 md:w-16 md:h-16 rounded-full bg-white shadow-md flex items-center justify-center
-                           font-bold text-xl md:text-3xl hover:shadow-lg transition-shadow active:scale-95"
-                    style="color: var(--color-primary);">
-                &#8250;
+                    class="hidden items-center justify-center font-bold text-base transition-opacity hover:opacity-70">
+                &#8592; Kembali
             </button>
 
-            </div>{{-- /.carousel left column --}}
+            <button id="btn-next-step"
+                    type="button"
+                    class="font-bold tracking-wide transition-opacity hover:opacity-85 active:scale-[0.99]">
+                Next Pilih Varian
+            </button>
+        </div>
 
-            {{-- RIGHT: scrollable column containing step card + review + buttons --}}
-            <div class="h-full flex flex-col justify-center gap-3 py-2">
-
-                {{-- Step instruction card --}}
-                <div id="step-card"
-                     class="bg-white rounded-2xl p-6 shadow-lg">
-                    <div class="flex items-start gap-4">
-                        <div id="step-card-num"
-                             class="w-10 h-10 rounded-full flex items-center justify-center
-                                    text-white font-bold text-base flex-none"
-                             style="background-color: var(--color-primary);">1</div>
-                        <div>
-                            <p id="step-card-title" class="font-bold text-lg lg:text-xl" style="color: var(--color-black);">
-                                Pilih Isi Corndog
-                            </p>
-                            <p id="step-card-desc" class="text-sm text-gray-500 mt-1 leading-relaxed">
-                                Geser atau gunakan tombol untuk memilih isi favoritemu
-                            </p>
-                        </div>
-                    </div>
-                    {{-- Ingredient selection grid — rendered by JS for steps 1 & 2 --}}
-                    <div id="ingredient-grid" class="grid gap-2 mt-4"></div>
-
-                    {{-- Sauce add button (step 3 only) --}}
-                    <div id="add-sauce-wrap" class="hidden mt-5 pt-5 border-t border-gray-100">
-                        <p class="text-sm text-right mb-3 font-semibold" style="color: var(--color-primary);">Max 2 sauce*</p>
-                        <button id="add-sauce-btn"
-                                type="button"
-                                class="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-                                       text-base font-bold border-2 transition-colors hover:opacity-80"
-                                style="border-color: var(--color-primary); color: var(--color-primary);">
-                            <span>+</span> Add Sauce
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Review panel (step 4 only) --}}
-                <div id="review-panel" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-lg mb-5" style="color: var(--color-black);">Ringkasan Pesananmu</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="review-items"></div>
-                    <div class="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                        <div class="flex justify-between text-gray-500">
-                            <span>Harga Dasar</span>
-                            <span id="review-base" class="font-medium text-gray-800">Rp 16.000</span>
-                        </div>
-                        <div class="flex justify-between text-gray-500" id="review-extra-row">
-                            <span>Varian Tambahan</span>
-                            <span id="review-extra" class="font-medium text-gray-800">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between font-bold text-base pt-2 border-t border-gray-100">
-                            <span style="color: var(--color-black);">Total</span>
-                            <span id="review-total" style="color: var(--color-primary);">Rp 16.000</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Next / Back buttons --}}
-                <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                    <button id="btn-back"
-                            type="button"
-                            class="hidden sm:inline-flex items-center justify-center px-8 py-4 rounded-2xl
-                                   font-bold text-base border-2 transition-opacity hover:opacity-70"
-                            style="border-color: var(--color-primary); color: var(--color-primary);">
-                        &#8592; Kembali
-                    </button>
-                    <button id="btn-next-step"
-                            type="button"
-                            class="flex-1 max-w-4xl mx-auto w-full py-4 rounded-2xl font-bold
-                                   text-lg tracking-wide
-                                   transition-opacity hover:opacity-85 active:scale-[0.99]"
-                            style="background-color: var(--color-primary); color: var(--color-white);">
-                        Next Pilih Varian
-                    </button>
-                </div>
-
-            </div>{{-- /.right scrollable column --}}
-        </div>{{-- /.grid --}}
-    </div>{{-- /.container --}}
+    </div>
 </section>
-
 {{-- ══════════════════════════════════════════════════════════════
      FOOTER
 ══════════════════════════════════════════════════════════════ --}}
@@ -543,6 +1165,53 @@ $(function () {
         el.innerHTML = html;
     }
 
+    function sauceTransform(display) {
+    var map = {
+        'KETCHUP'      : 'scale(1.15) translate(0px, -16px)',
+        'MAYONNAISE'   : 'scale(1.15) translate(0px, -16px)',
+        'HOT SAUCE'    : 'scale(1.15) translate(-3px, -16px)',
+        'CHEESE SAUCE' : 'scale(1.15) translate(-3px, -16px)'
+    };
+
+    return map[display] || 'scale(1.15) translate(0px, -16px)';
+}
+
+function getBaseTransform(display) {
+    var map = {
+        'SOSIS & MOZZA' : 'scale(1.15) translateY(-8px)',
+        'FULL MOZZA'    : 'scale(1.10) translateY(-8px)',
+        'FULL SOSIS'    : 'scale(1.10) translateY(-8px)',
+
+        'ORIGINAL'      : 'scale(1.30) translateY(-8px)',
+        'POTATO'        : 'scale(1.30) translateY(-8px)',
+        'RAMEN'         : 'scale(1.30) translateY(-8px)'
+    };
+
+    return map[display] || 'scale(1.0)';
+}
+
+function getSauceTransform(sauceDisplay, variantDisplay) {
+    var defaultMap = {
+        'KETCHUP'      : 'scale(1.15) translate(0px, -16px)',
+        'MAYONNAISE'   : 'scale(1.10) translate(0px, -16px)',
+        'HOT SAUCE'    : 'scale(1.15) translate(0px, -16px)',
+        'CHEESE SAUCE' : 'scale(1.15) translate(0px, -16px)'
+    };
+
+    var ramenMap = {
+        'KETCHUP'      : 'scale(1.08) translate(6px, -18px)',
+        'MAYONNAISE'   : 'scale(1.08) translate(6px, -8px)',
+        'HOT SAUCE'    : 'scale(1.08) translate(6px, -18px)',
+        'CHEESE SAUCE' : 'scale(1.08) translate(6px, -18px)'
+    };
+
+    if (variantDisplay === 'RAMEN') {
+        return ramenMap[sauceDisplay] || 'scale(1.08) translate(6px, -18px)';
+    }
+
+    return defaultMap[sauceDisplay] || 'scale(1.15) translate(0px, -16px)';
+}
+
     /* ─── Render carousel ───────────────────────────────────── */
     function renderCarousel(animate) {
         var step = STEPS[state.step];
@@ -555,38 +1224,36 @@ $(function () {
         // Update base image only on steps 1 & 2 — step 3 keeps the selected variant underneath
         if (!step.multiSelect) {
             // Inline scale values per asset — bypasses Tailwind JIT so dynamic strings are always applied
-            var scaleMap = {
-                'SOSIS & MOZZA' : 1.6,  // heavy transparent padding
-                'FULL MOZZA'    : 1.1,
-                'FULL SOSIS'    : 1.1,
-                'ORIGINAL'      : 1.1,  // smooth coating needs boost
-                'POTATO'        : 1.0,
-                'RAMEN'         : 1.0
-            };
-            var scaleVal = scaleMap[item.display] !== undefined ? scaleMap[item.display] : 1.0;
-            if (animate) {
-                $('#base-corndog').addClass('fading');
-                setTimeout(function () {
-                    $('#base-corndog')
-                        .attr('src', item.image)
-                        .css('transform', 'scale(' + scaleVal + ')')
-                        .removeClass('fading');
-                }, 180);
-            } else {
-                $('#base-corndog')
-                    .attr('src', item.image)
-                    .css('transform', 'scale(' + scaleVal + ')');
-            }
+           var baseTransform = getBaseTransform(item.display);
+
+if (animate) {
+    $('#base-corndog').addClass('fading');
+    setTimeout(function () {
+        $('#base-corndog')
+            .attr('src', item.image)
+            .css('transform', baseTransform)
+            .removeClass('fading');
+    }, 180);
+} else {
+    $('#base-corndog')
+        .attr('src', item.image)
+        .css('transform', baseTransform);
+}
         }
 
         // Update sauce overlay — preview current carousel item on step 3, clear otherwise
         if (step.multiSelect) {
             // Uniform inline transform for all sauces — matches Ketchup's proven calibration
+            var selectedVariant = STEPS[1].items[state.idx[1]];
             $('#overlay-sauce')
                 .attr('src', item.image)
-                .css('transform', 'scale(0.9) translateY(-1rem)');
+                .show()
+                .css('transform', getSauceTransform(item.display, selectedVariant.display));
+
         } else {
-            $('#overlay-sauce').attr('src', '');
+            $('#overlay-sauce')
+                .removeAttr('src')
+                .hide();
         }
 
         // Label
@@ -686,7 +1353,7 @@ $(function () {
         items.forEach(function (item, i) {
             var sel = i === selectedIdx;
             // Use inline style for SOSIS & MOZZA zoom — bypasses Tailwind JIT safelisting
-            var thumbStyle      = item.display === 'SOSIS & MOZZA' ? 'transform:scale(1.6);' : '';
+            var thumbStyle = item.display === 'SOSIS & MOZZA' ? 'transform:scale(1.15);' : '';
             var thumbHoverClass = item.display === 'SOSIS & MOZZA' ? '' : 'group-hover:scale-110';
             html += '<div class="ingredient-card group cursor-pointer rounded-xl p-3 text-center border-2 transition-all select-none"'
                   + ' data-idx="' + i + '"'
@@ -745,7 +1412,8 @@ $(function () {
         html += reviewCard('Varian', varian.image, varian.display, varian.extra);
         // Saos card
         var saosDisplay = saosList.length ? saosList.map(function (s) { return s.display; }).join(' + ') : 'Tidak ada';
-        var saosImg = saosList.length ? saosList[0].image : '{{ asset("assets/img/logo.png") }}';
+        var lastSaos = saosList.length ? saosList[saosList.length - 1] : null;
+        var saosImg = lastSaos ? lastSaos.image : '';
         html += reviewCard('Saos', saosImg, saosDisplay, null);
 
         document.getElementById('review-items').innerHTML = html;
@@ -758,13 +1426,17 @@ $(function () {
     }
 
     function reviewCard(label, img, name, extra) {
-        return '<div class="flex flex-col items-center bg-gray-50 rounded-xl p-4 gap-2">'
-             + '<p class="text-xs font-bold text-gray-400 uppercase tracking-widest">' + label + '</p>'
-             + '<div class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 flex items-center justify-center p-2 mx-auto rounded-2xl overflow-hidden"'
+        var imgHtml = img
+            ? '<img src="' + img + '" alt="' + name + '" class="w-full h-full object-contain object-center drop-shadow-md">'
+            : '<span class="text-xs font-bold text-gray-400">-</span>';
+
+        return '<div class="flex flex-col items-center bg-gray-50 rounded-xl p-3 gap-2">'
+             + '<p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">' + label + '</p>'
+             + '<div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 flex items-center justify-center p-2 mx-auto rounded-2xl overflow-hidden"'
              + '     style="background-color: #FDECD8;">'
-             + '<img src="' + img + '" alt="' + name + '" class="w-full h-full object-contain object-center drop-shadow-md"></div>'
-             + '<p class="font-bold text-sm text-center" style="color:var(--color-primary);">' + name + '</p>'
-             + (extra > 0 ? '<p class="text-xs font-semibold" style="color:var(--color-primary);">+ ' + rupiah(extra) + '</p>' : '')
+             + imgHtml + '</div>'
+             + '<p class="font-bold text-xs text-center leading-tight" style="color:var(--color-primary);">' + name + '</p>'
+             + (extra > 0 ? '<p class="text-[11px] font-semibold" style="color:var(--color-primary);">+ ' + rupiah(extra) + '</p>' : '')
              + '</div>';
     }
 
@@ -787,17 +1459,26 @@ $(function () {
         if (isReview) {
             var isiItem    = STEPS[0].items[state.idx[0]];
             var varianItem = STEPS[1].items[state.idx[1]];
-            var firstSauce = state.sauces.length ? STEPS[2].items[state.sauces[0]] : null;
+            var lastSauce  = state.sauces.length ? STEPS[2].items[state.sauces[state.sauces.length - 1]] : null;
 
-            var varScaleMap  = { 'ORIGINAL': 1.1, 'POTATO': 1.0, 'RAMEN': 1.0 };
-            var varScale     = varScaleMap[varianItem.display] !== undefined ? varScaleMap[varianItem.display] : 1.0;
+            // Review preview must use the exact same size/position as the final selected variant
+            $('#base-corndog')
+                .attr('src', varianItem.image)
+                .css('transform', getBaseTransform(varianItem.display));
 
-            // Coating replaces filling as the base layer — physically accurate, avoids double-stack
-            $('#base-corndog').attr('src', varianItem.image).css('transform', 'scale(' + varScale + ')');
             $('#middle-varian-wrap').hide();
-            $('#overlay-sauce')
-                .attr('src', firstSauce ? firstSauce.image : '')
-                .css('transform', 'scale(0.9) translateY(-1rem)');
+
+            // Review preview uses the last selected sauce, not the first one
+            if (lastSauce) {
+                $('#overlay-sauce')
+                    .attr('src', lastSauce.image)
+                    .show()
+                    .css('transform', getSauceTransform(lastSauce.display, varianItem.display));
+            } else {
+                $('#overlay-sauce')
+                    .removeAttr('src')
+                    .hide();
+            }
 
             // Hide carousel UI chrome — only the preview blob is shown
             document.getElementById('carousel-dots').style.display  = 'none';
@@ -807,6 +1488,7 @@ $(function () {
             document.getElementById('middle-varian-wrap').style.display = 'none';
             document.getElementById('carousel-dots').style.display      = '';
             document.getElementById('carousel-label').style.display     = '';
+            document.getElementById('sauce-chips').style.display        = state.step === 2 ? 'flex' : 'none';
         }
     }
 

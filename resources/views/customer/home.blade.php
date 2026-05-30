@@ -89,7 +89,7 @@
 ══════════════════════════════════════════════════════════════ --}}
 <header class="sticky top-0 z-30 w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
-    
+
     {{-- Main Navbar Content --}}
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
 
@@ -885,7 +885,7 @@
                 <img src="{{ asset('assets/img/logo.png') }}"
                      alt="Corndog-Ku"
                      class="w-14 h-14 rounded-full object-cover border-2 border-white/30 mb-4">
-                
+
             </div>
 
             {{-- Contact Us --}}

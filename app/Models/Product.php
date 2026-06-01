@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
-    protected $fillable = ['category_id', 'name', 'description', 'price', 'stock', 'cost_price', 'image', 'is_custom', 'is_available'];
+    protected $fillable = ['category_id', 'name', 'description', 'price', 'stock', 'low_stock', 'cost_price', 'image', 'is_custom', 'is_available'];
 
     protected $casts = [
         'is_custom'    => 'boolean',

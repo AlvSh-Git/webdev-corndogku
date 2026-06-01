@@ -124,7 +124,8 @@
 
             <div class="text-center mt-6 text-sm text-gray-600">
                 Sudah punya akun?
-                <a href="{{ route('login') }}" class="text-red-700 font-bold hover:underline">Masuk</a>
+                <a href="{{ route('login') }}{{ session('url.intended') ? '?redirect_to=' . urlencode(session('url.intended')) : '' }}"
+                   class="text-red-700 font-bold hover:underline">Masuk</a>
             </div>
         </div>
     </div>

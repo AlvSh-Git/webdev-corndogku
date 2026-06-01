@@ -14,8 +14,12 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        $products   = Product::with('category')->orderBy('category_id')->get();
-        $categories = Category::orderBy('id')->get();
+        $products   = Product::with('category')
+            ->where('is_custom', false)
+            ->whereHas('category', fn($q) => $q->whereRaw('LOWER(name) != ?', ['custom']))
+            ->orderBy('category_id')
+            ->get();
+        $categories = Category::whereRaw('LOWER(name) != ?', ['custom'])->orderBy('id')->get();
         $storeInfo  = $this->calcStoreStatus();
 
         $googleReviews = Cache::remember('google_reviews_corndogku', 86400, function () {

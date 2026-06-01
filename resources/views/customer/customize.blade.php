@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Custom Corndog — Corndog-Ku</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
@@ -477,7 +478,13 @@
             display: none !important;
         }
 
-       @media (max-width: 1180px) {
+       #carousel-center.oos-active #base-corndog,
+#carousel-center.oos-active #middle-varian,
+#carousel-center.oos-active #overlay-sauce {
+    filter: grayscale(80%) opacity(0.5);
+}
+
+@media (max-width: 1180px) {
     .custom-title-wrap {
         top: 30px;
         left: 34px;
@@ -749,7 +756,8 @@
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184
                              1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
+                <span id="cart-badge"
+                      class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold
                              flex items-center justify-center"
                       style="background-color: var(--color-accent); color: var(--color-black);">{{ count(session()->get('cart', [])) }}</span>
             </a>
@@ -900,6 +908,16 @@
 
             {{-- Step 3 sauce chips --}}
             <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center max-w-xs"></div>
+
+            {{-- OOS overlay badge --}}
+            <div id="oos-badge"
+                 class="hidden absolute pointer-events-none flex items-center justify-center"
+                 style="top: 42%; left: 50%; transform: translate(-50%, -50%); z-index: 22;">
+                <div class="text-white font-black text-xl px-6 py-2 rounded-full shadow-lg"
+                     style="background-color: #dc2626; transform: rotate(-12deg); letter-spacing: 3px;">
+                    HABIS
+                </div>
+            </div>
         </div>
 
         {{-- Selection name pill --}}
@@ -1064,6 +1082,49 @@
     </div>
 </footer>
 
+@php
+    // Maps a product name to the original local 3D render asset.
+    // The central visualizer always uses these static images — NOT the DB product photo.
+    $staticImageFor = function (string $name): string {
+        $n = strtolower($name);
+        if (str_contains($n, 'sosis') && str_contains($n, 'mozza')) return asset('assets/img/custom_sosis_mozza.png');
+        if (str_contains($n, 'full mozza') || (str_contains($n, 'mozza') && !str_contains($n, 'sosis'))) return asset('assets/img/custom_mozza.png');
+        if (str_contains($n, 'full sosis') || (str_contains($n, 'sosis') && !str_contains($n, 'mozza')))  return asset('assets/img/custom_sosis.png');
+        if (str_contains($n, 'original'))    return asset('assets/img/custom_original.png');
+        if (str_contains($n, 'potato'))      return asset('assets/img/custom_potato.png');
+        if (str_contains($n, 'ramen'))       return asset('assets/img/custom_ramen.png');
+        if (str_contains($n, 'ketchup'))     return asset('assets/img/custom_ketchup.png');
+        if (str_contains($n, 'mayo'))        return asset('assets/img/custom_mayonnaise.png');
+        if (str_contains($n, 'hot sauce') || str_contains($n, 'hot saos')) return asset('assets/img/custom_hotsauce.png');
+        if (str_contains($n, 'cheese sauce') || str_contains($n, 'cheese saos')) return asset('assets/img/custom_cheesesauce.png');
+        return asset('assets/img/custom_sosis_mozza.png'); // safe fallback
+    };
+
+    $mapProductsToJs = function ($col, bool $showPrice = true) use ($staticImageFor) {
+        return ($col ?? collect())->values()->map(function ($p) use ($staticImageFor, $showPrice) {
+            return [
+                'id'         => $p->id,
+                'name'       => strtoupper($p->name),
+                'display'    => strtoupper($p->name),
+                'image'      => $staticImageFor($p->name),
+                'extra'      => (int) $p->price,
+                'showPrice'  => $showPrice,
+                'outOfStock' => $p->stock <= 0,
+                'stock'      => (int) $p->stock,
+            ];
+        })->values()->all();
+    };
+
+    $jsIsian  = $mapProductsToJs($isianProducts  ?? collect(), false); // price hidden on Step 1
+    $jsVarian = $mapProductsToJs($varianProducts ?? collect(), true);
+    $jsSauce  = $mapProductsToJs($sauceProducts  ?? collect(), true);
+@endphp
+<script>
+var ISIAN_DATA  = @json($jsIsian);
+var VARIAN_DATA = @json($jsVarian);
+var SAUCE_DATA  = @json($jsSauce);
+</script>
+
 <script>
 $(function () {
     /* ─── Data ───────────────────────────────────────────────── */
@@ -1076,11 +1137,7 @@ $(function () {
             instruction: 'Pilih Isi Corndog',
             description: 'Geser atau gunakan tombol untuk memilih isi favoritemu',
             nextLabel: 'Next Pilih Varian',
-            items: [
-                { name: 'SOSIS &amp; MOZZA', display: 'SOSIS & MOZZA', image: '{{ asset("assets/img/custom_sosis_mozza.png") }}', extra: 0 },
-                { name: 'FULL MOZZA',         display: 'FULL MOZZA',    image: '{{ asset("assets/img/custom_mozza.png") }}',       extra: 0 },
-                { name: 'FULL SOSIS',         display: 'FULL SOSIS',   image: '{{ asset("assets/img/custom_sosis.png") }}',       extra: 0 }
-            ]
+            items: ISIAN_DATA
         },
         {
             num: 2,
@@ -1088,11 +1145,7 @@ $(function () {
             instruction: 'Pilih Varian Corndog',
             description: 'Geser atau gunakan tombol untuk memilih varian favoritemu',
             nextLabel: 'Next Pilih Saos',
-            items: [
-                { name: 'ORIGINAL', display: 'ORIGINAL', image: '{{ asset("assets/img/custom_original.png") }}', extra: 0 },
-                { name: 'POTATO',   display: 'POTATO',   image: '{{ asset("assets/img/custom_potato.png") }}',   extra: 4000 },
-                { name: 'RAMEN',    display: 'RAMEN',    image: '{{ asset("assets/img/custom_ramen.png") }}',    extra: 3000 }
-            ]
+            items: VARIAN_DATA
         },
         {
             num: 3,
@@ -1102,12 +1155,7 @@ $(function () {
             nextLabel: 'Next Review &amp; Order',
             multiSelect: true,
             maxSelect: 2,
-            items: [
-                { name: 'KETCHUP',      display: 'KETCHUP',      image: '{{ asset("assets/img/custom_ketchup.png") }}' },
-                { name: 'MAYONNAISE',   display: 'MAYONNAISE',   image: '{{ asset("assets/img/custom_mayonnaise.png") }}' },
-                { name: 'HOT SAUCE',    display: 'HOT SAUCE',    image: '{{ asset("assets/img/custom_hotsauce.png") }}' },
-                { name: 'CHEESE SAUCE', display: 'CHEESE SAUCE', image: '{{ asset("assets/img/custom_cheesesauce.png") }}' }
-            ]
+            items: SAUCE_DATA
         },
         {
             num: 4,
@@ -1218,8 +1266,25 @@ function getSauceTransform(sauceDisplay, variantDisplay) {
         if (state.step >= 3) return; // review step has no carousel
 
         var items = step.items;
+        if (!items || items.length === 0) return;
         var idx = currentIdx();
         var item = items[idx];
+        if (!item) return;
+
+        var isOOS = !!(item.outOfStock);
+
+        // OOS badge and greyscale on preview
+        var oosBadge = document.getElementById('oos-badge');
+        var carouselCenter = document.getElementById('carousel-center');
+        if (oosBadge) {
+            if (isOOS) {
+                oosBadge.classList.remove('hidden');
+                carouselCenter.classList.add('oos-active');
+            } else {
+                oosBadge.classList.add('hidden');
+                carouselCenter.classList.remove('oos-active');
+            }
+        }
 
         // Update base image only on steps 1 & 2 — step 3 keeps the selected variant underneath
         if (!step.multiSelect) {
@@ -1243,12 +1308,14 @@ if (animate) {
 
         // Update sauce overlay — preview current carousel item on step 3, clear otherwise
         if (step.multiSelect) {
-            // Uniform inline transform for all sauces — matches Ketchup's proven calibration
-            var selectedVariant = STEPS[1].items[state.idx[1]];
+            var selectedVariant = STEPS[1].items && STEPS[1].items[state.idx[1]];
+            var sauceTransformVal = selectedVariant
+                ? getSauceTransform(item.display, selectedVariant.display)
+                : 'scale(1.15) translate(0px, -16px)';
             $('#overlay-sauce')
                 .attr('src', item.image)
                 .show()
-                .css('transform', getSauceTransform(item.display, selectedVariant.display));
+                .css('transform', sauceTransformVal);
 
         } else {
             $('#overlay-sauce')
@@ -1259,10 +1326,16 @@ if (animate) {
         // Label
         document.getElementById('carousel-label-text').innerHTML = item.name;
         var priceEl = document.getElementById('carousel-label-price');
-        if (item.extra && item.extra > 0) {
+        if (isOOS) {
+            priceEl.textContent = '— Habis';
+            priceEl.style.color = '#dc2626';
+            priceEl.classList.remove('hidden');
+        } else if (item.showPrice && item.extra && item.extra > 0) {
             priceEl.textContent = '+ ' + rupiah(item.extra);
+            priceEl.style.color = '';
             priceEl.classList.remove('hidden');
         } else {
+            priceEl.style.color = '';
             priceEl.classList.add('hidden');
         }
 
@@ -1300,23 +1373,30 @@ if (animate) {
         var addBtn = document.getElementById('add-sauce-btn');
         if (step.multiSelect) {
             addWrap.classList.remove('hidden');
-            var alreadySelected = state.sauces.indexOf(idx) !== -1;
-            var maxReached = state.sauces.length >= step.maxSelect && !alreadySelected;
-            if (alreadySelected) {
-                addBtn.innerHTML = '&#10003; Ditambahkan';
-                addBtn.style.backgroundColor = 'var(--color-primary)';
-                addBtn.style.color = 'white';
-                addBtn.style.borderColor = 'var(--color-primary)';
-            } else if (maxReached) {
-                addBtn.innerHTML = 'Max ' + step.maxSelect + ' saos';
+            if (isOOS) {
+                addBtn.innerHTML = 'Habis';
                 addBtn.style.backgroundColor = '#f3f4f6';
                 addBtn.style.color = '#9ca3af';
                 addBtn.style.borderColor = '#d1d5db';
             } else {
-                addBtn.innerHTML = '+ Add Sauce';
-                addBtn.style.backgroundColor = 'white';
-                addBtn.style.color = 'var(--color-primary)';
-                addBtn.style.borderColor = 'var(--color-primary)';
+                var alreadySelected = state.sauces.indexOf(idx) !== -1;
+                var maxReached = state.sauces.length >= step.maxSelect && !alreadySelected;
+                if (alreadySelected) {
+                    addBtn.innerHTML = '&#10003; Ditambahkan';
+                    addBtn.style.backgroundColor = 'var(--color-primary)';
+                    addBtn.style.color = 'white';
+                    addBtn.style.borderColor = 'var(--color-primary)';
+                } else if (maxReached) {
+                    addBtn.innerHTML = 'Max ' + step.maxSelect + ' saos';
+                    addBtn.style.backgroundColor = '#f3f4f6';
+                    addBtn.style.color = '#9ca3af';
+                    addBtn.style.borderColor = '#d1d5db';
+                } else {
+                    addBtn.innerHTML = '+ Add Sauce';
+                    addBtn.style.backgroundColor = 'white';
+                    addBtn.style.color = 'var(--color-primary)';
+                    addBtn.style.borderColor = 'var(--color-primary)';
+                }
             }
         } else {
             addWrap.classList.add('hidden');
@@ -1352,20 +1432,25 @@ if (animate) {
         var html = '';
         items.forEach(function (item, i) {
             var sel = i === selectedIdx;
-            // Use inline style for SOSIS & MOZZA zoom — bypasses Tailwind JIT safelisting
+            var isItemOOS = !!(item && item.outOfStock);
             var thumbStyle = item.display === 'SOSIS & MOZZA' ? 'transform:scale(1.15);' : '';
-            var thumbHoverClass = item.display === 'SOSIS & MOZZA' ? '' : 'group-hover:scale-110';
-            html += '<div class="ingredient-card group cursor-pointer rounded-xl p-3 text-center border-2 transition-all select-none"'
+            var thumbHoverClass = (!isItemOOS && item.display !== 'SOSIS & MOZZA') ? 'group-hover:scale-110' : '';
+            var oosClasses = isItemOOS
+                ? ' opacity-50 grayscale cursor-not-allowed pointer-events-none'
+                : ' cursor-pointer';
+            html += '<div class="ingredient-card group rounded-xl p-3 text-center border-2 transition-all select-none' + oosClasses + '"'
                   + ' data-idx="' + i + '"'
-                  + ' style="border-color:' + (sel ? 'var(--color-primary)' : '#e5e7eb') + ';'
-                  + 'background-color:' + (sel ? '#fff8f5' : 'white') + ';">'
+                  + ' style="border-color:' + (sel && !isItemOOS ? 'var(--color-primary)' : '#e5e7eb') + ';'
+                  + 'background-color:' + (sel && !isItemOOS ? '#fff8f5' : 'white') + ';">'
                   + '<div class="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 flex items-center justify-center p-2 mx-auto mb-3 bg-white rounded-xl shadow-sm border-2 border-transparent overflow-hidden">'
                   + '<img src="' + item.image + '" class="w-full h-full object-contain object-center drop-shadow-md transition-transform duration-300 ' + thumbHoverClass + '" style="' + thumbStyle + '" alt="' + item.display + '">'
                   + '</div>'
                   + '<p class="text-xs font-bold leading-tight truncate"'
-                  + ' style="color:' + (sel ? 'var(--color-primary)' : '#374151') + ';">'
+                  + ' style="color:' + (sel && !isItemOOS ? 'var(--color-primary)' : '#374151') + ';">'
                   + item.display + '</p>';
-            if (item.extra > 0) {
+            if (isItemOOS) {
+                html += '<p class="text-[10px] font-bold mt-0.5" style="color:#dc2626;">Habis</p>';
+            } else if (item.showPrice && item.extra > 0) {
                 html += '<p class="text-[10px] font-semibold mt-0.5" style="color:var(--color-primary);">+'
                       + rupiah(item.extra) + '</p>';
             }
@@ -1400,9 +1485,10 @@ if (animate) {
         }
         panel.classList.remove('hidden');
 
-        var isi    = STEPS[0].items[state.idx[0]];
-        var varian = STEPS[1].items[state.idx[1]];
-        var saosList = state.sauces.map(function (i) { return STEPS[2].items[i]; });
+        var isi    = STEPS[0].items && STEPS[0].items[state.idx[0]];
+        var varian = STEPS[1].items && STEPS[1].items[state.idx[1]];
+        if (!isi || !varian) { panel.classList.add('hidden'); return; }
+        var saosList = state.sauces.map(function (i) { return STEPS[2].items && STEPS[2].items[i]; }).filter(Boolean);
 
         var html = '';
 
@@ -1457,9 +1543,15 @@ if (animate) {
         document.getElementById('btn-next').style.display = isReview ? 'none' : '';
 
         if (isReview) {
-            var isiItem    = STEPS[0].items[state.idx[0]];
-            var varianItem = STEPS[1].items[state.idx[1]];
-            var lastSauce  = state.sauces.length ? STEPS[2].items[state.sauces[state.sauces.length - 1]] : null;
+            var isiItem    = STEPS[0].items && STEPS[0].items[state.idx[0]];
+            var varianItem = STEPS[1].items && STEPS[1].items[state.idx[1]];
+            if (!isiItem || !varianItem) {
+                // Required selections missing — drop back to step 0
+                state.step = 0;
+                renderAll(false);
+                return;
+            }
+            var lastSauce  = state.sauces.length ? STEPS[2].items && STEPS[2].items[state.sauces[state.sauces.length - 1]] : null;
 
             // Review preview must use the exact same size/position as the final selected variant
             $('#base-corndog')
@@ -1509,6 +1601,8 @@ if (animate) {
 
     function toggleSauce() {
         var idx = currentIdx();
+        var currentSauce = STEPS[2].items && STEPS[2].items[idx];
+        if (currentSauce && currentSauce.outOfStock) return;
         var sauceIdx = state.sauces.indexOf(idx);
         if (sauceIdx !== -1) {
             state.sauces.splice(sauceIdx, 1);
@@ -1536,13 +1630,41 @@ if (animate) {
 
     function nextStep() {
         if (state.step < 3) {
+            var stepItems = STEPS[state.step].items;
+            // Steps 0 (isian) and 1 (varian) are required — block if DB returned nothing
+            if (state.step < 2 && (!stepItems || stepItems.length === 0)) {
+                showToast('Tidak ada pilihan tersedia untuk langkah ini.', true);
+                return;
+            }
+            if (stepItems && stepItems.length) {
+                var picked = stepItems[state.idx[state.step]];
+                if (picked && picked.outOfStock) {
+                    showToast('Item ini sedang habis. Silakan pilih item lain.', true);
+                    return;
+                }
+            }
             state.step++;
             renderAll(false);
             return;
         }
 
         // ── Step 4: Add custom corndog to cart ──────────────────
-        if (!isLoggedIn) { window.location.href = '/login'; return; }
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Anda belum login. Silakan login atau daftar untuk memesan.',
+                showCancelButton: true,
+                confirmButtonText: 'Login / Daftar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#a81d1d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent(window.location.href);
+                }
+            });
+            return;
+        }
 
         var isiItem    = STEPS[0].items[state.idx[0]];
         var varianItem = STEPS[1].items[state.idx[1]];
@@ -1552,7 +1674,8 @@ if (animate) {
                         + ' | Varian: ' + varianItem.display
                         + (sauceNames.length ? ' | Saos: ' + sauceNames.join(', ') : '');
 
-        var $btn = $('#btn-next-step');
+        var $btn        = $('#btn-next-step');
+        var origLabel   = STEPS[3].nextLabel || 'Tambah ke Keranjang 🛒';
         $btn.prop('disabled', true).text('Menambahkan...');
 
         $.ajax({
@@ -1572,18 +1695,34 @@ if (animate) {
                 sauces:       sauceNames.join(', '),
             },
             success: function (response) {
-                if (response.success) {
-                    window.location.href = '{{ route("cart") }}';
+                if (response && response.success) {
+                    // Update cart badge counter
+                    $('#cart-badge').text(response.count);
+
+                    // Show success state on button
+                    $btn.css({ 'background-color': '#16a34a', 'color': 'white' })
+                        .html('&#10003; Berhasil Ditambahkan!');
+
+                    // Redirect to cart after short delay
+                    setTimeout(function () {
+                        window.location.href = '{{ route("cart") }}';
+                    }, 1500);
+                } else {
+                    // Server said success:false — restore and notify
+                    $btn.prop('disabled', false)
+                        .css({ 'background-color': '', 'color': '' })
+                        .html(origLabel);
+                    showToast('Gagal menambahkan ke keranjang.', true);
                 }
             },
             error: function (xhr) {
-                var res = xhr.responseJSON || {};
-                var msg = res.error === 'store_closed'
-                    ? (res.message || 'Toko sedang tutup.')
-                    : 'Gagal menambahkan ke keranjang.';
-                showToast(msg, true);
                 $btn.prop('disabled', false)
-                    .html(STEPS[3].nextLabel || 'Tambah ke Keranjang 🛒');
+                    .css({ 'background-color': '', 'color': '' })
+                    .html(origLabel);
+                var msg = (xhr.responseJSON && xhr.responseJSON.message)
+                    ? xhr.responseJSON.message
+                    : 'Gagal menambahkan ke keranjang. Silakan coba lagi.';
+                showToast(msg, true);
             }
         });
     };

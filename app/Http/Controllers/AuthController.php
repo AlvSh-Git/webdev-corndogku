@@ -10,10 +10,17 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(Request $request)
     {
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());
+        }
+
+        if ($request->filled('redirect_to')) {
+            $safe = $this->safeRedirectUrl($request->query('redirect_to'));
+            if ($safe) {
+                session(['url.intended' => $safe]);
+            }
         }
 
         return view('auth.login');
@@ -31,6 +38,11 @@ class AuthController extends Controller
 
         if (Auth::attempt([$field => $identifier, 'password' => $request->password], $request->boolean('remember'))) {
             $request->session()->regenerate();
+
+            if (Auth::user()->role === 'customer') {
+                return redirect()->intended('/');
+            }
+
             return $this->redirectByRole(Auth::user());
         }
 
@@ -48,10 +60,17 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-    public function showRegister()
+    public function showRegister(Request $request)
     {
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());
+        }
+
+        if ($request->filled('redirect_to')) {
+            $safe = $this->safeRedirectUrl($request->query('redirect_to'));
+            if ($safe) {
+                session(['url.intended' => $safe]);
+            }
         }
 
         return view('auth.register');
@@ -90,7 +109,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/');
+        return redirect()->intended('/');
     }
 
     private function redirectByRole($user)
@@ -100,5 +119,16 @@ class AuthController extends Controller
             'cashier', 'employee' => redirect()->route('cashier.dashboard'),
             default            => redirect('/'),
         };
+    }
+
+    private function safeRedirectUrl(?string $url): ?string
+    {
+        if (!$url) return null;
+        $parsed  = parse_url($url);
+        $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+        if (isset($parsed['host']) && $parsed['host'] !== $appHost) {
+            return null;
+        }
+        return $url;
     }
 }

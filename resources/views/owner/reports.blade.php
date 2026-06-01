@@ -169,96 +169,14 @@
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
         <h2 class="font-bold text-base" style="color:var(--color-black);">Daily Revenue</h2>
-        <span class="text-xs px-3 py-1 rounded-lg font-semibold"
+        <span id="chart-period-label" class="text-xs px-3 py-1 rounded-lg font-semibold"
               style="background:var(--color-primary); color:var(--color-white);">
             {{ \Carbon\Carbon::parse($startDateStr)->format('d M') }} – {{ \Carbon\Carbon::parse($endDateStr)->format('d M Y') }}
         </span>
     </div>
 
-    @php
-        $chartMax  = count($chartData) > 0 ? max($chartData) : 1;
-        $barCount  = max(count($chartLabels), 1);
-        $svgW      = 700;
-        $chartH    = 200;
-        $topPad    = 20;
-        $startX    = 50;
-        $usableW   = $svgW - $startX - 10;
-        $slotW     = intval($usableW / $barCount);
-        $barW      = max(8, intval($slotW * 0.55));
-        $barOff    = intval(($slotW - $barW) / 2);
-        $yStep     = 4;
-    @endphp
-
-    {{-- Bar chart (pure SVG rendered server-side) --}}
-    <div class="w-full h-64 md:h-80 overflow-x-auto">
-        @if(count($chartLabels) === 0)
-            <div class="flex items-center justify-center h-full text-sm" style="color:#9c9c9c;">
-                No data for the selected period.
-            </div>
-        @else
-            <svg viewBox="0 0 {{ $svgW }} 260" class="w-full h-full" preserveAspectRatio="xMidYMid meet"
-                 aria-label="Daily revenue bar chart">
-
-                {{-- Y-axis grid lines & labels --}}
-                @for ($i = 0; $i <= $yStep; $i++)
-                    @php
-                        $yVal = ($chartMax / $yStep) * ($yStep - $i);
-                        $yPos = $topPad + ($chartH / $yStep) * $i;
-                        $yLbl = $yVal >= 1000000
-                            ? number_format($yVal / 1000000, 1) . 'M'
-                            : number_format($yVal / 1000, 0) . 'k';
-                    @endphp
-                    <line x1="45" y1="{{ $yPos }}" x2="{{ $svgW - 5 }}" y2="{{ $yPos }}"
-                          stroke="#E5E7EB" stroke-width="1"/>
-                    <text x="40" y="{{ $yPos + 4 }}" text-anchor="end"
-                          font-size="10" fill="#9ca3af">{{ $yLbl }}</text>
-                @endfor
-
-                {{-- Bars + date labels --}}
-                @foreach ($chartLabels as $idx => $label)
-                    @php
-                        $val   = $chartData[$idx] ?? 0;
-                        $barH  = $chartMax > 0 ? ($val / $chartMax) * $chartH : 0;
-                        $xSlot = $startX + $idx * $slotW;
-                        $xPos  = $xSlot + $barOff;
-                        $yBar  = $topPad + $chartH - $barH;
-                        $isMax = ($val === $chartMax && $val > 0);
-                        $valLbl = $val >= 1000000
-                            ? number_format($val / 1000000, 1) . 'M'
-                            : number_format($val / 1000, 0) . 'k';
-                    @endphp
-
-                    <rect x="{{ $xPos }}" y="{{ $yBar }}"
-                          width="{{ $barW }}" height="{{ $barH }}"
-                          rx="4"
-                          fill="{{ $isMax ? '#A6171C' : '#FFBE54' }}"
-                          opacity="{{ $isMax ? '1' : '0.75' }}"/>
-
-                    @if($barH > 14)
-                        <text x="{{ $xPos + $barW / 2 }}" y="{{ $yBar - 4 }}"
-                              text-anchor="middle" font-size="9" font-weight="600"
-                              fill="{{ $isMax ? '#A6171C' : '#555' }}">{{ $valLbl }}</text>
-                    @endif
-
-                    <text x="{{ $xSlot + $slotW / 2 }}" y="240"
-                          text-anchor="middle" font-size="10" fill="#6b7280">{{ $label }}</text>
-                @endforeach
-
-                {{-- X axis --}}
-                <line x1="45" y1="{{ $topPad + $chartH }}" x2="{{ $svgW - 5 }}" y2="{{ $topPad + $chartH }}"
-                      stroke="#E5E7EB" stroke-width="1.5"/>
-            </svg>
-        @endif
-    </div>
-
-    {{-- Legend --}}
-    <div class="flex items-center gap-4 mt-2 justify-end text-xs" style="color:#555;">
-        <span class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-sm" style="background:#A6171C;"></span> Highest day
-        </span>
-        <span class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-sm" style="background:#FFBE54; opacity:0.75;"></span> Other days
-        </span>
+    <div style="position:relative;height:280px;">
+        <canvas id="daily-revenue-chart"></canvas>
     </div>
 </div>
 
@@ -470,6 +388,8 @@
 {{-- ════════════════════════════════════════════════════════
      JAVASCRIPT
 ════════════════════════════════════════════════════════ --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
 $(function () {
 
@@ -481,6 +401,70 @@ $(function () {
         var d = new Date(str);
         return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
+
+    // ── Daily Revenue Chart ─────────────────────────────────
+    const dailyChart = new Chart(document.getElementById('daily-revenue-chart'), {
+        type: 'line',
+        data: {
+            labels: @json($chartLabels),
+            datasets: [{
+                label: 'Revenue',
+                data: @json($chartData),
+                borderColor: '#A6171C',
+                borderWidth: 2.5,
+                fill: false,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#A6171C',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: '#A6171C',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    callbacks: { label: ctx => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') },
+                    backgroundColor: '#1F2937', padding: 10, cornerRadius: 8,
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9CA3AF' } },
+                y: {
+                    grid: { color: '#E5E7EB' },
+                    ticks: {
+                        font: { size: 10 }, color: '#9CA3AF', maxTicksLimit: 5,
+                        callback: v => Number(v).toLocaleString('id-ID'),
+                    },
+                    beginAtZero: true,
+                    min: 0,
+                }
+            }
+        }
+    });
+
+    function fetchReportChart() {
+        var start = $('#date-start').val();
+        var end   = $('#date-end').val();
+        if (!start || !end) return;
+
+        $.get('{{ route("owner.reports.chart-data") }}', { start_date: start, end_date: end })
+            .done(function (res) {
+                dailyChart.data.labels           = res.labels;
+                dailyChart.data.datasets[0].data = res.values;
+                dailyChart.update();
+            });
+    }
+
+    $('#date-start, #date-end').on('change', function () { fetchReportChart(); });
 
     // ── Order Detail Modal ──────────────────────────────────
     var $modal = $('#modal-order-detail');

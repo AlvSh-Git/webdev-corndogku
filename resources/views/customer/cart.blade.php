@@ -80,17 +80,12 @@
                     </div>
 
                     @if (!empty($item['is_custom']))
-                        <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden flex-none border"
+                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden flex-none border"
                              style="background-color:#FDECD8; border-color:#d2d2d2; flex-shrink:0;">
-                            <img src="{{ $item['varian_image'] ?? $item['image'] ?? '' }}"
-                                 alt="base"
-                                 class="absolute inset-0 w-full h-full object-contain">
-                            @if (!empty($item['sauce_image'] ?? null))
-                                <img src="{{ $item['sauce_image'] }}"
-                                     alt="sauce"
-                                     class="absolute inset-0 w-full h-full object-contain"
-                                     style="z-index:10;">
-                            @endif
+                            <img src="{{ $item['image'] ?? asset('assets/img/CA_ORIGINAL.png') }}"
+                                 alt="{{ $item['varian'] ?? 'Custom Corndog' }}"
+                                 class="w-full h-full object-cover"
+                                 onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
                         </div>
                     @else
                         <img src="{{ $item['image'] }}"
@@ -275,13 +270,36 @@
                       style="color: var(--color-primary);">Rp 123.210</span>
             </div>
 
+            {{-- Store closed notice --}}
+            @if (!$storeOpen)
+            <div class="mb-3 flex items-start gap-2 p-3 rounded-xl text-sm font-semibold"
+                 style="background-color:#FEF2F2;color:#991B1B;border:1px solid #FECACA;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-none mt-0.5" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0
+                             001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                <span>Toko sedang tutup. Checkout akan diaktifkan kembali saat toko buka.</span>
+            </div>
+            @endif
+
             {{-- CTA --}}
-            <a href="{{ route('checkout') }}"
+            @if ($storeOpen)
+            <a id="btn-checkout" href="{{ route('checkout') }}"
                class="block w-full text-center py-3.5 rounded-[15px] font-bold text-white
                       hover:opacity-90 transition-opacity text-base"
                style="background-color: var(--color-primary);">
                 Checkout Sekarang
             </a>
+            @else
+            <button type="button" disabled
+                    class="block w-full text-center py-3.5 rounded-[15px] font-bold text-white
+                           cursor-not-allowed opacity-50 text-base"
+                    style="background-color:#9ca3af;">
+                Checkout Sekarang
+            </button>
+            @endif
 
         </div>
     </div>{{-- /.right column --}}
@@ -417,6 +435,11 @@ $(function () {
     /* ── Init ───────────────────────────────────────────── */
     recalc();
     checkEmpty();
+
+    /* ── Store-status: checkout button state driven server-side ─ */
+    @if (!$storeOpen)
+    $(document).on('click', '#btn-checkout', function (e) { e.preventDefault(); });
+    @endif
 
 });
 </script>

@@ -19,6 +19,28 @@ class MenuController extends Controller
         return response()->json($this->calcStoreStatus());
     }
 
+    public function customize()
+    {
+        $customProducts = Product::whereHas('category', fn($q) => $q->whereRaw('LOWER(name) = ?', ['custom']))
+            ->orderBy('name')
+            ->get();
+
+        $isianProducts  = $customProducts->filter(fn($p) => $this->matchesType($p->name, ['sosis', 'mozza']));
+        $varianProducts = $customProducts->filter(fn($p) => $this->matchesType($p->name, ['original', 'potato', 'ramen']));
+        $sauceProducts  = $customProducts->filter(fn($p) => $this->matchesType($p->name, ['sauce', 'saos', 'ketchup', 'mayo']));
+
+        return view('customer.customize', compact('isianProducts', 'varianProducts', 'sauceProducts'));
+    }
+
+    private function matchesType(string $name, array $keywords): bool
+    {
+        $lower = strtolower($name);
+        foreach ($keywords as $kw) {
+            if (str_contains($lower, $kw)) return true;
+        }
+        return false;
+    }
+
     public function catalog(Request $request): \Illuminate\Http\JsonResponse
     {
         $category = $request->input('category', 'Semua');
@@ -28,7 +50,9 @@ class MenuController extends Controller
         $max      = $request->input('max');
         $cats     = $request->input('cats', []);
 
-        $q = Product::with('category')->where('is_custom', false);
+        $q = Product::with('category')
+            ->where('is_custom', false)
+            ->whereHas('category', fn($c) => $c->whereRaw('LOWER(name) != ?', ['custom']));
 
         if (!empty($cats)) {
             $q->whereHas('category', fn ($c) => $c->whereIn('name', (array) $cats));

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -10,23 +11,13 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = session()->get('cart', []);
-        return view('customer.cart', compact('cartItems'));
+        $storeOpen = $this->calcStoreStatus()['is_open'];
+        return view('customer.cart', compact('cartItems', 'storeOpen'));
     }
 
     public function add(Request $request)
     {
         $status = $this->calcStoreStatus();
-        if (!$status['is_open']) {
-            $reopen = ($status['reopen_day'] && $status['reopen_time'])
-                ? ' Toko akan buka kembali pada ' . $status['reopen_day'] . ' pukul ' . $status['reopen_time'] . '.'
-                : '';
-            return response()->json([
-                'success'    => false,
-                'error'      => 'store_closed',
-                'message'    => 'Maaf, toko sedang tutup.' . $reopen,
-                'store_info' => $status,
-            ], 422);
-        }
 
         $cart = session()->get('cart', []);
 
@@ -40,19 +31,25 @@ class CartController extends Controller
             if (isset($cart[$key])) {
                 $cart[$key]['qty'] += (int) $request->input('qty', 1);
             } else {
+                // Fetch the varian product's actual DB image for the cart thumbnail.
+                // Intentionally no category filter — a simple UPPER match is enough and avoids join failures.
+                $varianProduct = Product::whereRaw('UPPER(name) = ?', [strtoupper(trim($varian))])->first();
+
+                $thumbImage = $varianProduct?->image
+                    ? asset($varianProduct->image)
+                    : asset('assets/img/CA_ORIGINAL.png');
+
                 $cart[$key] = [
-                    'id'           => $key,
-                    'name'         => 'Custom Corndog',
-                    'price'        => (int) $request->input('price'),
-                    'qty'          => (int) $request->input('qty', 1),
-                    'image'        => $request->input('image', ''),
-                    'varian_image' => $request->input('varian_image', ''),
-                    'sauce_image'  => $request->input('sauce_image', ''),
-                    'description'  => $request->input('description', ''),
-                    'is_custom'    => true,
-                    'isi'          => $isi,
-                    'varian'       => $varian,
-                    'sauces'       => $sauces,
+                    'id'          => $key,
+                    'name'        => 'Custom Corndog',
+                    'price'       => (int) $request->input('price'),
+                    'qty'         => (int) $request->input('qty', 1),
+                    'image'       => $thumbImage,
+                    'description' => $request->input('description', ''),
+                    'is_custom'   => true,
+                    'isi'         => $isi,
+                    'varian'      => $varian,
+                    'sauces'      => $sauces,
                 ];
             }
         } else {
@@ -75,9 +72,10 @@ class CartController extends Controller
         session()->put('cart', $cart);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Item ditambahkan ke keranjang.',
-            'count'   => count($cart),
+            'success'    => true,
+            'message'    => 'Item ditambahkan ke keranjang.',
+            'count'      => count($cart),
+            'store_open' => $status['is_open'],
         ]);
     }
 

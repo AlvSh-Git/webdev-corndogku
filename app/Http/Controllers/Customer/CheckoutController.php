@@ -19,6 +19,10 @@ class CheckoutController extends Controller
             return redirect()->route('login');
         }
 
+        if (!$this->calcStoreStatus()['is_open']) {
+            return redirect()->route('cart')->with('error', 'Toko sedang tutup. Checkout akan diaktifkan kembali saat toko buka.');
+        }
+
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {
@@ -78,6 +82,13 @@ class CheckoutController extends Controller
     {
         if (!auth()->check()) {
             return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        if (!$this->calcStoreStatus()['is_open']) {
+            return response()->json([
+                'error'   => 'store_closed',
+                'message' => 'Toko sedang tutup. Silakan checkout saat toko sudah buka kembali.',
+            ], 403);
         }
 
         $cart = session()->get('cart', []);
@@ -151,10 +162,29 @@ class CheckoutController extends Controller
                     'custom_notes' => $customNotes,
                 ]);
 
-                // Deduct stock for regular (non-custom) products
                 if ($productId) {
+                    // Deduct stock for regular (non-custom) products
                     Product::where('id', $productId)
                            ->update(['stock' => DB::raw('GREATEST(stock - ' . (int) $item['qty'] . ', 0)')]);
+                } elseif ($isCustom) {
+                    // Deduct ingredient stock for custom corndog from the hidden "custom" category
+                    $ingredients = array_values(array_filter([
+                        $item['isi']    ?? null,
+                        $item['varian'] ?? null,
+                    ]));
+                    if (!empty($item['sauces'])) {
+                        foreach (array_map('trim', explode(',', $item['sauces'])) as $sauce) {
+                            if ($sauce !== '') {
+                                $ingredients[] = $sauce;
+                            }
+                        }
+                    }
+                    $qty = (int) ($item['qty'] ?? 1);
+                    foreach ($ingredients as $ingredientName) {
+                        Product::whereHas('category', fn($c) => $c->whereRaw('LOWER(name) = ?', ['custom']))
+                            ->whereRaw('UPPER(name) = ?', [strtoupper(trim($ingredientName))])
+                            ->update(['stock' => DB::raw('GREATEST(stock - ' . $qty . ', 0)')]);
+                    }
                 }
             }
 

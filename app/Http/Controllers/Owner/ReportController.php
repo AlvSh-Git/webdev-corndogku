@@ -57,15 +57,33 @@ class ReportController extends Controller
         $revenueQris  = (int) ($paymentSplit->get('QRIS',  0));
         $revenueDebit = (int) ($paymentSplit->get('Debit', 0));
 
-        // Daily revenue for bar chart
-        $chartRaw = $this->completedOrders($startDate, $endDate)
+        // Daily revenue — every day in range present (zero-filled)
+        $dailyRevenues = $this->completedOrders($startDate, $endDate)
             ->selectRaw('DATE(orders.created_at) as date, SUM(orders.total_price) as revenue')
             ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->pluck('revenue', 'date')
+            ->map(fn($v) => (int) $v)
+            ->all();
 
-        $chartLabels = $chartRaw->map(fn($r) => Carbon::parse($r->date)->format('d/m'))->values()->toArray();
-        $chartData   = $chartRaw->map(fn($r) => (int) $r->revenue)->values()->toArray();
+        // Daily order counts — zero-filled for every day in range
+        $dailyOrderCounts = $this->completedOrders($startDate, $endDate)
+            ->selectRaw('DATE(orders.created_at) as date, COUNT(orders.id) as order_count')
+            ->groupBy('date')
+            ->pluck('order_count', 'date')
+            ->map(fn($v) => (int) $v)
+            ->all();
+
+        $chartLabels    = [];
+        $chartData      = [];
+        $chartOrderData = [];
+        $chartDates     = [];
+
+        foreach (\Carbon\CarbonPeriod::create($startDate->toDateString(), $endDate->toDateString()) as $day) {
+            $chartLabels[]    = $day->format('d/m');
+            $chartData[]      = $dailyRevenues[$day->format('Y-m-d')]    ?? 0;
+            $chartOrderData[] = $dailyOrderCounts[$day->format('Y-m-d')] ?? 0;
+            $chartDates[]     = $day->format('d M Y');
+        }
 
         // Paginated transaction list
         $transactions = $this->completedOrders($startDate, $endDate)
@@ -96,8 +114,34 @@ class ReportController extends Controller
             'revenueDebit',
             'chartLabels',
             'chartData',
+            'chartOrderData',
+            'chartDates',
             'transactions'
         ));
+    }
+
+    // ── Chart data AJAX endpoint ─────────────────────────────
+    public function getChartData()
+    {
+        [$startDate, $endDate] = $this->parseDateRange();
+
+        $daily = DB::table('orders')
+            ->selectRaw('DATE(created_at) as date, SUM(total_price) as revenue')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereNotIn('status', ['Cancelled'])
+            ->groupBy('date')
+            ->pluck('revenue', 'date')
+            ->map(fn($v) => (int) $v)
+            ->all();
+
+        $labels = [];
+        $values = [];
+        foreach (\Carbon\CarbonPeriod::create($startDate->toDateString(), $endDate->toDateString()) as $day) {
+            $labels[] = $day->format('d/m');
+            $values[] = $daily[$day->format('Y-m-d')] ?? 0;
+        }
+
+        return response()->json(['labels' => $labels, 'values' => $values]);
     }
 
     // ── CSV Export ───────────────────────────────────────────

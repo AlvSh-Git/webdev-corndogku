@@ -95,7 +95,8 @@
 
             <div class="text-center mt-8 text-sm text-gray-600">
                 Baru di Corndog-Ku?
-                <a href="{{ route('register') }}" class="text-red-700 font-bold hover:underline">Daftar</a>
+                <a href="{{ route('register') }}{{ session('url.intended') ? '?redirect_to=' . urlencode(session('url.intended')) : '' }}"
+                   class="text-red-700 font-bold hover:underline">Daftar</a>
             </div>
         </div>
     </div>

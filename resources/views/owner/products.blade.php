@@ -80,6 +80,7 @@
                     data-price="{{ $product->price }}"
                     data-cost="{{ $product->cost_price }}"
                     data-stock="{{ $product->stock }}"
+                    data-low-stock="{{ $product->low_stock ?? 0 }}"
                     data-available="{{ $product->is_available ? '1' : '0' }}"
                     data-desc="{{ $product->description }}"
                     data-image="{{ $product->image ? asset($product->image) : '' }}"
@@ -523,7 +524,7 @@
                         <div class="pm-field">
                             <label class="pm-label-sm">Minimum Stok Alert</label>
                             <div class="pm-pcs-wrap">
-                                <input type="number" name="min_stock_alert"
+                                <input type="number" id="edit-min-stock" name="min_stock_alert"
                                        class="pm-input" min="0" placeholder="Enter minimum stock">
                                 <span class="pm-pcs-suffix">pcs</span>
                             </div>
@@ -807,6 +808,7 @@ $(function () {
         $('#edit-price').val(btn.data('price'));
         $('#edit-cost').val(btn.data('cost'));
         $('#edit-stock').val(stockVal);
+        $('#edit-min-stock').val(btn.data('low-stock') || '');
         $('#edit-desc').val(btn.data('desc') || '');
 
         const img = btn.data('image') || '{{ asset("assets/img/CA_ORIGINAL.png") }}';

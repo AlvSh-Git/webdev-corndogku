@@ -93,7 +93,7 @@ class JadwalController extends Controller
                 'reopen_time' => $request->reopen_time,
             ], now()->addDays(7));
         } else {
-            Cache::forget('manual_override');
+            Cache::put('manual_override', ['is_open' => true], now()->addHours(24));
         }
 
         return response()->json(['success' => true, 'store_info' => $this->calcStoreStatus()]);

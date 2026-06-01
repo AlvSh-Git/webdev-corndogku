@@ -46,6 +46,7 @@ class ProductController extends Controller
             'price'        => $request->price,
             'cost_price'   => $request->cost_price,
             'stock'        => $stock,
+            'low_stock'    => $request->filled('min_stock_alert') ? (int) $request->min_stock_alert : null,
             'image'        => $imagePath,
             'is_custom'    => false,
             'is_available' => $isAvailable,
@@ -73,6 +74,7 @@ class ProductController extends Controller
         $product->price        = $request->price;
         $product->cost_price   = $request->cost_price;
         $product->stock        = (int) $request->input('stock', 0);
+        $product->low_stock    = $request->filled('min_stock_alert') ? (int) $request->min_stock_alert : null;
         $product->is_available = ($product->stock <= 0) ? false : $request->boolean('is_available', true);
 
         if ($request->hasFile('image')) {

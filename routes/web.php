@@ -22,7 +22,7 @@ use App\Http\Controllers\Customer\ChatbotController;
 // ── Public customer pages ───────────────────────────────────────
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/menu', [MenuController::class, 'index'])->name('menu');
-Route::get('/customize', fn () => view('customer.customize'))->name('customize');
+Route::get('/customize', [MenuController::class, 'customize'])->name('customize');
 Route::get('/store-status', [MenuController::class, 'storeStatus'])->name('store.status');
 Route::get('/api/products', [MenuController::class, 'catalog'])->name('api.products');
 Route::get('/api/orders/{id}', [HistoryController::class, 'show'])->name('api.orders.show');
@@ -64,9 +64,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // ── Owner routes — management access ────────────────────────────
 Route::prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard',        [OwnerDashboard::class, 'index'])->name('dashboard');
-    Route::get('/get-orders',       [OwnerDashboard::class, 'getOrders'])->name('get-orders');
-    Route::get('/get-stats',        [OwnerDashboard::class, 'getStats'])->name('get-stats');
-    Route::post('/store-status',    [OwnerDashboard::class, 'updateStatus'])->name('store.status');
+    Route::get('/get-orders',          [OwnerDashboard::class, 'getOrders'])->name('get-orders');
+    Route::get('/get-stats',           [OwnerDashboard::class, 'getStats'])->name('get-stats');
+    Route::get('/get-chart-data',      [OwnerDashboard::class, 'getChartData'])->name('get-chart-data');
+    Route::post('/store-status',       [OwnerDashboard::class, 'updateStatus'])->name('store.status');
+    Route::post('/orders/{id}/status', [OwnerDashboard::class, 'updateOrderStatus'])->name('orders.status');
 
     Route::get('/products',              [ProductController::class, 'index'])->name('products');
     Route::post('/products',             [ProductController::class, 'store'])->name('products.store');
@@ -79,6 +81,7 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
 
     Route::get('/reports',                    [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/chart-data',         [ReportController::class, 'getChartData'])->name('reports.chart-data');
     Route::get('/reports/export',             [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/order/{id}/detail', [ReportController::class, 'orderDetail'])->name('reports.order.detail');
 
@@ -92,6 +95,7 @@ Route::prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/dashboard',           [CashierDashboard::class, 'index'])->name('dashboard');
     Route::get('/get-orders',          [CashierDashboard::class, 'getOrders'])->name('get-orders');
     Route::get('/get-stats',           [CashierDashboard::class, 'getStats'])->name('get-stats');
+    Route::get('/get-chart-data',      [CashierDashboard::class, 'getChartData'])->name('get-chart-data');
     Route::post('/store-status',       [CashierDashboard::class, 'updateStatus'])->name('store.status');
     Route::post('/orders/{id}/status', [CashierDashboard::class, 'updateOrderStatus'])->name('orders.status');
 
@@ -100,4 +104,5 @@ Route::prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/get-products',                     [PurchaseController::class, 'getProducts'])->name('get-products');
     Route::post('/orders',                          [PurchaseController::class, 'store'])->name('orders.store');
     Route::post('/orders/{id}/send-whatsapp',       [PurchaseController::class, 'sendWhatsAppReceipt'])->name('orders.send-whatsapp');
+    Route::post('/orders/{id}/mark-qris-paid',      [PurchaseController::class, 'markQrisPaid'])->name('orders.mark-qris-paid');
 });

@@ -199,6 +199,7 @@ class PurchaseController extends Controller
 
             $order = Order::create([
                 'user_id'        => $userId,
+                'cashier_id'     => auth()->id(),
                 'customer_phone' => $request->customer_phone ? $this->normalizePhone(trim($request->customer_phone)) : null,
                 'order_number'   => $orderNumber,
                 'total_price'    => $totalPrice,
@@ -212,13 +213,7 @@ class PurchaseController extends Controller
                        ->update(['stock' => \DB::raw('GREATEST(stock - ' . (int) $line['quantity'] . ', 0)')]);
             }
 
-            $order->payment()->create([
-                'payment_method' => $request->payment_method,
-                'amount'         => $totalPrice,
-                'status'         => 'Paid',
-            ]);
-
-            return response()->json([
+            $receiptData = [
                 'success'        => true,
                 'order_id'       => $order->id,
                 'order_number'   => $orderNumber,
@@ -234,10 +229,101 @@ class PurchaseController extends Controller
                     'qty'      => $l['quantity'],
                     'subtotal' => $l['subtotal'],
                 ]),
+            ];
+
+            if ($request->payment_method === 'QRIS') {
+                $order->payment()->create([
+                    'payment_method' => 'QRIS',
+                    'amount'         => $totalPrice,
+                    'status'         => 'Unpaid',
+                ]);
+
+                $snapToken = null;
+                if (class_exists('\\Midtrans\\Snap') && config('services.midtrans.server_key')) {
+                    try {
+                        \Midtrans\Config::$serverKey    = config('services.midtrans.server_key');
+                        \Midtrans\Config::$isProduction = config('services.midtrans.is_production', false);
+                        \Midtrans\Config::$isSanitized  = true;
+                        \Midtrans\Config::$is3ds        = true;
+
+                        $mtItems = array_merge(
+                            array_map(fn($l) => [
+                                'id'       => (string) $l['product_id'],
+                                'price'    => (int) ($l['subtotal'] / max(1, $l['quantity'])),
+                                'quantity' => (int) $l['quantity'],
+                                'name'     => mb_substr($l['product_name'], 0, 50),
+                            ], $lineItems),
+                            [['id' => 'TAX-11', 'price' => $tax, 'quantity' => 1, 'name' => 'Pajak (11%)']]
+                        );
+
+                        $params = [
+                            'transaction_details' => [
+                                'order_id'     => $orderNumber,
+                                'gross_amount' => $totalPrice,
+                            ],
+                            'customer_details' => [
+                                'first_name' => $request->customer_name,
+                                'email'      => 'walkin@corndog.ku',
+                            ],
+                            'enabled_payments' => ['qris'],
+                            'item_details'     => $mtItems,
+                        ];
+
+                        $snapToken = \Midtrans\Snap::getSnapToken($params);
+                        Log::info('Midtrans Snap token generated (cashier)', ['order_number' => $orderNumber]);
+                    } catch (\Exception $e) {
+                        Log::error('Midtrans Snap token failed (cashier)', [
+                            'error'        => $e->getMessage(),
+                            'order_number' => $orderNumber,
+                        ]);
+                    }
+                }
+
+                return response()->json(array_merge($receiptData, ['snap_token' => $snapToken]));
+            }
+
+            $order->payment()->create([
+                'payment_method' => $request->payment_method,
+                'amount'         => $totalPrice,
+                'status'         => 'Paid',
             ]);
+
+            return response()->json($receiptData);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function markQrisPaid($id)
+    {
+        $order = Order::with(['items', 'payment', 'user'])->find((int) $id);
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order tidak ditemukan.'], 404);
+        }
+
+        $order->payment()->update(['status' => 'Paid']);
+
+        $subtotalInt = (int) round($order->total_price / 1.11);
+        $taxInt      = $order->total_price - $subtotalInt;
+
+        return response()->json([
+            'success'        => true,
+            'order_id'       => $order->id,
+            'order_number'   => $order->order_number,
+            'customer'       => $order->user?->name ?? 'Walk-in',
+            'customer_phone' => $order->customer_phone,
+            'order_type'     => $order->order_type,
+            'payment'        => 'QRIS',
+            'subtotal'       => $subtotalInt,
+            'tax'            => $taxInt,
+            'total'          => $order->total_price,
+            'items'          => $order->items->map(fn($i) => [
+                'name'     => $i->product_name,
+                'qty'      => $i->quantity,
+                'subtotal' => $i->subtotal,
+            ]),
+        ]);
     }
 
     // ── Send WhatsApp receipt via Fonnte API ─────────────────

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Product;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -24,15 +25,15 @@ class DashboardController extends Controller
                   $onlineOrders = $cashierOrders = $pendingOrders = null;
 
         try {
-            $dbOrders = Order::with(['user', 'items.product', 'payment'])
+            $dbOrders = Order::with(['user', 'cashier', 'items.product', 'payment'])
                 ->whereDate('created_at', $selectedDate)
                 ->latest()
                 ->get();
 
             $revenueToday  = (int) $dbOrders->whereNotIn('status', ['Cancelled'])->sum('total_price');
-            $totalOrders   = $dbOrders->count();
-            $onlineOrders  = $dbOrders->where('order_type', 'online')->count();
-            $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->count();
+            $totalOrders   = $dbOrders->whereNotIn('status', ['Cancelled'])->count();
+            $onlineOrders  = $dbOrders->where('order_type', 'online')->whereNotIn('status', ['Cancelled'])->count();
+            $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->whereNotIn('status', ['Cancelled'])->count();
             $pendingOrders = $dbOrders->where('status', 'Pending')->count();
 
             $yesterday        = Carbon::parse($selectedDate)->subDay()->toDateString();
@@ -48,32 +49,34 @@ class DashboardController extends Controller
                     $source       = $o->order_type === 'online' ? 'online' : 'cashier';
                     $payment      = $o->payment?->payment_method ?? 'Cash';
                     $itemsSummary = $o->items->map(
-                        fn($i) => $i->quantity . '× ' . ($i->product?->name ?? 'Item')
+                        fn($i) => $i->quantity . '× ' . ($i->product_name ?? $i->product?->name ?? 'Item')
                     )->implode(', ');
 
                     $orderItems = $o->items->map(fn($i) => [
-                        'name'     => $i->product?->name ?? 'Item',
+                        'name'     => $i->product_name ?? $i->product?->name ?? 'Item',
                         'variant'  => $i->custom_notes ?? '',
                         'price'    => $i->quantity > 0 ? (int) ($i->subtotal / $i->quantity) : 0,
                         'qty'      => $i->quantity,
                         'subtotal' => $i->subtotal,
-                        'img'      => $i->product?->image ?? '',
+                        'img'      => $i->product?->image ? asset($i->product->image) : '',
                     ])->values()->toArray();
 
                     return (object) [
-                        'db_id'       => $o->id,
-                        'id'          => '#' . $o->order_number,
-                        'is_new'      => $o->created_at->gte(now()->subMinutes(30)),
-                        'customer'    => $o->user?->name ?? 'Walk-in Customer',
-                        'sub'         => $o->user ? 'Customer' : '',
-                        'source'      => $source,
-                        'items'       => $itemsSummary ?: '-',
-                        'status'      => $o->status,
-                        'time'        => $o->created_at->format('h:i A'),
-                        'total'       => $o->total_price,
-                        'order_type'  => $o->order_type,
-                        'payment'     => $payment,
-                        'order_items' => $orderItems,
+                        'db_id'               => $o->id,
+                        'id'                  => '#' . $o->order_number,
+                        'is_new'              => $o->created_at->gte(now()->subMinutes(30)),
+                        'customer'            => $o->user?->name ?? 'Walk-in Customer',
+                        'sub'                 => $o->user ? 'Customer' : '',
+                        'source'              => $source,
+                        'items'               => $itemsSummary ?: '-',
+                        'status'              => $o->status,
+                        'time'                => $o->created_at->format('h:i A'),
+                        'total'               => $o->total_price,
+                        'order_type'          => $o->order_type,
+                        'payment'             => $payment,
+                        'order_items'         => $orderItems,
+                        'cashier_name'        => $o->cashier?->name ?? null,
+                        'cancellation_reason' => $o->cancellation_reason,
                     ];
                 });
             }
@@ -81,14 +84,33 @@ class DashboardController extends Controller
             // DB not ready — view will use mock stubs
         }
 
-        $chartData   = null;
-        $profitToday = null;
+        $chartData = null;
+
+        try {
+            $weekStart = Carbon::parse($selectedDate)->startOfWeek(Carbon::MONDAY);
+            $weekEnd   = $weekStart->copy()->addDays(6);
+
+            $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
+                ->whereDate('created_at', '>=', $weekStart->toDateString())
+                ->whereDate('created_at', '<=', $weekEnd->toDateString())
+                ->whereNotIn('status', ['Cancelled'])
+                ->groupByRaw('DAYOFWEEK(created_at)')
+                ->pluck('rev', 'dow');
+
+            // MySQL DAYOFWEEK: 1=Sun, 2=Mon, 3=Tue, 4=Wed, 5=Thu, 6=Fri, 7=Sat
+            $chartData = [];
+            foreach ([['Mon',2],['Tue',3],['Wed',4],['Thu',5],['Fri',6],['Sat',7],['Sun',1]] as [$label, $dow]) {
+                $chartData[] = ['label' => $label, 'value' => (int) ($rawChart[$dow] ?? 0)];
+            }
+        } catch (\Exception $e) {
+            // DB not ready — view will use mock stubs
+        }
 
         return view('cashier.dashboard', compact(
             'role', 'storeStatus', 'selectedDate',
             'orders', 'revenueToday', 'revenueGrowth',
             'totalOrders', 'onlineOrders', 'cashierOrders', 'pendingOrders',
-            'chartData', 'profitToday'
+            'chartData'
         ));
     }
 
@@ -110,7 +132,7 @@ class DashboardController extends Controller
                 'Cancelled' => $allRows->where('status', 'Cancelled')->count(),
             ];
 
-            $query = Order::with(['user', 'items.product', 'payment'])
+            $query = Order::with(['user', 'cashier', 'items.product', 'payment'])
                 ->whereDate('created_at', $date)
                 ->latest();
 
@@ -124,32 +146,34 @@ class DashboardController extends Controller
                 $source       = $o->order_type === 'online' ? 'online' : 'cashier';
                 $payment      = $o->payment?->payment_method ?? 'Cash';
                 $itemsSummary = $o->items->map(
-                    fn($i) => $i->quantity . '× ' . ($i->product?->name ?? 'Item')
+                    fn($i) => $i->quantity . '× ' . ($i->product_name ?? $i->product?->name ?? 'Item')
                 )->implode(', ');
 
                 $orderItems = $o->items->map(fn($i) => [
-                    'name'     => $i->product?->name ?? 'Item',
+                    'name'     => $i->product_name ?? $i->product?->name ?? 'Item',
                     'variant'  => $i->custom_notes ?? '',
                     'price'    => $i->quantity > 0 ? (int) ($i->subtotal / $i->quantity) : 0,
                     'qty'      => $i->quantity,
                     'subtotal' => $i->subtotal,
-                    'img'      => $i->product?->image ?? '',
+                    'img'      => $i->product?->image ? asset($i->product->image) : '',
                 ])->values()->toArray();
 
                 return [
-                    'db_id'       => $o->id,
-                    'id'          => '#' . $o->order_number,
-                    'is_new'      => $o->created_at->gte(now()->subMinutes(30)),
-                    'customer'    => $o->user?->name ?? 'Walk-in Customer',
-                    'sub'         => $o->user ? 'Customer' : '',
-                    'source'      => $source,
-                    'items'       => $itemsSummary ?: '-',
-                    'status'      => $o->status,
-                    'time'        => $o->created_at->format('h:i A'),
-                    'total'       => $o->total_price,
-                    'order_type'  => $o->order_type,
-                    'payment'     => $payment,
-                    'order_items' => $orderItems,
+                    'db_id'               => $o->id,
+                    'id'                  => '#' . $o->order_number,
+                    'is_new'              => $o->created_at->gte(now()->subMinutes(30)),
+                    'customer'            => $o->user?->name ?? 'Walk-in Customer',
+                    'sub'                 => $o->user ? 'Customer' : '',
+                    'source'              => $source,
+                    'items'               => $itemsSummary ?: '-',
+                    'status'              => $o->status,
+                    'time'                => $o->created_at->format('h:i A'),
+                    'total'               => $o->total_price,
+                    'order_type'          => $o->order_type,
+                    'payment'             => $payment,
+                    'order_items'         => $orderItems,
+                    'cashier_name'        => $o->cashier?->name ?? null,
+                    'cancellation_reason' => $o->cancellation_reason,
                 ];
             })->values();
 
@@ -189,9 +213,9 @@ class DashboardController extends Controller
                 ->get();
 
             $revenueToday  = (int) $dbOrders->whereNotIn('status', ['Cancelled'])->sum('total_price');
-            $totalOrders   = $dbOrders->count();
-            $onlineOrders  = $dbOrders->where('order_type', 'online')->count();
-            $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->count();
+            $totalOrders   = $dbOrders->whereNotIn('status', ['Cancelled'])->count();
+            $onlineOrders  = $dbOrders->where('order_type', 'online')->whereNotIn('status', ['Cancelled'])->count();
+            $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->whereNotIn('status', ['Cancelled'])->count();
             $pendingOrders = $dbOrders->where('status', 'Pending')->count();
 
             $totalCostToday = (int) DB::table('order_items')
@@ -226,14 +250,88 @@ class DashboardController extends Controller
         }
     }
 
+    public function getChartData(Request $request)
+    {
+        $rawDate = $request->query('date', today()->toDateString());
+        $date    = Carbon::parse($rawDate)->min(today())->toDateString();
+
+        try {
+            $weekStart = Carbon::parse($date)->startOfWeek(Carbon::MONDAY);
+            $weekEnd   = $weekStart->copy()->addDays(6);
+
+            $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
+                ->whereDate('created_at', '>=', $weekStart->toDateString())
+                ->whereDate('created_at', '<=', $weekEnd->toDateString())
+                ->whereNotIn('status', ['Cancelled'])
+                ->groupByRaw('DAYOFWEEK(created_at)')
+                ->pluck('rev', 'dow');
+
+            $labels = [];
+            $values = [];
+            foreach ([['Mon',2],['Tue',3],['Wed',4],['Thu',5],['Fri',6],['Sat',7],['Sun',1]] as [$label, $dow]) {
+                $labels[] = $label;
+                $values[] = (int) ($rawChart[$dow] ?? 0);
+            }
+
+            return response()->json(['labels' => $labels, 'values' => $values]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'labels' => ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                'values' => [0,0,0,0,0,0,0],
+            ]);
+        }
+    }
+
     public function updateOrderStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => ['required', 'in:Pending,Preparing,Ready,Completed,Cancelled'],
+            'status'              => ['required', 'in:Pending,Preparing,Ready,Completed,Cancelled'],
+            'cancellation_reason' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $order = Order::findOrFail($id);
-        $order->update(['status' => $request->status]);
+        $order = Order::with('items.product')->findOrFail($id);
+
+        $updateData = ['status' => $request->status];
+
+        // Assign the processing cashier the first time a staff member touches this order
+        if (!$order->cashier_id) {
+            $updateData['cashier_id'] = auth()->id();
+        }
+
+        if ($request->status === 'Cancelled') {
+            $updateData['cancellation_reason'] = $request->cancellation_reason;
+
+            // Restore stock for every item in the cancelled order
+            foreach ($order->items as $item) {
+                if ($item->product_id) {
+                    Product::where('id', $item->product_id)
+                        ->update(['stock' => DB::raw('stock + ' . (int) $item->quantity)]);
+                } elseif ($item->custom_notes) {
+                    $notes       = json_decode($item->custom_notes, true) ?? [];
+                    $ingredients = array_values(array_filter([
+                        $notes['isi']    ?? null,
+                        $notes['varian'] ?? null,
+                    ]));
+                    if (!empty($notes['sauces'])) {
+                        foreach (array_map('trim', explode(',', $notes['sauces'])) as $sauce) {
+                            if ($sauce !== '') {
+                                $ingredients[] = $sauce;
+                            }
+                        }
+                    }
+                    foreach ($ingredients as $ingredientName) {
+                        Product::whereHas('category', fn($c) => $c->whereRaw('LOWER(name) = ?', ['custom']))
+                            ->whereRaw('UPPER(name) = ?', [strtoupper(trim($ingredientName))])
+                            ->update(['stock' => DB::raw('stock + ' . (int) $item->quantity)]);
+                    }
+                }
+            }
+
+            // Remove any payment record so revenue calculations stay accurate
+            $order->payment()->delete();
+        }
+
+        $order->update($updateData);
 
         // Ensure every completed order has a payment record so the Sales Report
         // can always join on payments without missing rows.

@@ -4,6 +4,10 @@
 
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="{{ config('services.midtrans.is_production')
+    ? 'https://app.midtrans.com/snap/snap.js'
+    : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+        data-client-key="{{ config('services.midtrans.client_key', '') }}"></script>
 
 {{-- ══════════════════════════════════════════════════════════════
      CASHIER POS
@@ -1020,14 +1024,56 @@ $(function () {
             data        : JSON.stringify(payload),
             success     : function (res) {
                 $('#processing-modal').css('display', 'none');
-                if (res.success) {
-                    showReceipt(res);
-                } else {
+                if (!res.success) {
                     Swal.fire({
                         icon: 'error', title: 'Gagal',
                         text: res.message || 'Gagal menyimpan order. Silakan coba lagi.',
                         confirmButtonColor: '#a81d1d',
                     });
+                    return;
+                }
+
+                if (res.snap_token) {
+                    window.snap.pay(res.snap_token, {
+                        onSuccess: function () {
+                            $.ajax({
+                                type    : 'POST',
+                                url     : '{{ route("cashier.orders.mark-qris-paid", ":id") }}'.replace(':id', res.order_id),
+                                data    : { _token: '{{ csrf_token() }}' },
+                                success : function (paidRes) {
+                                    if (paidRes.success) { showReceipt(paidRes); }
+                                },
+                                error   : function () {
+                                    Swal.fire('Pembayaran Diterima',
+                                        'Pembayaran QRIS berhasil. Order #' + res.order_number + ' sedang diproses.',
+                                        'success');
+                                },
+                            });
+                        },
+                        onPending: function () {
+                            Swal.fire({
+                                icon: 'info', title: 'Menunggu Pembayaran',
+                                text: 'Pembayaran QRIS untuk order ' + res.order_number + ' sedang menunggu konfirmasi.',
+                                confirmButtonColor: '#a81d1d',
+                            });
+                        },
+                        onError: function () {
+                            Swal.fire({
+                                icon: 'error', title: 'Pembayaran Gagal',
+                                text: 'Pembayaran QRIS tidak berhasil. Silakan coba metode lain.',
+                                confirmButtonColor: '#a81d1d',
+                            });
+                        },
+                        onClose: function () {
+                            Swal.fire({
+                                icon: 'warning', title: 'Pembayaran Dibatalkan',
+                                text: 'Popup QRIS ditutup. Konfirmasi pembayaran secara manual atau pilih metode lain.',
+                                confirmButtonColor: '#a81d1d',
+                            });
+                        },
+                    });
+                } else {
+                    showReceipt(res);
                 }
             },
             error       : function (xhr) {

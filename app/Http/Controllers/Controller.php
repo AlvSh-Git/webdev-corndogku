@@ -18,6 +18,10 @@ abstract class Controller
     {
         $override = Cache::get('manual_override');
 
+        if ($override && ($override['is_open'] ?? false)) {
+            return ['is_open' => true, 'reason' => 'manual', 'reopen_day' => '', 'reopen_time' => ''];
+        }
+
         if ($override && ($override['is_closed'] ?? false)) {
             return [
                 'is_open'     => false,

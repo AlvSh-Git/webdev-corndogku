@@ -17,13 +17,13 @@
     $storeStatus   = $storeStatus   ?? 'available';
 
     $chartData = $chartData ?? [
-        ['label'=>'Sun','value'=>0],
         ['label'=>'Mon','value'=>200000],
         ['label'=>'Tue','value'=>590000],
         ['label'=>'Wed','value'=>550000],
         ['label'=>'Thu','value'=>650000],
         ['label'=>'Fri','value'=>400000],
         ['label'=>'Sat','value'=>500000],
+        ['label'=>'Sun','value'=>0],
     ];
 
     $orders = $orders ?? array_map(fn($o) => (object) $o, [
@@ -305,11 +305,11 @@
             <div class="w-9 h-9 rounded-lg flex items-center justify-center font-black text-white text-lg"
                  style="background-color:var(--color-primary);">!</div>
         </div>
-        <ul class="divide-y text-sm" style="border-color:var(--color-border);">
+        <ul class="divide-y text-sm overflow-y-auto" style="border-color:var(--color-border);max-height:288px;">
             @forelse ($lowStockItems as $item)
-                <li class="flex justify-between py-2">
+                <li class="flex justify-between py-2 pr-1">
                     <span style="color:var(--color-black);">{{ $item['name'] }}</span>
-                    <span class="font-medium text-xs px-2 py-0.5 rounded-full"
+                    <span class="font-medium text-xs px-2 py-0.5 rounded-full flex-none ml-2"
                           style="background-color:rgba(166,23,28,0.1);color:var(--color-primary);">
                         {{ $item['qty'] }}
                     </span>
@@ -357,16 +357,10 @@
     </div>
 
     {{-- ── REVENUE CHART ─────────────────────────────────────────────── --}}
-    <div id="dash-chart" class="rounded-xl p-5"
+    <div id="dash-chart" class="rounded-xl p-5 flex flex-col"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-base font-bold" style="color:var(--color-black);">Revenue Chart</h2>
-                <p class="text-[11px]" style="color:#9CA3AF;">
-                    Week of {{ $windowDays->first()->format('d M') }}
-                    – {{ $windowDays->last()->format('d M Y') }}
-                </p>
-            </div>
+        <div class="flex items-center justify-between mb-4 flex-none">
+            <h2 class="text-base font-bold" style="color:var(--color-black);">Revenue</h2>
             <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold
                          px-2 py-1 rounded-lg flex-none"
                   style="background-color:var(--color-primary-surface);color:var(--color-primary);">
@@ -374,7 +368,7 @@
                 Revenue
             </span>
         </div>
-        <div style="position:relative;height:240px;">
+        <div class="flex-1 relative" style="min-height:180px;">
             <canvas id="revenue-chart"></canvas>
         </div>
     </div>
@@ -710,6 +704,7 @@ $(function () {
 
         fetchStats(prev);
         fetchOrders(currentStatus, 1);
+        fetchChartData(prev);
     });
 
     /* NEXT button — shift highlight right; clamped to today */
@@ -729,6 +724,7 @@ $(function () {
 
         fetchStats(next);
         fetchOrders(currentStatus, 1);
+        fetchChartData(next);
     });
 
     /* Clicking any visible date cell */
@@ -737,6 +733,7 @@ $(function () {
         highlightDate(d);
         fetchStats(d);
         fetchOrders(currentStatus, 1);
+        fetchChartData(d);
     });
 
     /* ═══════════════════════════════════════════════════════════
@@ -773,7 +770,7 @@ $(function () {
     /* ═══════════════════════════════════════════════════════════
        REVENUE CHART
     ═══════════════════════════════════════════════════════════ */
-    new Chart(document.getElementById('revenue-chart'), {
+    const revenueChart = new Chart(document.getElementById('revenue-chart'), {
         type: 'line',
         data: {
             labels: @json(collect($chartData)->pluck('label')),
@@ -781,15 +778,17 @@ $(function () {
                 label: 'Revenue',
                 data:  @json(collect($chartData)->pluck('value')),
                 borderColor: '#A6171C',
-                backgroundColor: 'rgba(166,23,28,0.07)',
                 borderWidth: 2.5,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#A6171C',
-                pointBorderWidth: 2.5,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                fill: true,
-                tension: 0.35,
+                fill: false,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#A6171C',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: '#A6171C',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 2,
             }]
         },
         options: {
@@ -799,6 +798,7 @@ $(function () {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: true,
                     callbacks: { label: ctx => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') },
                     backgroundColor: '#1F2937', padding: 10, cornerRadius: 8,
                 }
@@ -806,16 +806,26 @@ $(function () {
             scales: {
                 x: { grid:{ display:false }, ticks:{ font:{size:11}, color:'#9CA3AF' } },
                 y: {
-                    grid: { color:'#F3F4F6' },
+                    grid: { color:'#E5E7EB', borderDash:[5,5] },
                     ticks: {
-                        font:{size:10}, color:'#9CA3AF', maxTicksLimit:6,
-                        callback: v => v===0 ? '0' : v>=1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K',
+                        font:{size:10}, color:'#9CA3AF', maxTicksLimit:5,
+                        callback: v => Number(v).toLocaleString('id-ID'),
                     },
                     beginAtZero: true,
+                    min: 0,
                 }
             }
         }
     });
+
+    function fetchChartData(dateStr) {
+        $.get('{{ route("owner.get-chart-data") }}', { date: dateStr })
+            .done(function (res) {
+                revenueChart.data.labels                 = res.labels;
+                revenueChart.data.datasets[0].data       = res.values;
+                revenueChart.update();
+            });
+    }
 
     /* ═══════════════════════════════════════════════════════════
        ORDER TABLE — AJAX pagination
@@ -962,8 +972,11 @@ $(function () {
         const items=order.order_items||[];
         if(!items.length)return'<p style="font-size:12px;color:#9CA3AF;text-align:center;padding:16px 0;">No items</p>';
         return items.map(function(item){
-            const imgSrc=item.img?'{{ asset("assets/img/") }}/'+item.img:'';
-            const imgTag=imgSrc?`<img src="${imgSrc}" alt="${item.name}" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover;">`:'';
+            // item.img is already a full URL (asset()) from the backend
+            const imgSrc=item.img||'';
+            const imgTag=imgSrc
+                ?`<img src="${imgSrc}" alt="${item.name}" onerror="this.style.display='none';this.parentElement.style.background='#F3F4F6';" style="width:100%;height:100%;object-fit:cover;">`
+                :'';
             return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #F5F5F5;">
                 <div style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#F3F4F6;border:1px solid #EFEFEF;">${imgTag}</div>
                 <div style="flex:1;min-width:0;padding-top:2px;">
@@ -994,6 +1007,29 @@ $(function () {
         const totalQty=(order.order_items||[]).reduce((s,i)=>s+(i.qty||0),0);
         $('#drawer-item-count').text('×'+(totalQty||1));
         order.is_new?$('#drawer-new-badge').css('display','inline'):$('#drawer-new-badge').css('display','none');
+
+        // Cashier name — always populate; show fallback when not yet assigned
+        $('#drawer-cashier-name-text').text(
+            order.cashier_name || (order.source === 'online' ? 'Online Order' : '-')
+        );
+
+        // Cancellation reason + lock stepper if Cancelled
+        if(order.status==='Cancelled'){
+            if(order.cancellation_reason){
+                $('#drawer-cancel-reason-text').text(order.cancellation_reason);
+                $('#drawer-cancel-reason-line').show();
+            }else{
+                $('#drawer-cancel-reason-line').hide();
+            }
+            // Disable stepper & cancel button
+            $('#drawer-stepper-wrapper').css({opacity:'0.45','pointer-events':'none'});
+            $('#btn-batalkan-order').css({opacity:'0.45','pointer-events':'none',cursor:'not-allowed'});
+        }else{
+            $('#drawer-cancel-reason-line').hide();
+            $('#drawer-stepper-wrapper').css({opacity:'1','pointer-events':'auto'});
+            $('#btn-batalkan-order').css({opacity:'1','pointer-events':'auto',cursor:'pointer'});
+        }
+
         $('#drawer-items').html(buildItemsHTML(order));
         renderStepperForStatus(order.status);
         $('#drawer-backdrop').css('display','block');
@@ -1012,6 +1048,80 @@ $(function () {
     $(document).on('click','#drawer-backdrop',function(e){e.preventDefault();closeDrawer();});
     $(document).on('click','#order-detail-drawer',function(e){e.stopPropagation();});
     $(document).on('keydown',function(e){if(e.key==='Escape')closeDrawer();});
+
+    /* ── Step-item: update order status with SweetAlert2 ─────── */
+    $(document).on('click','.step-item',function(e){
+        e.stopPropagation();
+        if(!drawerOrder||!drawerOrder.db_id)return;
+        var newStatus=$(this).data('step');
+        if(!newStatus||newStatus===drawerOrder.status)return;
+
+        Swal.fire({
+            title:'Ubah Status Order',
+            text:'Yakin ingin mengubah status menjadi "'+newStatus+'"?',
+            icon:'question',
+            showCancelButton:true,
+            confirmButtonText:'Ya, Ubah',
+            cancelButtonText:'Batal',
+            confirmButtonColor:'#A6171C',
+            cancelButtonColor:'#6B7280',
+        }).then(function(result){
+            if(!result.isConfirmed)return;
+            $.ajax({
+                url:'/owner/orders/'+drawerOrder.db_id+'/status',
+                method:'POST',
+                data:{status:newStatus,_token:'{{ csrf_token() }}'},
+                success:function(res){
+                    if(!res.success)return;
+                    drawerOrder.status=newStatus;
+                    renderStepperForStatus(newStatus);
+                    fetchOrders(currentStatus,currentPage||1);
+                },
+                error:function(){
+                    Swal.fire('Gagal','Tidak dapat memperbarui status. Coba lagi.','error');
+                }
+            });
+        });
+    });
+
+    /* ── Batalkan Order with SweetAlert2 textarea ────────────── */
+    $(document).on('click','#btn-batalkan-order',function(e){
+        e.stopPropagation();
+        if(!drawerOrder||!drawerOrder.db_id)return;
+
+        Swal.fire({
+            title:'Batalkan Order',
+            html:'<p style="color:#555;font-size:13px;margin-bottom:6px;">Masukkan alasan pembatalan untuk <strong>'+drawerOrder.id+'</strong>:</p>',
+            input:'textarea',
+            inputPlaceholder:'Tuliskan alasan pembatalan...',
+            inputAttributes:{style:'font-size:13px;border-radius:8px;border:1px solid #E5E7EB;padding:8px;'},
+            showCancelButton:true,
+            confirmButtonText:'Batalkan Order',
+            cancelButtonText:'Tidak',
+            confirmButtonColor:'#DC2626',
+            cancelButtonColor:'#6B7280',
+            inputValidator:function(value){
+                if(!value||!value.trim())return'Alasan pembatalan wajib diisi!';
+            }
+        }).then(function(result){
+            if(!result.isConfirmed)return;
+            $.ajax({
+                url:'/owner/orders/'+drawerOrder.db_id+'/status',
+                method:'POST',
+                data:{status:'Cancelled',cancellation_reason:result.value,_token:'{{ csrf_token() }}'},
+                success:function(res){
+                    if(!res.success)return;
+                    drawerOrder.status='Cancelled';
+                    drawerOrder.cancellation_reason=result.value;
+                    closeDrawer();
+                    fetchOrders(currentStatus,currentPage||1);
+                },
+                error:function(){
+                    Swal.fire('Gagal','Tidak dapat membatalkan order. Coba lagi.','error');
+                }
+            });
+        });
+    });
 });
 </script>
 

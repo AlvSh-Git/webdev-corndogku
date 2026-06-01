@@ -6,7 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Corndog-Ku')</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>.swal2-container { z-index: 999999 !important; }</style>
     @stack('styles')
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">

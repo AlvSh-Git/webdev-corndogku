@@ -6,7 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Corndog-Ku') — Dashboard</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* Force SweetAlert2 above the order-detail drawer (z-index: 9999) and its backdrop (9998) */
+        .swal2-container { z-index: 999999 !important; }
+    </style>
 </head>
 <body class="font-sans antialiased">
 

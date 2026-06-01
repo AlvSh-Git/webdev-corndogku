@@ -52,6 +52,7 @@
 
             {{-- Layer 2: Native interactive CTA button --}}
             <a href="{{ route('customize') }}"
+               id="btn-custom-cta"
                class="absolute bottom-[10%] md:bottom-[15%] left-[5%] md:left-[8%] z-10
                       inline-flex items-center gap-2 w-max px-6 md:px-10 py-2.5 md:py-3
                       bg-[#A6171C] text-white font-bold rounded-full
@@ -555,6 +556,26 @@ $(function () {
             });
     }
 
+    /* ── Custom Corndog CTA — require login ─────────────── */
+    $('#btn-custom-cta').on('click', function (e) {
+        if (!isLoggedIn) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Silakan login atau daftar untuk membuat custom corndog.',
+                showCancelButton: true,
+                confirmButtonText: 'Login / Daftar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#a81d1d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent("{{ route('customize') }}");
+                }
+            });
+        }
+    });
+
     /* ── Category tabs ────────────────────────────────────── */
     $(document).on('click', '.cat-tab', function () {
         activeCat = $(this).data('cat');
@@ -694,6 +715,23 @@ $(function () {
        PRODUCT DETAIL MODAL
     ══════════════════════════════════════════════════════════ */
     $(document).on('click', '.btn-pesan', function () {
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Silakan login atau daftar untuk memesan.',
+                showCancelButton: true,
+                confirmButtonText: 'Login / Daftar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#a81d1d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent(window.location.href);
+                }
+            });
+            return;
+        }
+
         var $b = $(this);
         currentProductId    = $b.data('id');
         currentProductPrice = parseInt($b.data('price'), 10) || 0;
@@ -711,7 +749,22 @@ $(function () {
 
     /* ── Add to cart (outline button) — stay on page ────── */
     $(document).on('click', '.btn-add-only', function () {
-        if (!isLoggedIn) { window.location.href = '/login'; return; }
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Kamu harus login atau daftar dulu untuk memasukkan menu ini ke keranjang.',
+                showCancelButton: true,
+                confirmButtonText: 'Login / Daftar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#a81d1d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent(window.location.href);
+                }
+            });
+            return;
+        }
 
         var $btn     = $(this);
         var origHtml = $btn.html();
@@ -733,16 +786,12 @@ $(function () {
             success: function (response) {
                 if (response.success) {
                     closeModal();
-                    showCartToast('Ditambahkan ke keranjang!');
                     $('#cart-badge').text(response.count);
+                    showCartToast('Ditambahkan ke keranjang!');
                 }
             },
-            error: function (xhr) {
-                var res = xhr.responseJSON || {};
-                var msg = res.error === 'store_closed'
-                    ? (res.message || 'Toko sedang tutup.')
-                    : 'Gagal menambahkan ke keranjang.';
-                showCartToast(msg, true);
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
             },
             complete: function () {
                 $btn.prop('disabled', false).html(origHtml);
@@ -752,7 +801,22 @@ $(function () {
 
     /* ── Pesan Sekarang (solid button) — add then redirect ─ */
     $(document).on('click', '.btn-order-now', function () {
-        if (!isLoggedIn) { window.location.href = '/login'; return; }
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Kamu harus login atau daftar dulu untuk memasukkan menu ini ke keranjang.',
+                showCancelButton: true,
+                confirmButtonText: 'Login / Daftar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#a81d1d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent(window.location.href);
+                }
+            });
+            return;
+        }
 
         var $btn = $(this);
         var qty  = parseInt($('#modal-qty').text(), 10) || 1;
@@ -775,12 +839,8 @@ $(function () {
                     window.location.href = '{{ route("cart") }}';
                 }
             },
-            error: function (xhr) {
-                var res = xhr.responseJSON || {};
-                var msg = res.error === 'store_closed'
-                    ? (res.message || 'Toko sedang tutup.')
-                    : 'Gagal menambahkan ke keranjang.';
-                showCartToast(msg, true);
+            error: function () {
+                showCartToast('Gagal menambahkan ke keranjang.', true);
                 $btn.prop('disabled', false).text('Pesan Sekarang');
             }
         });

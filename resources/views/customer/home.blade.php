@@ -780,7 +780,7 @@
                     @endforeach
                 </div>
                 <p class="text-xs text-white/55 mt-4">
-                    Jl. Rungkut Mejoyo Utara No.61, Surabaya
+                    {{ config('store.address') }}
                 </p>
             </div>
         </div>
@@ -910,7 +910,7 @@
                 <ul class="space-y-2 text-sm text-white/70">
                     <li>@corndogku_id</li>
                     <li>+62 823-2511-0652</li>
-                    <li class="pt-1">Jl. Rungkut Mejoyo Utara No.61, Surabaya</li>
+                    <li class="pt-1">{{ config('store.address') }}</li>
                 </ul>
             </div>
 

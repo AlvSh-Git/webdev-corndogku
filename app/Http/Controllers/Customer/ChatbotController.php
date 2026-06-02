@@ -21,7 +21,8 @@ class ChatbotController extends Controller
 
         // ── Lightweight RAG: inject live menu/price data into the system prompt ──
         $businessContext = $this->buildBusinessContext();
-        $systemPrompt    = $this->buildSystemPrompt($businessContext);
+        $storeInfo       = $this->buildStoreInfo();
+        $systemPrompt    = $this->buildSystemPrompt($businessContext, $storeInfo);
 
         // Pull a few recent turns as conversation history — ONLY for logged-in
         // users (a null user_id would otherwise mix in every guest's logs).
@@ -106,30 +107,62 @@ class ChatbotController extends Controller
     }
 
     /**
-     * The strict, grounded system prompt. The retrieved menu context is injected
-     * verbatim, and the model is told to answer ONLY from it.
+     * Collects the LIVE store state — canonical address, opening hours, and the
+     * real-time open/closed status — all sourced from the base Controller so the
+     * chatbot never drifts out of sync with the actual schedule/database.
      */
-    private function buildSystemPrompt(string $businessContext): string
+    private function buildStoreInfo(): array
     {
-        $alamat = 'Jl. Rungkut Mejoyo Utara No.61, Surabaya';
-        $jamBuka = 'Senin–Kamis 10.00–21.00, Jumat–Sabtu 10.00–22.00, Minggu tutup (WIB)';
+        // Fetch the schedule once and reuse it for both status + hours.
+        $schedule = $this->operationalSchedule();
+        $status   = $this->calcStoreStatus($schedule);
+
+        if ($status['is_open']) {
+            $statusLine = 'Sedang BUKA sekarang';
+        } elseif (!empty($status['reopen_day']) && !empty($status['reopen_time'])) {
+            $statusLine = "Sedang TUTUP, buka lagi {$status['reopen_day']} jam {$status['reopen_time']}";
+        } else {
+            $statusLine = 'Sedang TUTUP';
+        }
+
+        return [
+            'address' => $this->storeAddress(),
+            'hours'   => $this->scheduleHours($schedule),
+            'status'  => $statusLine,
+        ];
+    }
+
+    /**
+     * The strict, grounded system prompt. The retrieved menu context and the
+     * live store state are injected verbatim, and the model is told to answer
+     * ONLY from it.
+     */
+    private function buildSystemPrompt(string $businessContext, array $storeInfo): string
+    {
+        $alamat  = $storeInfo['address'];
+        $jamBuka = $storeInfo['hours'];
+        $status  = $storeInfo['status'];
 
         return "Kamu adalah asisten virtual Corndog-Ku. Panggil pelanggan dengan sebutan 'Kak'. Gunakan bahasa Indonesia santai, ramah, dan luwes (seperti admin sosmed kekinian). Jangan menggunakan bahasa baku atau kaku.\n\n"
              . "PERANMU: HANYA menjawab tentang menu Corndog-Ku, harga, cara pemesanan, lokasi, dan jam buka.\n\n"
              . "INFO LOKASI & JAM BUKA (Gunakan bahasa santai saat menjawab):\n"
              . "- Lokasi: {$alamat}\n"
-             . "- Jam Buka: {$jamBuka}\n\n"
+             . "- Jam Buka: {$jamBuka}\n"
+             . "- Status Saat Ini: {$status}\n\n"
              . "INFO MENU SAAT INI:\n"
              . $businessContext . "\n\n"
              . "ATURAN MUTLAK (SANKSI TEGAS):\n"
              . "1. DILARANG KERAS membahas coding, IT, pelajaran, atau topik di luar Corndog-Ku.\n"
              . "2. Jika ditanya hal di luar konteks, tolak dengan kalimat template ini: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'\n"
-             . "3. Jawab sesingkat dan seasik mungkin. Jangan bertele-tele.\n\n"
+             . "3. Jawab sesingkat dan seasik mungkin. Jangan bertele-tele.\n"
+             . "4. Kalau ditanya soal buka/tutup sekarang, jawab sesuai 'Status Saat Ini' di atas.\n\n"
              . "CONTOH PERCAKAPAN:\n"
              . "User: 'Lokasinya dimana min?'\n"
              . "Kamu: 'Lokasi Corndog-Ku ada di {$alamat}, Kak! Mampir yuk! 🌭'\n"
              . "User: 'Buka jam berapa?'\n"
-             . "Kamu: 'Kita buka dari jam {$jamBuka} ya Kak. Ditunggu orderannya!'\n"
+             . "Kamu: 'Jam buka kita {$jamBuka} ya Kak. Ditunggu orderannya!'\n"
+             . "User: 'Sekarang buka gak?'\n"
+             . "Kamu: '{$status}, Kak! 🌭'\n"
              . "User: 'Tolong buatkan kode Java.'\n"
              . "Kamu: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'";
     }

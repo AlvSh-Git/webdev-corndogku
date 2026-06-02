@@ -109,7 +109,7 @@
             <h1 class="text-xl md:text-2xl font-bold leading-tight" style="color:var(--color-black);">
                 Welcome to Corndog-Ku!
             </h1>
-            <p class="mt-0.5 text-xs" style="color:#888;">Jl. Rungkut Mejoyo Utara No.61, Blora</p>
+            <p class="mt-0.5 text-xs" style="color:#888;">{{ config('store.address') }}</p>
         </div>
     </div>
 

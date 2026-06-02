@@ -430,7 +430,7 @@ class PurchaseController extends Controller
         };
 
         $message  = "🌽 *CORNDOG-KU — Struk Pembelian*\n";
-        $message .= "Jl. Rungkut Mejoyo Utara No.61, Surabaya\n\n";
+        $message .= $this->storeAddress() . "\n\n";
         $message .= "No. Pesanan : *{$order->order_number}*\n";
         $message .= "Pelanggan   : *" . ($order->user?->name ?? 'Walk-in') . "*\n";
         $message .= "Tipe Order  : *{$orderTypeLbl}*\n";

@@ -14,37 +14,14 @@ class JadwalController extends Controller
         return $this->calcStoreStatus();
     }
 
-    private function defaultSchedule(): array
-    {
-        return [
-            ['key' => 'senin',  'label' => 'Senin',  'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
-            ['key' => 'selasa', 'label' => 'Selasa', 'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
-            ['key' => 'rabu',   'label' => 'Rabu',   'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
-            ['key' => 'kamis',  'label' => 'Kamis',  'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
-            ['key' => 'jumat',  'label' => 'Jumat',  'open' => true,  'buka' => '10:00', 'tutup' => '22:00'],
-            ['key' => 'sabtu',  'label' => 'Sabtu',  'open' => true,  'buka' => '10:00', 'tutup' => '22:00'],
-            ['key' => 'minggu', 'label' => 'Minggu', 'open' => false, 'buka' => '',      'tutup' => ''],
-        ];
-    }
-
     public function index()
     {
-        $schedule  = Cache::get('jadwal_operasional', $this->defaultSchedule());
-        $storeInfo = $this->calcStoreStatus();
+        $schedule  = $this->operationalSchedule();
+        $storeInfo = $this->calcStoreStatus($schedule);
         $override  = Cache::get('manual_override');
         $role      = $this->currentRole();
 
-        $dayMap = [
-            'Sunday'    => 'minggu',
-            'Monday'    => 'senin',
-            'Tuesday'   => 'selasa',
-            'Wednesday' => 'rabu',
-            'Thursday'  => 'kamis',
-            'Friday'    => 'jumat',
-            'Saturday'  => 'sabtu',
-        ];
-
-        $todayKey   = $dayMap[Carbon::now('Asia/Jakarta')->format('l')];
+        $todayKey   = $this->scheduleKeyFor(Carbon::now('Asia/Jakarta'));
         $todayEntry = collect($schedule)->firstWhere('key', $todayKey);
         $todayLabel = $todayEntry['label'] ?? '';
         $todayBuka  = $todayEntry['buka']  ?? '';

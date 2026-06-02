@@ -13,8 +13,81 @@ abstract class Controller
         return in_array($segment, ['owner', 'cashier']) ? $segment : 'owner';
     }
 
-    /** Real-time store status: checks manual override first, then today's schedule. */
-    protected function calcStoreStatus(): array
+    /** Single source of truth for the store address (configurable via .env). */
+    protected function storeAddress(): string
+    {
+        return (string) config('store.address');
+    }
+
+    /**
+     * Single source of truth for the store's opening hours before an owner
+     * customizes them. Shared by the status calc, the chatbot, and the Owner UI
+     * so every surface agrees on the same default state.
+     */
+    protected function defaultSchedule(): array
+    {
+        return [
+            ['key' => 'senin',  'label' => 'Senin',  'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
+            ['key' => 'selasa', 'label' => 'Selasa', 'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
+            ['key' => 'rabu',   'label' => 'Rabu',   'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
+            ['key' => 'kamis',  'label' => 'Kamis',  'open' => true,  'buka' => '10:00', 'tutup' => '21:00'],
+            ['key' => 'jumat',  'label' => 'Jumat',  'open' => true,  'buka' => '10:00', 'tutup' => '22:00'],
+            ['key' => 'sabtu',  'label' => 'Sabtu',  'open' => true,  'buka' => '10:00', 'tutup' => '22:00'],
+            ['key' => 'minggu', 'label' => 'Minggu', 'open' => false, 'buka' => '',      'tutup' => ''],
+        ];
+    }
+
+    /** The live operational schedule from cache, falling back to the shared default. */
+    protected function operationalSchedule(): array
+    {
+        $schedule = Cache::get('jadwal_operasional');
+
+        return empty($schedule) ? $this->defaultSchedule() : $schedule;
+    }
+
+    /**
+     * Human-readable opening hours, derived LIVE from the operational schedule
+     * (the same data that drives calcStoreStatus). Returns one entry per day,
+     * e.g. "Senin 10:00–21:00, ..., Minggu tutup (WIB)". Pass a pre-fetched
+     * schedule to avoid re-reading the cache.
+     */
+    protected function scheduleHours(?array $schedule = null): string
+    {
+        $schedule = $schedule ?: $this->operationalSchedule();
+
+        $parts = [];
+        foreach ($schedule as $day) {
+            $label = $day['label'] ?? ($day['key'] ?? '');
+            $parts[] = (($day['open'] ?? false) && ($day['buka'] ?? '') && ($day['tutup'] ?? ''))
+                ? "{$label} {$day['buka']}–{$day['tutup']}"
+                : "{$label} tutup";
+        }
+
+        return implode(', ', $parts) . ' (WIB)';
+    }
+
+    /** Maps a moment to its schedule key (e.g. Monday → 'senin'). */
+    protected function scheduleKeyFor(Carbon $when): string
+    {
+        $dayMap = [
+            'Sunday'    => 'minggu',
+            'Monday'    => 'senin',
+            'Tuesday'   => 'selasa',
+            'Wednesday' => 'rabu',
+            'Thursday'  => 'kamis',
+            'Friday'    => 'jumat',
+            'Saturday'  => 'sabtu',
+        ];
+
+        return $dayMap[$when->format('l')];
+    }
+
+    /**
+     * Real-time store status: checks manual override first, then today's
+     * schedule. Pass a pre-fetched schedule to avoid re-reading the cache;
+     * otherwise it falls back to the shared default schedule.
+     */
+    protected function calcStoreStatus(?array $schedule = null): array
     {
         $override = Cache::get('manual_override');
 
@@ -31,25 +104,10 @@ abstract class Controller
             ];
         }
 
-        $schedule = Cache::get('jadwal_operasional');
+        $schedule = $schedule ?: $this->operationalSchedule();
 
-        // No schedule configured yet — treat as open
-        if (empty($schedule)) {
-            return ['is_open' => true, 'reason' => 'schedule', 'reopen_day' => '', 'reopen_time' => ''];
-        }
-
-        $now    = Carbon::now('Asia/Jakarta');
-        $dayMap = [
-            'Sunday'    => 'minggu',
-            'Monday'    => 'senin',
-            'Tuesday'   => 'selasa',
-            'Wednesday' => 'rabu',
-            'Thursday'  => 'kamis',
-            'Friday'    => 'jumat',
-            'Saturday'  => 'sabtu',
-        ];
-
-        $todayKey   = $dayMap[$now->format('l')];
+        $now        = Carbon::now('Asia/Jakarta');
+        $todayKey   = $this->scheduleKeyFor($now);
         $todayEntry = collect($schedule)->firstWhere('key', $todayKey);
 
         if ($todayEntry && ($todayEntry['open'] ?? false)

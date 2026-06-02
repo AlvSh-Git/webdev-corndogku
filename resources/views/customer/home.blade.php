@@ -93,7 +93,7 @@
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
     {{-- Main Navbar Content --}}
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12 h-16 flex items-center justify-between gap-6">
 
         {{-- Brand --}}
         <a href="{{ route('welcome') }}" class="flex items-center gap-2 flex-none">
@@ -197,28 +197,39 @@
 ══════════════════════════════════════════════════════════════ --}}
 <div class="relative w-full overflow-x-hidden bg-[#FEFDF2] pb-16">
 
-    {{-- Hero poster — full-width, edge-to-edge, z-20 so corndog stick overlaps marquee --}}
-    <div class="relative z-20 w-full mt-0 md:mt-4">
-        <img src="{{ asset('assets/img/home_poster.png') }}"
-             alt="Promo Poster"
-             class="w-full h-auto object-cover hover:scale-[1.01] transition-transform duration-700 drop-shadow-xl">
+    {{-- Hero — solid red section with two separate corndog images absolutely
+         positioned left & right, and centered text. Fluid min-height + py so
+         nothing overflows on mobile. --}}
+    <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern
+                    min-h-[400px] md:min-h-[500px] flex items-center justify-center
+                    overflow-hidden py-16">
 
-        <div class="absolute inset-0 flex flex-col justify-start items-start pt-[12%] sm:pt-[10%] md:pt-[12%] pl-[15%] sm:pl-[18%] md:pl-[20%] lg:pl-[22%] pointer-events-none">
-            <h1 class="text-white font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight mb-2 md:mb-4 text-left drop-shadow-lg">
+        <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
+             class="absolute left-[-30px] md:left-[-10px] lg:left-0 top-[55%] lg:top-[60%] -translate-y-1/2
+                    h-[300px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-auto max-w-none object-contain
+                    opacity-30 md:opacity-100 pointer-events-none z-0">
+
+        <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
+             class="absolute right-[-20px] md:right-4 lg:right-12 top-[55%] lg:top-[60%] -translate-y-1/2
+                    h-[200px] md:h-[300px] lg:h-[450px] xl:h-[480px] w-auto max-w-none object-contain
+                    opacity-30 md:opacity-100 pointer-events-none z-0">
+
+        <div class="relative z-10 flex flex-col items-start text-left px-4 max-w-lg md:max-w-2xl mx-auto">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
                 Crispy Corndog,<br>Happy Mood
             </h1>
-            <p class="text-white text-[10px] sm:text-sm md:text-base lg:text-lg max-w-[180px] sm:max-w-[300px] md:max-w-md lg:max-w-xl mb-4 md:mb-8 text-left drop-shadow-md">
+            <p class="text-sm md:text-base text-gray-100 mb-8">
                 Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap gigitan. Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
             </p>
             <a href="{{ route('menu') }}"
-               class="pointer-events-auto bg-[#FEFDF2] text-[#B82B21] font-bold text-xs sm:text-sm md:text-base lg:text-lg py-2 px-6 md:py-3 md:px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+               class="bg-white text-[#8D1818] font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 transition-transform">
                 TRY NOW
             </a>
         </div>
-    </div>
+    </section>
 
     {{-- Ticker band — z-10 + negative margin so the poster's corndog stick breaks on top of it --}}
-    <div class="relative z-10 w-full bg-[#B82B21] text-white py-2.5 md:py-3 -mt-4 sm:-mt-8 md:-mt-12 lg:-mt-16 xl:-mt-20 overflow-hidden whitespace-nowrap shadow-md">
+    <div class="relative z-10 w-full bg-[#B82B21] text-white py-2.5 md:py-3 overflow-hidden whitespace-nowrap shadow-md">
         <div class="animate-marquee font-bold tracking-widest text-base md:text-xl flex gap-8 items-center">
             @for ($i = 0; $i < 2; $i++)
                 @foreach(array_fill(0, 7, '● ISI HARI MU DENGAN CORNDOG') as $t)
@@ -325,7 +336,7 @@
         </div>
     </div>
 
-    <div class="relative z-10 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16
+    <div class="relative z-10 max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12
                 flex flex-col lg:flex-row items-center lg:items-stretch
                 gap-8 lg:gap-0 py-16 lg:py-0"
          style="min-height: 680px;">
@@ -556,7 +567,7 @@
      5. CUSTOMIZE CORNDOG BANNER
 ══════════════════════════════════════════════════════════════ --}}
 <section class="w-full py-6 sm:py-8" style="background-color: var(--color-light);">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
 
         {{-- Wrapper: relative so the button can be layered above the image --}}
         <div class="relative w-full">
@@ -571,12 +582,12 @@
             {{-- Layer 2: Native interactive CTA button --}}
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
-               class="absolute bottom-[10%] md:bottom-[15%] left-[5%] md:left-[8%] z-10
-                      inline-flex items-center gap-2 w-max px-6 md:px-10 py-2.5 md:py-3
-                      bg-[#A6171C] text-white font-bold rounded-full
-                      hover:scale-105 transition-transform shadow-lg">
+               class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
+                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-[10px] sm:text-xs font-bold
+                      px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
+                      hover:bg-red-800 transition-colors w-auto max-w-fit">
                 Yuk, Buat Corndog Kamu!
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor"
                      stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -593,7 +604,7 @@
 <section id="menu" class="w-full" style="background-color: var(--color-light);">
 
     {{-- Section heading --}}
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 pt-12 pb-0">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12 pt-12 pb-0">
         <h2 class="font-helvetica text-center mb-8"
             style="font-size: clamp(28px, 3vw, 40px); font-weight: 900; color: var(--color-black);">
             Menu Categories
@@ -724,7 +735,7 @@
      7. LOCATION & HOURS — full-width section
 ══════════════════════════════════════════════════════════════ --}}
 <section class="w-full py-16" style="background-color: var(--color-white);">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
             {{-- Map embed --}}
@@ -780,7 +791,7 @@
      8. TESTIMONIALS — full-width "Your trust in us"
 ══════════════════════════════════════════════════════════════ --}}
 <section class="w-full py-16" style="background-color: #FFF9E6;">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
 
         <div class="mb-8">
             <span class="inline-block bg-white font-bold text-lg px-5 py-2 rounded-full shadow-sm"
@@ -882,7 +893,7 @@
      9. FOOTER — full-width
 ══════════════════════════════════════════════════════════════ --}}
 <footer class="w-full" style="background-color: var(--color-primary);">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
             {{-- Brand column --}}
@@ -1351,8 +1362,9 @@ $(function () {
 
 {{-- Chat window --}}
 <div id="chatbot-window"
-     class="hidden fixed bottom-24 right-6 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-     style="width: 340px; height: 480px; border: 1px solid #e5e7eb;">
+     class="hidden fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl
+            w-[calc(100vw-2rem)] max-w-[340px] md:w-96 h-[70vh] max-h-[480px] md:h-[480px]"
+     style="border: 1px solid #e5e7eb;">
 
     {{-- Header --}}
     <div class="flex items-center justify-between px-4 py-3 flex-shrink-0"

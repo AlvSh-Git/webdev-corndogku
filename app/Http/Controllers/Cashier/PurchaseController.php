@@ -265,7 +265,7 @@ class PurchaseController extends Controller
                                 'first_name' => $request->customer_name,
                                 'email'      => 'walkin@corndog.ku',
                             ],
-                            'enabled_payments' => ['qris'],
+                            'enabled_payments' => ['other_qris', 'gopay', 'shopeepay'],
                             'item_details'     => $mtItems,
                         ];
 
@@ -324,6 +324,71 @@ class PurchaseController extends Controller
                 'subtotal' => $i->subtotal,
             ]),
         ]);
+    }
+
+    // ── Midtrans server-to-server notification (webhook) ─────────────
+    //
+    // Midtrans POSTs here whenever a transaction changes state. Because it is a
+    // server call (no session/cookie) the route is public and CSRF-exempt; we
+    // authenticate it instead with the SHA-512 signature_key. This guarantees the
+    // DB is updated even if the cashier closes the browser before onSuccess fires.
+    public function midtransNotification(Request $request)
+    {
+        $serverKey         = config('services.midtrans.server_key');
+        $orderId           = $request->input('order_id');
+        $statusCode        = $request->input('status_code');
+        $grossAmount       = $request->input('gross_amount');
+        $signatureKey      = $request->input('signature_key');
+        $transactionStatus = $request->input('transaction_status');
+        $fraudStatus       = $request->input('fraud_status');
+
+        if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
+            return response()->json(['message' => 'Invalid payload'], 400);
+        }
+
+        // Verify signature: sha512(order_id + status_code + gross_amount + server_key)
+        $expected = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        if (!hash_equals($expected, (string) $signatureKey)) {
+            Log::warning('Midtrans notification signature mismatch', ['order_id' => $orderId]);
+            return response()->json(['message' => 'Invalid signature'], 403);
+        }
+
+        $order = Order::where('order_number', $orderId)->first();
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Map Midtrans transaction_status → our payment status enum
+        $paymentStatus = match ($transactionStatus) {
+            'capture'    => ($fraudStatus === 'challenge') ? 'Unpaid' : 'Paid',
+            'settlement' => 'Paid',
+            'pending'    => 'Unpaid',
+            'deny', 'cancel', 'expire' => 'Failed',
+            default      => 'Unpaid',
+        };
+
+        // updateOrCreate (scoped to this order via the hasOne relation) keeps the
+        // webhook idempotent — Midtrans may deliver the same notification twice.
+        $order->payment()->updateOrCreate([], [
+            'payment_method' => 'QRIS',
+            'amount'         => $order->total_price,
+            'status'         => $paymentStatus,
+        ]);
+
+        // Advance the order out of Pending once paid; cancel it if the charge failed.
+        if ($paymentStatus === 'Paid' && $order->status === 'Pending') {
+            $order->update(['status' => 'Preparing']);
+        } elseif ($paymentStatus === 'Failed' && $order->status === 'Pending') {
+            $order->update(['status' => 'Cancelled']);
+        }
+
+        Log::info('Midtrans notification processed', [
+            'order_number'       => $orderId,
+            'transaction_status' => $transactionStatus,
+            'payment_status'     => $paymentStatus,
+        ]);
+
+        return response()->json(['message' => 'OK']);
     }
 
     // ── Send WhatsApp receipt via Fonnte API ─────────────────

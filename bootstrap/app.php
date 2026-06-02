@@ -11,7 +11,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo('/login');
+        // Midtrans posts server-to-server (no session/cookie) → exempt from CSRF.
+        // The endpoint authenticates itself via the SHA-512 signature_key instead.
+        $middleware->validateCsrfTokens(except: [
+            'midtrans/notification',
+        ]);
+
+        // RBAC alias — used as role:owner / role:cashier,owner on route groups.
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
+
+        // Unauthenticated users hitting a protected route are sent to login with
+        // a flash message. (AJAX/JSON requests still receive a 401 instead.)
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            session()->flash('error', 'Silakan login terlebih dahulu.');
+            return route('login');
+        });
         $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
             $user = $request->user();
             if (! $user) {

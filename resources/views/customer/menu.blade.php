@@ -38,7 +38,7 @@
      CUSTOMIZE CORNDOG BANNER
 ══════════════════════════════════════════════════════════════ --}}
 <section class="pt-6 pb-4 sm:pt-8 sm:pb-6" style="background-color: var(--color-light);">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 2xl:px-12">
 
         {{-- Wrapper: relative so the button can be layered above the image --}}
         <div class="relative w-full">
@@ -53,12 +53,12 @@
             {{-- Layer 2: Native interactive CTA button --}}
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
-               class="absolute bottom-[10%] md:bottom-[15%] left-[5%] md:left-[8%] z-10
-                      inline-flex items-center gap-2 w-max px-6 md:px-10 py-2.5 md:py-3
-                      bg-[#A6171C] text-white font-bold rounded-full
-                      hover:scale-105 transition-transform shadow-lg">
+               class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
+                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-[10px] sm:text-xs font-bold
+                      px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
+                      hover:bg-red-800 transition-colors w-auto max-w-fit">
                 Yuk, Buat Corndog Kamu!
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor"
                      stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -77,7 +77,7 @@
 @endphp
 
 <section class="w-full">
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8">
+    <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 2xl:px-12 py-8">
 
     {{-- Category tabs + Filter/Sort controls --}}
     <div class="flex justify-between items-center mb-8 gap-3">
@@ -284,7 +284,7 @@
 
     {{-- Product grid — populated by AJAX --}}
     <div id="product-grid"
-         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
     </div>
 
     {{-- Empty state --}}

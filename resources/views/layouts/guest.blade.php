@@ -64,8 +64,9 @@
 
     {{-- Chat window --}}
     <div id="chatbot-window"
-         class="hidden fixed bottom-24 right-6 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-         style="width: 340px; height: 480px; border: 1px solid #e5e7eb;">
+         class="hidden fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl
+                w-[calc(100vw-2rem)] max-w-[340px] md:w-96 h-[70vh] max-h-[480px] md:h-[480px]"
+         style="border: 1px solid #e5e7eb;">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-4 py-3 flex-shrink-0"

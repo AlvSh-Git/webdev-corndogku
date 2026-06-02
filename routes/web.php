@@ -32,6 +32,10 @@ Route::post('/orders/{id}/send-whatsapp', [HistoryController::class, 'sendReceip
 // ── Chatbot ──────────────────────────────────────────────────────
 Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 
+// ── Midtrans server-to-server payment notification (webhook) ─────
+// Public + CSRF-exempt (see bootstrap/app.php); authenticated via signature_key.
+Route::post('/midtrans/notification', [PurchaseController::class, 'midtransNotification'])->name('midtrans.notification');
+
 // ── Cart ────────────────────────────────────────────────────────
 Route::get('/cart',          [CartController::class, 'index'])->name('cart');
 Route::post('/cart/add',     [CartController::class, 'add'])->name('cart.add');
@@ -39,16 +43,19 @@ Route::post('/cart/remove',  [CartController::class, 'remove'])->name('cart.remo
 Route::post('/cart/update',  [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/clear',   [CartController::class, 'clear'])->name('cart.clear');
 
-// ── Checkout ─────────────────────────────────────────────────────
-Route::get('/checkout',       [CheckoutController::class, 'index'])->name('checkout');
-Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+// ── Customer account area — requires login (any authenticated user) ──
+Route::middleware('auth')->group(function () {
+    // Checkout
+    Route::get('/checkout',        [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
 
-// ── Order history ────────────────────────────────────────────────
-Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    // Order history
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
-// ── Customer profile ────────────────────────────────────────────
-Route::get('/profile',  [ProfileController::class, 'index'])->name('profile');
-Route::put('/profile',  [ProfileController::class, 'update'])->name('profile.update');
+    // Customer profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 
 // ── Auth ─────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -62,8 +69,8 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ── Owner routes — management access ────────────────────────────
-Route::prefix('owner')->name('owner.')->group(function () {
+// ── Owner routes — management access (auth + owner role only) ───
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard',        [OwnerDashboard::class, 'index'])->name('dashboard');
     Route::get('/get-orders',          [OwnerDashboard::class, 'getOrders'])->name('get-orders');
     Route::get('/get-stats',           [OwnerDashboard::class, 'getStats'])->name('get-stats');
@@ -92,8 +99,8 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::post('/jadwal-operasional/toggle', [JadwalController::class, 'toggleStatus'])->name('jadwal.toggle');
 });
 
-// ── Cashier routes — operational access ─────────────────────────
-Route::prefix('cashier')->name('cashier.')->group(function () {
+// ── Cashier routes — operational access (auth + cashier/owner) ──
+Route::middleware(['auth', 'role:cashier,owner'])->prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/dashboard',           [CashierDashboard::class, 'index'])->name('dashboard');
     Route::get('/get-orders',          [CashierDashboard::class, 'getOrders'])->name('get-orders');
     Route::get('/get-stats',           [CashierDashboard::class, 'getStats'])->name('get-stats');

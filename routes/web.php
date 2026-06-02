@@ -18,6 +18,7 @@ use App\Http\Controllers\Owner\JadwalController;
 use App\Http\Controllers\Cashier\DashboardController as CashierDashboard;
 use App\Http\Controllers\Cashier\PurchaseController;
 use App\Http\Controllers\Customer\ChatbotController;
+use App\Http\Controllers\Owner\UserMaintenanceController;
 
 // ── Public customer pages ───────────────────────────────────────
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -78,7 +79,8 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::post('/category/store',      [CategoryController::class, 'store'])->name('category.store');
     Route::post('/category/store-ajax', [CategoryController::class, 'storeAjax'])->name('category.storeAjax');
 
-    Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/users', [UserMaintenanceController::class, 'index'])->name('users');
+    Route::post('/users', [UserMaintenanceController::class, 'store'])->name('users.store');
 
     Route::get('/reports',                    [ReportController::class, 'index'])->name('reports');
     Route::get('/reports/chart-data',         [ReportController::class, 'getChartData'])->name('reports.chart-data');

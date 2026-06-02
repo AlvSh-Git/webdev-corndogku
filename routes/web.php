@@ -79,8 +79,11 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::post('/category/store',      [CategoryController::class, 'store'])->name('category.store');
     Route::post('/category/store-ajax', [CategoryController::class, 'storeAjax'])->name('category.storeAjax');
 
+    // User Maintenance
     Route::get('/users', [UserMaintenanceController::class, 'index'])->name('users');
     Route::post('/users', [UserMaintenanceController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [UserMaintenanceController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserMaintenanceController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/reports',                    [ReportController::class, 'index'])->name('reports');
     Route::get('/reports/chart-data',         [ReportController::class, 'getChartData'])->name('reports.chart-data');

@@ -19,6 +19,7 @@ use App\Http\Controllers\Cashier\DashboardController as CashierDashboard;
 use App\Http\Controllers\Cashier\PurchaseController;
 use App\Http\Controllers\Customer\ChatbotController;
 use App\Http\Controllers\Owner\UserMaintenanceController;
+use App\Http\Controllers\Customer\WishlistController;
 
 // ── Public customer pages ───────────────────────────────────────
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -55,6 +56,11 @@ Route::middleware('auth')->group(function () {
     // Customer profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // ── Wishlist Routes ──
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
 });
 
 // ── Auth ─────────────────────────────────────────────────────────

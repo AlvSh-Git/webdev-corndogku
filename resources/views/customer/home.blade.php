@@ -710,6 +710,7 @@
                                         {{ $product->description }}
                                     </p>
                                 </div>
+                                
 
                                 <div class="flex items-center justify-between gap-1 mt-auto">
                                     <p class="text-sm font-black" style="color: var(--color-primary);">
@@ -995,12 +996,27 @@
 
         {{-- RIGHT: Details --}}
         <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between gap-5">
-
-            {{-- Name + price --}}
+            {{-- Name + price + wishlist icon --}}
             <div>
-                <h3 id="modal-title"
-                    class="text-xl font-bold leading-snug mb-2"
-                    style="color: var(--color-black);"></h3>
+                <div class="flex items-start justify-between gap-4 mb-2">
+                    <h3 id="modal-title"
+                        class="text-xl font-bold leading-snug"
+                        style="color: var(--color-black);"></h3>
+                    
+                    {{-- TOMBOL LOVE DI DALAM MODAL --}}
+                    <button id="modal-btn-wishlist" 
+                            class="flex-none w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200" 
+                            data-id="">
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="w-5 h-5 text-gray-400" 
+                             fill="none" 
+                             viewBox="0 0 24 24" 
+                             stroke="currentColor" 
+                             stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                        </svg>
+                    </button>
+                </div>
                 <p id="modal-price"
                    class="text-xl font-black"
                    style="color: var(--color-primary);"></p>

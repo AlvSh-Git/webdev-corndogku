@@ -21,6 +21,7 @@ class User extends Authenticatable
         'avatar',
         'role',
         'status',
+        'cart_data',
     ];
 
     protected $hidden = [
@@ -44,5 +45,10 @@ class User extends Authenticatable
     public function chatbotLogs()
     {
         return $this->hasMany(ChatbotLog::class);
+    }
+
+    public function wishlistProducts()
+    {
+        return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps();
     }
 }

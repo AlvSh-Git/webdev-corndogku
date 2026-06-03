@@ -62,20 +62,21 @@ class DashboardController extends Controller
                     ])->values()->toArray();
 
                     return (object) [
-                        'db_id'               => $o->id,
-                        'id'                  => '#' . $o->order_number,
-                        'is_new'              => $o->created_at->gte(now()->subMinutes(30)),
-                        'customer'            => $o->user?->name ?? 'Walk-in Customer',
-                        'sub'                 => $o->user ? 'Customer' : '',
-                        'source'              => $source,
-                        'items'               => $itemsSummary ?: '-',
-                        'status'              => $o->status,
-                        'time'                => $o->created_at->format('h:i A'),
-                        'total'               => $o->total_price,
-                        'order_type'          => $o->order_type,
-                        'payment'             => $payment,
-                        'order_items'         => $orderItems,
-                        'cashier_name'        => $o->cashier?->name ?? null,
+                        'db_id'=> $o->id,
+                        'id'  => '#' . $o->order_number,
+                        'is_new' => $o->created_at->gte(now()->subMinutes(30)),
+                        'customer'=> $o->user?->name ?? 'Walk-in Customer',
+                        'phone'=> $o->customer_phone,
+                        'sub' => $o->user ? 'Customer' : '',
+                        'source' => $source,
+                        'items'=> $itemsSummary ?: '-',
+                        'status' => $o->status,
+                        'time' => $o->created_at->format('h:i A'),
+                        'total' => $o->total_price,
+                        'order_type' => $o->order_type,
+                        'payment'=> $payment,
+                        'order_items'=> $orderItems,
+                        'cashier_name'=> $o->cashier?->name ?? null,
                         'cancellation_reason' => $o->cancellation_reason,
                     ];
                 });
@@ -159,20 +160,21 @@ class DashboardController extends Controller
                 ])->values()->toArray();
 
                 return [
-                    'db_id'               => $o->id,
-                    'id'                  => '#' . $o->order_number,
-                    'is_new'              => $o->created_at->gte(now()->subMinutes(30)),
-                    'customer'            => $o->user?->name ?? 'Walk-in Customer',
-                    'sub'                 => $o->user ? 'Customer' : '',
-                    'source'              => $source,
-                    'items'               => $itemsSummary ?: '-',
-                    'status'              => $o->status,
-                    'time'                => $o->created_at->format('h:i A'),
-                    'total'               => $o->total_price,
+                    'db_id'=> $o->id,
+                    'id' => '#' . $o->order_number,
+                    'is_new' => $o->created_at->gte(now()->subMinutes(30)),
+                    'customer'=> $o->user?->name ?? 'Walk-in Customer',
+                    'sub'=> $o->user ? 'Customer' : '',
+                    'phone'=> $o->customer_phone,
+                    'source'  => $source,
+                    'items' => $itemsSummary ?: '-',
+                    'status' => $o->status,
+                    'time' => $o->created_at->format('h:i A'),
+                    'total' => $o->total_price,
                     'order_type'          => $o->order_type,
-                    'payment'             => $payment,
-                    'order_items'         => $orderItems,
-                    'cashier_name'        => $o->cashier?->name ?? null,
+                    'payment'=> $payment,
+                    'order_items'=> $orderItems,
+                    'cashier_name' => $o->cashier?->name ?? null,
                     'cancellation_reason' => $o->cancellation_reason,
                 ];
             })->values();
@@ -289,7 +291,8 @@ class DashboardController extends Controller
             'cancellation_reason' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $order = Order::with('items.product')->findOrFail($id);
+        // Tambahkan 'payment' agar data pembayarannya ikut terpanggil
+        $order = Order::with(['items.product', 'payment'])->findOrFail($id);
 
         $updateData = ['status' => $request->status];
 
@@ -301,7 +304,48 @@ class DashboardController extends Controller
         if ($request->status === 'Cancelled') {
             $updateData['cancellation_reason'] = $request->cancellation_reason;
 
-            // Restore stock for every item in the cancelled order
+            // --- AWAL LOGIKA REFUND MIDTRANS ---
+            $isRefundedViaMidtrans = false;
+
+            // Cek apakah order lunas dibayar online (QRIS/E-Wallet)
+            if ($order->payment && $order->payment->status === 'Paid' && in_array(strtolower($order->payment->payment_method), ['qris', 'gopay', 'shopeepay'])) {
+                
+                $serverKey = config('services.midtrans.server_key');
+                $isProduction = config('services.midtrans.is_production', false);
+                $baseUrl = $isProduction ? 'https://api.midtrans.com/v2' : 'https://api.sandbox.midtrans.com/v2';
+
+                $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                    ])
+                    ->post("{$baseUrl}/{$order->order_number}/refund", [
+                        'refund_key' => 'REF-' . $order->order_number . '-' . time(),
+                        'amount'     => (int) $order->payment->amount,
+                        'reason'     => $request->cancellation_reason ?? 'Dibatalkan oleh Kasir'
+                    ]);
+
+                // Batalkan proses Cancel jika Midtrans menolak refund (misal saldo merchant kurang)
+                if ($response->failed() && $response->status() !== 200) {
+                    \Illuminate\Support\Facades\Log::error('Midtrans Refund Failed', [
+                        'order_id' => $order->order_number,
+                        'response' => $response->json()
+                    ]);
+
+                    return response()->json([
+                        'error' => 'refund_failed',
+                        'message' => 'Gagal Refund Midtrans: ' . ($response->json('status_message') ?? 'Terjadi kesalahan jaringan.')
+                    ], 422);
+                }
+
+                // Jika sukses, ubah status payment menjadi Refunded
+                $order->payment->update(['status' => 'Refunded']);
+                $isRefundedViaMidtrans = true;
+            }
+            // --- AKHIR LOGIKA REFUND MIDTRANS ---
+
+
+            // Restore stock for every item in the cancelled order (KODE ASLI)
             foreach ($order->items as $item) {
                 if ($item->product_id) {
                     Product::where('id', $item->product_id)
@@ -327,8 +371,9 @@ class DashboardController extends Controller
                 }
             }
 
-            // Remove any payment record so revenue calculations stay accurate
-            $order->payment()->delete();
+            if (!$isRefundedViaMidtrans) {
+                $order->payment()->delete();
+            }
         }
 
         $order->update($updateData);

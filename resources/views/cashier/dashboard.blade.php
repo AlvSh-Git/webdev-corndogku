@@ -492,6 +492,41 @@ $(function () {
 
     let winStart = '{{ $winStartPHP }}';
     let winEnd   = '{{ $winEndPHP }}';
+    let lastTotalOrders = -1;
+
+    /* ═══════════════════════════════════════════════════════════
+       AUDIO — Web Audio API (no external file, no CORS issues)
+       The AudioContext must be created/resumed after a user gesture.
+       We unlock it on the very first interaction so the beep is
+       ready before the first 15-second poll fires.
+    ═══════════════════════════════════════════════════════════ */
+    let audioCtx = null;
+
+    function unlockAudio() {
+        if (audioCtx) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        } catch (e) {}
+    }
+    $(document).one('click keydown touchstart', unlockAudio);
+
+    function playNotificationBeep() {
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        try {
+            const osc  = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.6);
+        } catch (e) {}
+    }
 
     /* ═══════════════════════════════════════════════════════════
        DATE UTILITIES
@@ -642,7 +677,8 @@ $(function () {
     const UP_ARROW   = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>';
     const DOWN_ARROW = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
 
-    function fetchStats(dateStr) {
+   
+            function fetchStats(dateStr) {
         $.get('{{ route("cashier.get-stats") }}', { date: dateStr })
             .done(function (res) {
                 $('#widget-revenue').text('Rp ' + Number(res.revenue).toLocaleString('id-ID'));
@@ -663,9 +699,44 @@ $(function () {
                 );
 
                 $('#widget-pending-orders').text(Number(res.pendingOrders) + ' orders');
+
+                /* ── NEW ORDER DETECTION ── */
+                if (dateStr === todayISO()) {
+                    const currentTotal = Number(res.totalOrders);
+
+                    if (lastTotalOrders !== -1 && currentTotal > lastTotalOrders) {
+                        const newCount = currentTotal - lastTotalOrders;
+                        console.log('[Poll] 🔔 Pesanan baru terdeteksi! +' + newCount + ' order.');
+
+                        // FIX 1: Web Audio API beep — replaces new Audio(externalURL) which
+                        // is always blocked by autoplay policy when called outside a gesture.
+                        playNotificationBeep();
+
+                        // FIX 2: SweetAlert2 toast — was completely missing before.
+                        Swal.fire({
+                            toast:             true,
+                            position:          'top-end',
+                            icon:              'success',
+                            title:             '🛎️ Pesanan Baru Masuk!',
+                            text:              newCount + ' pesanan baru telah diterima.',
+                            showConfirmButton:  false,
+                            timer:             5000,
+                            timerProgressBar:  true,
+                        });
+
+                        // FIX 3: fetchOrders removed from here — the setInterval already
+                        // calls fetchOrders(silent=true) on the same tick, so calling it
+                        // here too would fire two overlapping AJAX requests for the table.
+                    }
+
+                    lastTotalOrders = currentTotal;
+                } else {
+                    // Viewing a past date: reset so switching back to today doesn't
+                    // trigger a false-positive notification on the next poll.
+                    lastTotalOrders = -1;
+                }
             });
     }
-
     /* ═══════════════════════════════════════════════════════════
        REVENUE CHART
     ═══════════════════════════════════════════════════════════ */
@@ -823,11 +894,16 @@ $(function () {
         $('#cashier-pagination').html(html);
     }
 
-    function fetchOrders(status, page) {
+    // FIX 4: added `silent` parameter (default false).
+    // When silent=true the loading spinner is suppressed — used by the polling
+    // interval so the table doesn't flash "Memuat data…" every 15 seconds.
+    function fetchOrders(status, page, silent = false) {
         currentStatus = status;
         currentPage   = page;
-        $('#orders-tbody').html('<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;">Memuat data…</td></tr>');
-        $('#cashier-pagination').html('');
+        if (!silent) {
+            $('#orders-tbody').html('<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;">Memuat data…</td></tr>');
+            $('#cashier-pagination').html('');
+        }
 
         $.get('{{ route("cashier.get-orders") }}', { status, page, date: SELECTED_DATE })
             .done(function (res) {
@@ -853,7 +929,11 @@ $(function () {
                 }
                 buildPagination(res.current_page, res.last_page, status);
             })
-            .fail(() => { $('#orders-tbody tr td[colspan]').closest('tr').remove(); });
+            .fail(function () {
+                if (!silent) {
+                    $('#orders-tbody').html('<tr><td colspan="8" style="text-align:center;padding:32px;color:#EF4444;font-size:13px;">Gagal memuat data. Coba lagi.</td></tr>');
+                }
+            });
     }
 
     $(document).on('click', '.order-tab', function () {
@@ -926,6 +1006,7 @@ $(function () {
         drawerOrder = order;
         $('#drawer-order-id').text(order.id || '-');
         $('#drawer-customer-name').text(order.customer || 'Customer');
+        $('#drawer-customer-phone').text(order.phone || 'Phone');
         $('#drawer-order-type').text(typeMap[order.order_type] || order.order_type || '-');
         $('#drawer-payment').text(payMap[order.payment] || order.payment || '-');
         $('#drawer-source').text(order.source === 'online' ? 'Online Order' : 'Kasir');
@@ -1073,9 +1154,15 @@ $(function () {
                     updateTableRow(drawerOrder);
                     closeDrawer();
                     fetchOrders(currentStatus, currentPage || 1);
+                    Swal.fire('Berhasil', 'Order dibatalkan dan uang telah di-refund.', 'success');
                 },
-                error: function () {
-                    Swal.fire('Gagal', 'Tidak dapat membatalkan order. Coba lagi.', 'error');
+                // --- PASTIKAN BAGIAN INI SAMA ---
+                error: function (xhr) {
+                    let errorMsg = 'Tidak dapat membatalkan order. Coba lagi.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire('Gagal Membatalkan', errorMsg, 'error');
                 }
             });
         });
@@ -1104,7 +1191,18 @@ $(function () {
             } catch (_) {}
         });
     }
-
+    /* ═══════════════════════════════════════════════════════════
+       AUTO-REFRESH POLLING — every 15 seconds
+       FIX 5: interval now calls BOTH fetchStats (detects new orders
+       and triggers the toast + beep) AND fetchOrders with silent=true
+       (keeps the table current for status changes without a spinner).
+    ═══════════════════════════════════════════════════════════ */
+    setInterval(function () {
+        if (SELECTED_DATE !== todayISO()) return;
+        console.log('[Poll] Memeriksa pesanan baru...');
+        fetchStats(SELECTED_DATE);
+        fetchOrders(currentStatus, currentPage, true);
+    }, 15000);
 });
 </script>
 

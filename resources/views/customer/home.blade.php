@@ -14,13 +14,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .swal2-container { z-index: 999999 !important; }
-        @keyframes ticker {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .ticker-track { animation: ticker 28s linear infinite; }
-        .ticker-track:hover { animation-play-state: paused; }
-
         .product-card {
             transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
@@ -53,20 +46,6 @@
             transform: translateY(-4px);
             box-shadow: 6px 8px 32px rgba(0,0,0,0.18);
         }
-
-        /* ── Marquee category rail ── */
-        @keyframes marquee-rail {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .marquee-track {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            animation: marquee-rail 24s linear infinite;
-            white-space: nowrap;
-        }
-        .marquee-track:hover { animation-play-state: paused; }
 
         /* ── Horizontal scroll — no visible scrollbar ── */
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -632,7 +611,7 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════════
-     6. MENU CATEGORIES + PER-CATEGORY PRODUCT MARQUEES (id="menu")
+     6. MENU CATEGORIES + PER-CATEGORY PRODUCT ROWS (id="menu")
 ══════════════════════════════════════════════════════════════ --}}
 <section id="menu" class="w-full" style="background-color: var(--color-light);">
 
@@ -644,22 +623,20 @@
         </h2>
     </div>
 
-    {{-- ── Category tab buttons (static, DB-driven) ──────────────── --}}
-    <div class="flex flex-row overflow-x-auto justify-center gap-4 w-full hide-scrollbar px-4 pb-6">
+    {{-- ── Category tab buttons ───────────────────────────────── --}}
+    <div class="flex flex-row overflow-x-auto hide-scrollbar gap-4 px-4 pb-6 justify-center">
         @foreach ($categories as $category)
             @if (strtolower($category->name) === 'custom') @continue @endif
             <button type="button"
-                    class="category-btn relative flex-none px-8 py-2.5 font-bold whitespace-nowrap
-                           transition-all hover:opacity-90
+                    class="category-btn relative flex-none px-8 py-2 font-bold rounded-full whitespace-nowrap transition-all hover:opacity-90
                            {{ $loop->first ? 'cat-btn-active' : 'cat-btn-inactive' }}"
                     data-target="marquee-{{ $category->id }}"
                     style="{{ $loop->first
-                        ? 'background-color: white; color: var(--color-primary); border-radius: 9999px; box-shadow: 0 4px 20px rgba(0,0,0,0.14);'
-                        : 'background-color: var(--color-primary); color: white; border-radius: 9999px;' }}">
+                        ? 'background-color: white; color: var(--color-primary); box-shadow: 0 4px 20px rgba(0,0,0,0.14);'
+                        : 'background-color: var(--color-primary); color: white;' }}">
                 {{ $category->name }}
-                {{-- Speech-bubble triangle tail (visible only on active) --}}
                 <span class="active-tail pointer-events-none absolute left-1/2 {{ $loop->first ? '' : 'hidden' }}"
-                      style="bottom: -9px; width: 16px; height: 16px;
+                      style="bottom:-9px; width:16px; height:16px;
                              background-color: white;
                              transform: translateX(-50%) rotate(45deg);
                              clip-path: polygon(100% 0%, 100% 100%, 0% 100%);
@@ -668,28 +645,13 @@
         @endforeach
     </div>
 
-    {{-- ── One marquee container per category ──────────────────────── --}}
+    {{-- ── One horizontal-scroll product row per category ──────── --}}
     @foreach ($categories as $category)
         @if (strtolower($category->name) === 'custom') @continue @endif
-        @php
-            $catProducts = $products->where('category_id', $category->id);
-
-            // Guarantee track width ≥ 2 × max-viewport (1440 px) so the -50%
-            // animation never reveals a blank gap on the right side.
-            // Card approx px: w-[260px] + mx-3 (24 px) + flex-gap (12 px) = 296 px.
-            // Copies must be even so translateX(-50%) resets on an identical frame.
-            $count = $catProducts->count();
-            if ($count > 0) {
-                $needed = (int) ceil((2 * 1440) / ($count * 296));
-                if ($needed % 2 !== 0) { $needed++; }
-                $totalCopies = max(2, $needed);
-            } else {
-                $totalCopies = 2;
-            }
-        @endphp
+        @php $catProducts = $products->where('category_id', $category->id); @endphp
 
         <div id="marquee-{{ $category->id }}"
-             class="category-marquee-container overflow-hidden w-full py-10 {{ $loop->first ? '' : 'hidden' }}">
+             class="category-marquee-container w-full {{ $loop->first ? '' : 'hidden' }}">
 
             @if ($catProducts->isEmpty())
                 <div class="py-16 text-center">
@@ -697,66 +659,58 @@
                     <p class="font-bold text-base" style="color: var(--color-black);">Belum ada produk di kategori ini.</p>
                 </div>
             @else
-                <div class="marquee-track hover:[animation-play-state:paused]">
-                    @for ($r = 0; $r < $totalCopies; $r++)
-                        @foreach ($catProducts as $product)
-                            <div class="product-card relative bg-white rounded-3xl shadow-sm p-4 pt-14
-                                         w-[240px] md:w-[260px] shrink-0 mx-3 flex flex-col justify-between
-                                         cursor-pointer hover:-translate-y-1 transition-all duration-200"
-                                 @if($r > 0) aria-hidden="true" @endif
-                                 data-category="{{ $product->category->name }}"
-                                 data-price="{{ $product->price }}"
-                                 data-name="{{ strtolower($product->name) }}"
-                                 style="box-shadow: var(--shadow-card);">
+                <div class="flex overflow-x-auto hide-scrollbar gap-6 pb-12 pt-20 px-8 w-full">
+                    @foreach ($catProducts as $product)
+                        <div class="product-card relative bg-white rounded-[2rem] shadow-md p-5 pt-16 min-w-[250px] shrink-0 flex flex-col justify-between cursor-pointer"
+                             data-category="{{ $product->category->name }}"
+                             data-price="{{ $product->price }}"
+                             data-name="{{ strtolower($product->name) }}"
+                             style="box-shadow: var(--shadow-card);">
 
-                                {{-- Image pops out of card top --}}
-                                <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full
-                                            flex items-center justify-center"
-                                     style="background-color: #FDECD8;">
-                                    <img src="{{ asset($product->image) }}"
-                                         alt="{{ $product->name }}"
-                                         class="w-16 h-16 object-contain drop-shadow-md"
-                                         onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
-                                </div>
-
-                                <div>
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-center mb-1"
-                                       style="color: var(--color-accent);">{{ $product->category->name }}</p>
-                                    <p class="font-bold text-sm text-center leading-snug mb-1"
-                                       style="color: var(--color-primary);">{{ $product->name }}</p>
-                                    <p class="text-[11px] text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
-                                        {{ $product->description }}
-                                    </p>
-                                </div>
-                                
-
-                                <div class="flex items-center justify-between gap-1 mt-auto">
-                                    <p class="text-sm font-black" style="color: var(--color-primary);">
-                                        Rp {{ number_format($product->price, 0, ',', '.') }}
-                                    </p>
-                                    @if ($product->is_available && $product->stock > 0)
-                                        <button type="button"
-                                                class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold
-                                                       transition-opacity hover:opacity-80"
-                                                style="background-color: var(--color-accent); color: var(--color-black);"
-                                                data-id="{{ $product->id }}"
-                                                data-name="{{ $product->name }}"
-                                                data-price="{{ $product->price }}"
-                                                data-description="{{ $product->description }}"
-                                                data-image="{{ asset($product->image) }}">
-                                            Pesan
-                                        </button>
-                                    @else
-                                        <button type="button" disabled
-                                                class="flex-none px-3 py-1.5 rounded-full text-xs font-bold cursor-not-allowed"
-                                                style="background-color: #d1d5db; color: #9ca3af;">
-                                            Habis
-                                        </button>
-                                    @endif
-                                </div>
+                            {{-- Image pops out of the card top --}}
+                            <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 w-28 h-28 rounded-full flex items-center justify-center"
+                                 style="background-color: #FDECD8;">
+                                <img src="{{ asset($product->image) }}"
+                                     alt="{{ $product->name }}"
+                                     class="w-20 h-20 object-contain drop-shadow-md"
+                                     onerror="this.src='{{ asset('assets/img/CA_ORIGINAL.png') }}'">
                             </div>
-                        @endforeach
-                    @endfor
+
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-center mb-1"
+                                   style="color: var(--color-accent);">{{ $product->category->name }}</p>
+                                <p class="font-bold text-sm text-center leading-snug mb-1"
+                                   style="color: var(--color-primary);">{{ $product->name }}</p>
+                                <p class="text-[11px] text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
+                                    {{ $product->description }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-1 mt-auto">
+                                <p class="text-sm font-black" style="color: var(--color-primary);">
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                </p>
+                                @if ($product->is_available && $product->stock > 0)
+                                    <button type="button"
+                                            class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
+                                            style="background-color: var(--color-accent); color: var(--color-black);"
+                                            data-id="{{ $product->id }}"
+                                            data-name="{{ $product->name }}"
+                                            data-price="{{ $product->price }}"
+                                            data-description="{{ $product->description }}"
+                                            data-image="{{ asset($product->image) }}">
+                                        Pesan
+                                    </button>
+                                @else
+                                    <button type="button" disabled
+                                            class="flex-none px-3 py-1.5 rounded-full text-xs font-bold cursor-not-allowed"
+                                            style="background-color: #d1d5db; color: #9ca3af;">
+                                        Habis
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @endif
 
@@ -1104,7 +1058,7 @@ $(function () {
     var currentProductImage = '';
     var currentProductDesc  = '';
 
-    /* ── Category tab → marquee switcher ───────────────────── */
+    /* ── Category tab → product row switcher ───────────────── */
     $('.category-btn').on('click', function () {
         var target = $(this).data('target');
 
@@ -1122,7 +1076,7 @@ $(function () {
             .css({ 'background-color': 'white', 'color': 'var(--color-primary)', 'box-shadow': '0 4px 20px rgba(0,0,0,0.14)' });
         $(this).find('.active-tail').removeClass('hidden');
 
-        // Swap marquee containers
+        // Swap product row containers
         $('.category-marquee-container').addClass('hidden');
         $('#' + target).removeClass('hidden');
     });
@@ -1325,45 +1279,6 @@ $(function () {
 
     /* Reviews navigation is handled by Swiper (see script block below jQuery). */
 
-    /* ── Normalize all marquee speeds to match Corndog Manis pace ─── */
-    (function normalizeMarqueeSpeeds() {
-        var BASE_DURATION = 24; // seconds — the CSS default
-
-        var $manisBtn = $('.category-btn').filter(function () {
-            return $.trim($(this).text()) === 'Corndog Manis';
-        });
-        if (!$manisBtn.length) { return; }
-        var manisId = $manisBtn.data('target');
-
-        // Temporarily show hidden containers off-screen so the browser lays them out
-        var hidden = [];
-        $('.category-marquee-container').each(function () {
-            if ($(this).hasClass('hidden')) {
-                hidden.push(this);
-                $(this).removeClass('hidden')
-                       .css({ visibility: 'hidden', position: 'absolute', pointerEvents: 'none' });
-            }
-        });
-
-        var $manisTrack = $('#' + manisId + ' .marquee-track').first();
-        var manisW = $manisTrack.length ? $manisTrack[0].scrollWidth : 0;
-
-        if (manisW > 0) {
-            // Speed (px/s) that Corndog Manis scrolls: it moves -50% (half its width) in BASE_DURATION s
-            var pxPerSec = (manisW / 2) / BASE_DURATION;
-            $('.marquee-track').each(function () {
-                var w = this.scrollWidth;
-                if (w > 0) {
-                    this.style.animationDuration = ((w / 2) / pxPerSec).toFixed(2) + 's';
-                }
-            });
-        }
-
-        // Restore hidden containers
-        $.each(hidden, function (_, el) {
-            $(el).css({ visibility: '', position: '', pointerEvents: '' }).addClass('hidden');
-        });
-    })();
 
 });
 </script>

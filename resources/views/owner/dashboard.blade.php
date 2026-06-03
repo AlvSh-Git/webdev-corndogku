@@ -995,6 +995,7 @@ $(function () {
         drawerOrder=order;
         $('#drawer-order-id').text(order.id||'-');
         $('#drawer-customer-name').text(order.customer||'Customer');
+        $('#drawer-customer-phone').text(order.phone || 'Phone');
         $('#drawer-order-type').text(typeMap[order.order_type]||order.order_type||'-');
         $('#drawer-payment').text(payMap[order.payment]||order.payment||'-');
         $('#drawer-source').text(order.source==='online'?'Online Order':'Kasir');

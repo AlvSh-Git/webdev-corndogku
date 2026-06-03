@@ -88,9 +88,7 @@
         </button>
     </div>
 
-    {{-- ════════════════════════════════════════════════
-         SCROLLABLE BODY
-    ════════════════════════════════════════════════ --}}
+    {{-- SCROLLABLE BODY--}}
     <div style="flex:1;overflow-y:auto;padding:18px 20px 0;">
 
         {{-- 1. ORDER ID + CUSTOMER — 2-kolom ─────────────────────── --}}
@@ -150,6 +148,10 @@
                             Customer
                         </p>
                         <p id="drawer-order-type"
+                           style="font-size:11px;color:#9CA3AF;margin:0;">
+                            -
+                        </p>
+                        <p id="drawer-customer-phone"
                            style="font-size:11px;color:#9CA3AF;margin:0;">
                             -
                         </p>

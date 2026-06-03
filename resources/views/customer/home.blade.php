@@ -13,6 +13,23 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        /* ── Root: prevent horizontal scroll + unify background ──
+           NOTE: overflow-x must be on html only, NOT on body.
+           Setting overflow-x:hidden on body breaks position:fixed/sticky. */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            width: 100%;
+            max-width: 100%;
+            background-color: #FFFEF0;
+        }
+
+        /* Override the CSS variable so all var(--color-light) usages become #FFFEF0 */
+        :root {
+            --color-light: #FFFEF0;
+        }
+
         .swal2-container { z-index: 999999 !important; }
         @keyframes ticker {
             0%   { transform: translateX(0); }
@@ -82,6 +99,61 @@
             display: inline-flex;
             white-space: nowrap;
         }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           FLOATING FOOD DECORATION — absolute inside #promo-cards-wrapper
+           The images stay anchored to the promo section and do NOT follow
+           the viewport. Scroll listener adds/removes .active class only.
+           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           LEFT SIZE   → width on .floating-food-left  (+ xl override below)
+           RIGHT SIZE  → width on .floating-food-right (+ xl override below)
+           LEFT POS    → left:0 + active translateX on .floating-food-left
+           RIGHT POS   → right:0 + active translateX on .floating-food-right
+           WHEN LEFT   → LEFT_SHOW  in scroll script (default 80 px)
+           WHEN RIGHT  → RIGHT_SHOW in scroll script (default 350 px)
+           MOBILE HIDE → display:none on .floating-food (restored at 1024 px)
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        .floating-food {
+            position: absolute;                        /* anchored to #promo-cards-wrapper */
+            top: 50%;                                  /* vertical centre — tweak % to shift up/down */
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;                                /* behind cards content (cards use z-10) */
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: none;                             /* ← hidden on mobile by default */
+        }
+        @media (min-width: 1024px) {
+            .floating-food { display: block; }
+        }
+
+        /* Left image — Bingsoo */
+        .floating-food-left {
+            left: 0;                                   /* ← LEFT POSITION anchor */
+            width: 340px;                              /* ← LEFT SIZE on laptop */
+            transform: translateY(-50%) translateX(-100%);    /* hidden: fully off-screen */
+        }
+        @media (min-width: 1280px) {
+            .floating-food-left { width: 380px; }      /* ← LEFT SIZE on large desktop */
+        }
+        .floating-food-left.active {
+            opacity: 1;
+            transform: translateY(-50%) translateX(-36%);     /* ← ~64 % visible from left */
+        }
+
+        /* Right image — Corndog, flipped horizontally to face left */
+        .floating-food-right {
+            right: 0;                                  /* ← RIGHT POSITION anchor */
+            width: 290px;                              /* ← RIGHT SIZE on laptop (360px − 20%) */
+            transform: translateY(-50%) translateX(100%) scaleX(-1);   /* hidden + flipped */
+        }
+        @media (min-width: 1280px) {
+            .floating-food-right { width: 320px; }     /* ← RIGHT SIZE on large desktop (400px − 20%) */
+        }
+        .floating-food-right.active {
+            opacity: 1;
+            transform: translateY(-50%) translateX(36%) scaleX(-1);    /* ← ~64 % visible from right */
+        }
     </style>
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
@@ -89,7 +161,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      1. NAVBAR — edge-to-edge with wide inner container
 ══════════════════════════════════════════════════════════════ --}}
-<header class="sticky top-0 z-30 w-full bg-white border-b"
+<header class="fixed top-0 left-0 right-0 z-[9999] w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
     {{-- Main Navbar Content --}}
@@ -118,7 +190,7 @@
         {{-- Right: Wishlist → Cart → Avatar → Greeting → Logout --}}
         <div class="flex items-center gap-4 flex-none">
 
-            {{-- Wishlist Button (Hanya tampil jika user sudah login) --}}
+            {{-- Wishlist (logged-in only) --}}
             @auth
                 <a href="{{ route('wishlist') }}"
                    class="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
@@ -128,15 +200,12 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
                     </svg>
-                    <span id="wishlist-badge" 
+                    <span id="wishlist-badge"
                           class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center text-white bg-red-600">
                         {{ auth()->user()->wishlistProducts()->count() }}
                     </span>
                 </a>
             @endauth
-
-        {{-- Right: Cart → Avatar → Greeting → Logout --}}
-        <div class="flex items-center gap-4 flex-none">
 
             {{-- Cart --}}
             <a href="{{ route('cart') }}"
@@ -184,8 +253,8 @@
                    style="background-color: var(--color-primary); color: var(--color-white);">Log In</a>
             @endauth
 
-        </div>
-    </div>
+        </div>{{-- /.right flex --}}
+    </div>{{-- /.navbar row --}}
 
     {{-- Banner Toko Tutup ditaruh tepat di bawah content navbar namun masih di dalam <header> --}}
     @php $storeInfo = $storeInfo ?? ['is_open' => true, 'reason' => 'schedule', 'reopen_day' => '', 'reopen_time' => '']; @endphp
@@ -211,26 +280,14 @@
     @endif
 </header>
 
+{{-- Spacer: pushes content below the fixed header.
+     64px = navbar only | 112px = navbar + store-closed banner --}}
+<div style="height: {{ !($storeInfo['is_open'] ?? true) ? '112px' : '64px' }};"></div>
 
 {{-- ══════════════════════════════════════════════════════════════
      2-4. HERO POSTER + TICKER + PROMO CARDS — Figma "thumbnail users"
 ══════════════════════════════════════════════════════════════ --}}
-<div class="relative w-full overflow-x-hidden bg-[#FEFDF2] pb-16">
-
-    {{-- Scroll-reveal decorative images — slide in from left/right when cards section enters viewport --}}
-    <img id="reveal-left-img"
-         src="{{ asset('assets/img/home_bingsoo_01.png') }}"
-         alt="" aria-hidden="true"
-         class="absolute left-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
-                -translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
-                hidden lg:block">
-
-    <img id="reveal-right-img"
-         src="{{ asset('assets/img/home_corndog_01.png') }}"
-         alt="" aria-hidden="true"
-         class="absolute right-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
-                translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
-                hidden lg:block">
+<div class="relative w-full bg-[#FFFEF0] pb-16">
 
     {{-- Hero — solid red section with two separate corndog images absolutely
          positioned left & right, and centered text. Fluid min-height + py so
@@ -270,46 +327,60 @@
         </div>
     </div>
 
-    {{-- Cards grid --}}
-    <div class="relative container mx-auto px-4 mt-12 max-w-5xl">
+    {{-- Cards grid — wrapper is relative so food images are absolute inside it --}}
+    <div id="promo-cards-wrapper" class="relative w-full mt-12">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+        {{-- Decorative food images — absolute, edge-peeking, scroll-triggered --}}
+        <img id="floating-food-left"
+             src="{{ asset('assets/img/home_bingsoo_01.png') }}"
+             alt="" aria-hidden="true"
+             class="floating-food floating-food-left">
 
-            {{-- Left: 2 stacked cards with floating Order Now buttons --}}
-            <div id="section-best-seller" class="flex flex-col gap-6">
-                <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <img src="{{ asset('assets/img/home_card_01.png') }}"
-                         alt="Promo 1"
-                         class="w-full block">
-                    <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                        <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
-                            Order Now 🔥
-                        </span>
-                    </div>
-                </a>
+        <img id="floating-food-right"
+             src="{{ asset('assets/img/home_corndog_01.png') }}"
+             alt="" aria-hidden="true"
+             class="floating-food floating-food-right">
 
-                <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <img src="{{ asset('assets/img/home_card_02.png') }}"
-                         alt="Promo 2"
-                         class="w-full block">
-                    <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                        <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
-                            Order Now 🔥
-                        </span>
-                    </div>
-                </a>
+        <div class="relative z-10 container mx-auto px-4 max-w-5xl">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {{-- Left: 2 stacked cards with floating Order Now buttons --}}
+                <div id="section-best-seller" class="flex flex-col gap-6">
+                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <img src="{{ asset('assets/img/home_card_01.png') }}"
+                             alt="Promo 1"
+                             class="w-full block">
+                        <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
+                                Order Now 🔥
+                            </span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <img src="{{ asset('assets/img/home_card_02.png') }}"
+                             alt="Promo 2"
+                             class="w-full block">
+                        <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
+                                Order Now 🔥
+                            </span>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Right: 1 large card --}}
+                <div id="section-buy-now" class="flex h-full">
+                    <a href="{{ route('menu') }}" class="group block w-full h-full">
+                        <img src="{{ asset('assets/img/home_card_03.png') }}"
+                             alt="Promo 3"
+                             class="w-full h-full object-cover rounded-[2rem] shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                    </a>
+                </div>
             </div>
 
-            {{-- Right: 1 large card --}}
-            <div id="section-buy-now" class="flex h-full">
-                <a href="{{ route('menu') }}" class="group block w-full h-full">
-                    <img src="{{ asset('assets/img/home_card_03.png') }}"
-                         alt="Promo 3"
-                         class="w-full h-full object-cover rounded-[2rem] shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
-                </a>
-            </div>
         </div>
-
     </div>
 </div>
 
@@ -726,7 +797,7 @@
                                         {{ $product->description }}
                                     </p>
                                 </div>
-                                
+
 
                                 <div class="flex items-center justify-between gap-1 mt-auto">
                                     <p class="text-sm font-black" style="color: var(--color-primary);">
@@ -766,7 +837,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      7. LOCATION & HOURS — full-width section
 ══════════════════════════════════════════════════════════════ --}}
-<section class="w-full py-16" style="background-color: var(--color-white);">
+<section class="w-full py-16" style="background-color: #FFFEF0;">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
@@ -811,9 +882,6 @@
                         </div>
                     @endforeach
                 </div>
-                <p class="text-xs text-white/55 mt-4">
-                    {{ config('store.address') }}
-                </p>
             </div>
         </div>
     </div>
@@ -822,7 +890,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      8. TESTIMONIALS — full-width "Your trust in us"
 ══════════════════════════════════════════════════════════════ --}}
-<section class="w-full py-16" style="background-color: #FFF9E6;">
+<section class="w-full py-16" style="background: linear-gradient(90deg, #FFECC2 0%, #FFE6B0 35%, #FFDEA0 70%, #FFD98A 100%);">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
 
         <div class="mb-8">
@@ -970,16 +1038,13 @@
             </div>
         </div>
 
-        <div class="mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3
-                    text-xs text-white/40"
-             style="border-top: 1px solid rgba(255,255,255,0.15);">
-            <span>&copy; {{ date('Y') }} Corndog-Ku. All rights reserved.</span>
-            <div class="flex gap-4">
-                <a href="#" class="hover:text-white/70 transition-colors">Privacy Policy</a>
-                <span class="text-white/20">|</span>
-                <a href="#" class="hover:text-white/70 transition-colors">Terms of Service</a>
-            </div>
-        </div>
+        <div class="mt-10 pt-6 flex justify-center items-center text-center
+            text-xs text-white/40"
+     style="border-top: 1px solid rgba(255,255,255,0.15);">
+
+    <span>&copy; {{ date('Y') }} Corndog-Ku. All rights reserved.</span>
+
+</div>
     </div>
 </footer>
 
@@ -1018,16 +1083,16 @@
                     <h3 id="modal-title"
                         class="text-xl font-bold leading-snug"
                         style="color: var(--color-black);"></h3>
-                    
+
                     {{-- TOMBOL LOVE DI DALAM MODAL --}}
-                    <button id="modal-btn-wishlist" 
-                            class="flex-none w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200" 
+                    <button id="modal-btn-wishlist"
+                            class="flex-none w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200"
                             data-id="">
-                        <svg xmlns="http://www.w3.org/2000/svg" 
-                             class="w-5 h-5 text-gray-400" 
-                             fill="none" 
-                             viewBox="0 0 24 24" 
-                             stroke="currentColor" 
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-5 h-5 text-gray-400"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
                              stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
                         </svg>
@@ -1602,27 +1667,52 @@ $(function () {
 
 <script>
 (function () {
-    function makeRevealObserver(imgId) {
-        var img = document.getElementById(imgId);
-        if (!img) return null;
-        return new IntersectionObserver(function (entries, obs) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    img.classList.remove('-translate-x-full', 'translate-x-full', 'opacity-0');
-                    img.classList.add('translate-x-0', 'opacity-100');
-                    obs.disconnect();
-                }
-            });
-        }, { threshold: 0.15 });
+    var leftImg  = document.getElementById('floating-food-left');
+    var rightImg = document.getElementById('floating-food-right');
+    if (!leftImg || !rightImg) return;
+
+    /* ── SCROLL THRESHOLDS (px from top) ─────────────────────────────
+       LEFT_SHOW  → scrollY needed to show the left  image  ← tweak here
+       LEFT_HIDE  → scrollY at which the left  image hides again (< SHOW for hysteresis)
+       RIGHT_SHOW → scrollY needed to show the right image  ← tweak here
+       RIGHT_HIDE → scrollY at which the right image hides again
+    ──────────────────────────────────────────────────────────────────── */
+    var LEFT_SHOW  = 80;    /* ← scrollY to show left  image  */
+    var LEFT_HIDE  = 50;    /* ← scrollY to hide left  image again */
+    var RIGHT_SHOW = 350;   /* ← scrollY to show right image (~3 scroll steps) */
+    var RIGHT_HIDE = 280;   /* ← scrollY to hide right image again */
+
+    var ticking = false;
+
+    function update() {
+        var y = window.scrollY;
+
+        /* Left image — appears first, after one small scroll */
+        if (y >= LEFT_SHOW) {
+            leftImg.classList.add('active');
+        } else if (y < LEFT_HIDE) {
+            leftImg.classList.remove('active');
+        }
+
+        /* Right image — appears later (~3 scroll steps), disappears sooner on way back up */
+        if (y >= RIGHT_SHOW) {
+            rightImg.classList.add('active');
+        } else if (y < RIGHT_HIDE) {
+            rightImg.classList.remove('active');
+        }
+
+        ticking = false;
     }
 
-    var leftObs  = makeRevealObserver('reveal-left-img');
-    var rightObs = makeRevealObserver('reveal-right-img');
-    var bestSeller = document.getElementById('section-best-seller');
-    var buyNow     = document.getElementById('section-buy-now');
+    window.addEventListener('scroll', function () {
+        if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+        }
+    }, { passive: true });
 
-    if (leftObs  && bestSeller) leftObs.observe(bestSeller);
-    if (rightObs && buyNow)     rightObs.observe(buyNow);
+    /* Run once immediately in case the page loads already scrolled */
+    update();
 })();
 </script>
 

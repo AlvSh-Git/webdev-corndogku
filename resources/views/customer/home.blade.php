@@ -728,9 +728,9 @@
                     <p class="font-bold text-base" style="color: var(--color-black);">Belum ada produk di kategori ini.</p>
                 </div>
             @else
-                <div class="flex overflow-x-auto hide-scrollbar gap-6 pb-12 pt-20 px-8 w-full">
+                <div class="flex flex-row overflow-x-auto gap-6 pb-12 pt-20 px-8 w-full hide-scrollbar">
                     @foreach ($catProducts as $product)
-                        <div class="product-card relative bg-white rounded-[2rem] shadow-md p-5 pt-16 min-w-[250px] shrink-0 flex flex-col justify-between cursor-pointer"
+                        <div class="product-card flex flex-col relative bg-white rounded-[2rem] shadow-md p-5 pt-16 min-w-[240px] w-[240px] shrink-0 justify-between cursor-pointer"
                              data-category="{{ $product->category->name }}"
                              data-price="{{ $product->price }}"
                              data-name="{{ strtolower($product->name) }}"
@@ -781,41 +781,6 @@
                                         </button>
                                     @endif
                                 </div>
-                            </div>
-
-                            <div>
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-center mb-1"
-                                   style="color: var(--color-accent);">{{ $product->category->name }}</p>
-                                <p class="font-bold text-sm text-center leading-snug mb-1"
-                                   style="color: var(--color-primary);">{{ $product->name }}</p>
-                                <p class="text-[11px] text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
-                                    {{ $product->description }}
-                                </p>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-1 mt-auto">
-                                <p class="text-sm font-black" style="color: var(--color-primary);">
-                                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                                </p>
-                                @if ($product->is_available && $product->stock > 0)
-                                    <button type="button"
-                                            class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-80"
-                                            style="background-color: var(--color-accent); color: var(--color-black);"
-                                            data-id="{{ $product->id }}"
-                                            data-name="{{ $product->name }}"
-                                            data-price="{{ $product->price }}"
-                                            data-description="{{ $product->description }}"
-                                            data-image="{{ asset($product->image) }}">
-                                        Pesan
-                                    </button>
-                                @else
-                                    <button type="button" disabled
-                                            class="flex-none px-3 py-1.5 rounded-full text-xs font-bold cursor-not-allowed"
-                                            style="background-color: #d1d5db; color: #9ca3af;">
-                                        Habis
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @endforeach
                 </div>

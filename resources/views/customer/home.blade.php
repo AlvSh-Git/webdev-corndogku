@@ -240,12 +240,10 @@
                     overflow-hidden py-10">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
-             class="absolute top-1/2 -translate-y-1/2 left-0 w-48 md:w-56 lg:w-64 object-contain -translate-x-1/4
-                    opacity-30 md:opacity-100 pointer-events-none z-0">
+             class="absolute left-[-20px] md:left-[-10px] lg:left-0 top-[55%] lg:top-[58%] -translate-y-1/2 h-[110%] md:h-[125%] lg:h-[135%] w-auto max-w-none object-contain opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
-             class="absolute top-1/2 -translate-y-1/2 right-0 w-48 md:w-56 lg:w-64 object-contain translate-x-1/4
-                    opacity-30 md:opacity-100 pointer-events-none z-0">
+             class="absolute right-[-10px] md:right-4 lg:right-12 top-[55%] lg:top-[58%] -translate-y-1/2 h-[85%] md:h-[95%] lg:h-[105%] w-auto max-w-none object-contain opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <div class="relative z-10 flex flex-col items-start text-left px-4 max-w-lg md:max-w-2xl mx-auto">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">

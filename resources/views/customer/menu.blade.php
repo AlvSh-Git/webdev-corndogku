@@ -54,7 +54,7 @@
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
                class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
-                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-[10px] sm:text-xs font-bold
+                      inline-flex items-center gap-1 bg-[#ba0d0d] text-white text-[10px] sm:text-xs font-bold
                       px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
                       hover:bg-red-800 transition-colors w-auto max-w-fit">
                 Yuk, Buat Corndog Kamu!

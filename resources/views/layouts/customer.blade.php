@@ -76,13 +76,15 @@
 
             @auth
                 <a href="{{ route('profile') }}"
+                   id="navbar-user-avatar"
                    class="w-9 h-9 rounded-full flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
                    style="background-color: var(--color-primary);"
                    title="{{ auth()->user()->name }}">
                     {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
                 </a>
-                <span class="hidden sm:block text-sm font-semibold"
+                <span id="navbar-user-name"
+                      class="hidden sm:block text-sm font-semibold"
                       style="color: var(--color-black);">
                     Halo, {{ auth()->user()->name }}
                 </span>

@@ -164,7 +164,7 @@
     </div>
 
 
-    {{-- ── Add User Modal ───────────────────────────────────────── --}}
+    {{-- ── Add User Model ───────────────────────────────────────── --}}
     <div id="addUserModal"
          class="fixed inset-0 z-50 hidden items-center justify-center"
          style="background-color: rgba(0, 0, 0, 0.55);">
@@ -196,7 +196,7 @@
                             placeholder="Name"
                             maxlength="15"
                             required
-                            class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                            class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                             style="border-color: #DADADA;">
                 </div>
 
@@ -210,7 +210,7 @@
                            value="{{ old('username') }}"
                            placeholder="Username"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -250,7 +250,7 @@
                            value="{{ old('email') }}"
                            placeholder="example@gmail.com"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -263,7 +263,7 @@
                            name="password"
                            placeholder="********"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -276,7 +276,7 @@
                            name="password_confirmation"
                            placeholder="********"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -332,7 +332,7 @@
                             placeholder="Name"
                             maxlength="15"
                             required
-                            class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                            class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                             style="border-color: #DADADA;">
                 </div>
 
@@ -346,7 +346,7 @@
                            name="username"
                            placeholder="Username"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -386,7 +386,7 @@
                            name="email"
                            placeholder="example@gmail.com"
                            required
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -398,7 +398,7 @@
                     <input type="password"
                            name="password"
                            placeholder="Kosongkan jika tidak ingin mengubah password"
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 
@@ -410,7 +410,7 @@
                     <input type="password"
                            name="password_confirmation"
                            placeholder="Kosongkan jika tidak ingin mengubah password"
-                           class="w-full rounded-lg border px-4 py-3 text-sm outline-none"
+                           class="w-full rounded-lg border px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none"
                            style="border-color: #DADADA;">
                 </div>
 

@@ -197,6 +197,21 @@
 ══════════════════════════════════════════════════════════════ --}}
 <div class="relative w-full overflow-x-hidden bg-[#FEFDF2] pb-16">
 
+    {{-- Scroll-reveal decorative images — slide in from left/right when cards section enters viewport --}}
+    <img id="reveal-left-img"
+         src="{{ asset('assets/img/home_bingsoo_01.png') }}"
+         alt="" aria-hidden="true"
+         class="absolute left-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
+                -translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
+                hidden lg:block">
+
+    <img id="reveal-right-img"
+         src="{{ asset('assets/img/home_corndog_01.png') }}"
+         alt="" aria-hidden="true"
+         class="absolute right-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
+                translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
+                hidden lg:block">
+
     {{-- Hero — solid red section with two separate corndog images absolutely
          positioned left & right, and centered text. Fluid min-height + py so
          nothing overflows on mobile. --}}
@@ -245,7 +260,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
 
             {{-- Left: 2 stacked cards with floating Order Now buttons --}}
-            <div class="flex flex-col gap-6">
+            <div id="section-best-seller" class="flex flex-col gap-6">
                 <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <img src="{{ asset('assets/img/home_card_01.png') }}"
                          alt="Promo 1"
@@ -270,7 +285,7 @@
             </div>
 
             {{-- Right: 1 large card --}}
-            <div class="flex h-full">
+            <div id="section-buy-now" class="flex h-full">
                 <a href="{{ route('menu') }}" class="group block w-full h-full">
                     <img src="{{ asset('assets/img/home_card_03.png') }}"
                          alt="Promo 3"
@@ -1550,6 +1565,32 @@ $(function () {
     function scrollToBottom() {
         messages.scrollTop = messages.scrollHeight;
     }
+})();
+</script>
+
+<script>
+(function () {
+    function makeRevealObserver(imgId) {
+        var img = document.getElementById(imgId);
+        if (!img) return null;
+        return new IntersectionObserver(function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    img.classList.remove('-translate-x-full', 'translate-x-full', 'opacity-0');
+                    img.classList.add('translate-x-0', 'opacity-100');
+                    obs.disconnect();
+                }
+            });
+        }, { threshold: 0.15 });
+    }
+
+    var leftObs  = makeRevealObserver('reveal-left-img');
+    var rightObs = makeRevealObserver('reveal-right-img');
+    var bestSeller = document.getElementById('section-best-seller');
+    var buyNow     = document.getElementById('section-buy-now');
+
+    if (leftObs  && bestSeller) leftObs.observe(bestSeller);
+    if (rightObs && buyNow)     rightObs.observe(buyNow);
 })();
 </script>
 

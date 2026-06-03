@@ -16,7 +16,7 @@
 {{-- ══════════════════════════════════════════════════════════════
      CUSTOMER NAVBAR
 ══════════════════════════════════════════════════════════════ --}}
-<header class="sticky top-0 z-30 bg-white border-b"
+<header class="fixed top-0 left-0 right-0 z-[9999] w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
     <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16 h-16
@@ -132,10 +132,8 @@
 
     </div>{{-- /.navbar-container --}}
 
-</header>{{-- /.navbar --}}
-
-{{-- BANNER TOKO TUTUP --}}
-@php $storeInfo = $storeInfo ?? ['is_open' => true, 'reason' => 'schedule', 'reopen_day' => '', 'reopen_time' => '']; @endphp
+    {{-- BANNER TOKO TUTUP — inside <header> so it sticks with the navbar --}}
+    @php $storeInfo = $storeInfo ?? ['is_open' => true, 'reason' => 'schedule', 'reopen_day' => '', 'reopen_time' => '']; @endphp
     @if (!$storeInfo['is_open'])
     <div id="store-closed-banner"
          class="w-full py-3 px-4 flex items-center justify-center gap-2 text-sm font-semibold"
@@ -157,6 +155,11 @@
     </div>
     @endif
 
+</header>{{-- /.navbar --}}
+
+{{-- Spacer: pushes content below the fixed header.
+     64px = navbar only | 112px = navbar + store-closed banner --}}
+<div style="height: {{ !($storeInfo['is_open'] ?? true) ? '112px' : '64px' }};"></div>
 
 {{-- ══════════════════════════════════════════════════════════════
      PAGE BODY

@@ -29,7 +29,8 @@
 
         {{-- Avatar --}}
         <div class="relative flex-none self-center sm:self-auto">
-            <div class="w-36 h-36 rounded-full flex items-center justify-center
+            <div id="profile-hero-avatar"
+                 class="w-36 h-36 rounded-full flex items-center justify-center
                         text-white text-5xl font-bold select-none"
                  style="background-color: var(--color-primary);
                         box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
@@ -580,10 +581,13 @@ $(function () {
                 if (res.success) {
                     showAlert(res.message, 'success');
 
-                    // Reflect updated name in the hero greeting without a page reload
+                    // Reflect updated name instantly across all display points
                     if (res.name) {
-                        var firstName = res.name.split(' ')[0];
+                        var initial = res.name.charAt(0).toUpperCase();
                         $('[data-hero-name]').text(res.name + '!');
+                        $('#profile-hero-avatar').text(initial);
+                        $('#navbar-user-avatar').text(initial).attr('title', res.name);
+                        $('#navbar-user-name').text('Halo, ' + res.name);
                     }
 
                     // Collapse password panel and clear its fields

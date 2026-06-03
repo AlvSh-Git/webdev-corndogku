@@ -217,28 +217,41 @@
 ══════════════════════════════════════════════════════════════ --}}
 <div class="relative w-full overflow-x-hidden bg-[#FEFDF2] pb-16">
 
+    {{-- Scroll-reveal decorative images — slide in from left/right when cards section enters viewport --}}
+    <img id="reveal-left-img"
+         src="{{ asset('assets/img/home_bingsoo_01.png') }}"
+         alt="" aria-hidden="true"
+         class="absolute left-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
+                -translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
+                hidden lg:block">
+
+    <img id="reveal-right-img"
+         src="{{ asset('assets/img/home_corndog_01.png') }}"
+         alt="" aria-hidden="true"
+         class="absolute right-0 bottom-8 w-40 xl:w-56 object-contain pointer-events-none z-20
+                translate-x-full opacity-0 transition-all duration-[1000ms] ease-out
+                hidden lg:block">
+
     {{-- Hero — solid red section with two separate corndog images absolutely
          positioned left & right, and centered text. Fluid min-height + py so
          nothing overflows on mobile. --}}
     <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern
-                    min-h-[400px] md:min-h-[500px] flex items-center justify-center
-                    overflow-hidden py-16">
+                    flex items-center justify-center
+                    overflow-hidden py-10">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
-             class="absolute left-[-30px] md:left-[-10px] lg:left-0 top-[55%] lg:top-[60%] -translate-y-1/2
-                    h-[300px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-auto max-w-none object-contain
+             class="absolute top-1/2 -translate-y-1/2 left-0 w-48 md:w-56 lg:w-64 object-contain -translate-x-1/4
                     opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
-             class="absolute right-[-20px] md:right-4 lg:right-12 top-[55%] lg:top-[60%] -translate-y-1/2
-                    h-[200px] md:h-[300px] lg:h-[450px] xl:h-[480px] w-auto max-w-none object-contain
+             class="absolute top-1/2 -translate-y-1/2 right-0 w-48 md:w-56 lg:w-64 object-contain translate-x-1/4
                     opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <div class="relative z-10 flex flex-col items-start text-left px-4 max-w-lg md:max-w-2xl mx-auto">
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">
                 Crispy Corndog,<br>Happy Mood
             </h1>
-            <p class="text-sm md:text-base text-gray-100 mb-8">
+            <p class="text-sm md:text-base text-gray-100 mb-4">
                 Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap gigitan. Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
             </p>
             <a href="{{ route('menu') }}"
@@ -265,7 +278,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
 
             {{-- Left: 2 stacked cards with floating Order Now buttons --}}
-            <div class="flex flex-col gap-6">
+            <div id="section-best-seller" class="flex flex-col gap-6">
                 <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <img src="{{ asset('assets/img/home_card_01.png') }}"
                          alt="Promo 1"
@@ -290,7 +303,7 @@
             </div>
 
             {{-- Right: 1 large card --}}
-            <div class="flex h-full">
+            <div id="section-buy-now" class="flex h-full">
                 <a href="{{ route('menu') }}" class="group block w-full h-full">
                     <img src="{{ asset('assets/img/home_card_03.png') }}"
                          alt="Promo 3"
@@ -1586,6 +1599,32 @@ $(function () {
     function scrollToBottom() {
         messages.scrollTop = messages.scrollHeight;
     }
+})();
+</script>
+
+<script>
+(function () {
+    function makeRevealObserver(imgId) {
+        var img = document.getElementById(imgId);
+        if (!img) return null;
+        return new IntersectionObserver(function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    img.classList.remove('-translate-x-full', 'translate-x-full', 'opacity-0');
+                    img.classList.add('translate-x-0', 'opacity-100');
+                    obs.disconnect();
+                }
+            });
+        }, { threshold: 0.15 });
+    }
+
+    var leftObs  = makeRevealObserver('reveal-left-img');
+    var rightObs = makeRevealObserver('reveal-right-img');
+    var bestSeller = document.getElementById('section-best-seller');
+    var buyNow     = document.getElementById('section-buy-now');
+
+    if (leftObs  && bestSeller) leftObs.observe(bestSeller);
+    if (rightObs && buyNow)     rightObs.observe(buyNow);
 })();
 </script>
 

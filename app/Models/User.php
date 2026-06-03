@@ -20,7 +20,6 @@ class User extends Authenticatable
         'google_id',
         'avatar',
         'role',
-        'branch',
         'status',
         'cart_data',
     ];

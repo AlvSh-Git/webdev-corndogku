@@ -2,6 +2,9 @@
 
 @section('title', 'Kasir — Purchase')
 
+{{-- On lg+: kill page scroll, manage spacing ourselves inside the wrapper --}}
+@section('main-class', 'overflow-y-auto lg:overflow-hidden p-4 sm:p-6 lg:p-8')
+
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="{{ config('services.midtrans.is_production')
@@ -10,31 +13,30 @@
         data-client-key="{{ config('services.midtrans.client_key', '') }}"></script>
 
 {{-- ══════════════════════════════════════════════════════════════
-     CASHIER POS
-     Left:  Product catalog — AJAX-paginated grid
-     Right: Order panel — sticky, internally scrollable cart
+     CASHIER POS — Desktop-app layout (no page scroll on lg+)
+     Wrapper fills <main> exactly (h-full).
+     Left column scrolls independently; right panel stretches to bottom.
 ══════════════════════════════════════════════════════════════ --}}
-
-<div class="flex items-center gap-3 mb-2">
-    <h1 class="text-xl font-black tracking-tight leading-none" style="color:var(--color-black);">Kasir</h1>
-    <span id="store-status-badge"
-          style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
-                 border-radius:9999px;font-size:11px;font-weight:700;
-                 {{ $storeInfo['is_open'] ? 'background:#dcfce7;color:#166534;' : 'background:#fee2e2;color:#991b1b;' }}">
-        <span id="store-status-dot"
-              style="width:7px;height:7px;border-radius:50%;flex-shrink:0;
-                     background:{{ $storeInfo['is_open'] ? '#22c55e' : '#ef4444' }};"></span>
-        <span id="store-status-text">{{ $storeInfo['is_open'] ? 'Toko Buka' : 'Toko Tutup' }}</span>
-    </span>
-</div>
-{{-- lg:items-start is CRITICAL — without it flex children stretch to equal height
-     which defeats position:sticky on the right column --}}
-<div class="flex flex-col lg:flex-row gap-5 lg:items-start">
+<div class="flex flex-col lg:flex-row lg:h-full gap-5 overflow-hidden">
 
     {{-- ══════════════════════════════════════════
-         LEFT — Product Catalog
+         LEFT — Product Catalog (independently scrollable on lg+)
     ══════════════════════════════════════════ --}}
-    <div class="w-full lg:w-7/12 xl:w-8/12 flex flex-col gap-4">
+    <div class="w-full lg:w-7/12 xl:w-8/12 lg:h-full lg:overflow-y-auto pr-2 flex flex-col gap-4">
+
+        {{-- Kasir heading + store badge --}}
+        <div class="flex items-center gap-3">
+            <h1 class="text-xl font-black tracking-tight leading-none" style="color:var(--color-black);">Kasir</h1>
+            <span id="store-status-badge"
+                  style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
+                         border-radius:9999px;font-size:11px;font-weight:700;
+                         {{ $storeInfo['is_open'] ? 'background:#dcfce7;color:#166534;' : 'background:#fee2e2;color:#991b1b;' }}">
+                <span id="store-status-dot"
+                      style="width:7px;height:7px;border-radius:50%;flex-shrink:0;
+                             background:{{ $storeInfo['is_open'] ? '#22c55e' : '#ef4444' }};"></span>
+                <span id="store-status-text">{{ $storeInfo['is_open'] ? 'Toko Buka' : 'Toko Tutup' }}</span>
+            </span>
+        </div>
 
         {{-- Search --}}
         <div class="relative">
@@ -86,11 +88,9 @@
     </div>{{-- /left --}}
 
     {{-- ══════════════════════════════════════════
-         RIGHT — Order Panel (sticky, strict viewport height)
-         sticky top-4 + explicit height keeps the Order button pinned.
-         flex flex-col + shrink-0 sections + flex-1 cart = no page scroll needed.
+         RIGHT — Order Panel (h-full, stretches to screen bottom on lg+)
     ══════════════════════════════════════════ --}}
-    <div class="w-full lg:w-5/12 xl:w-4/12 sticky top-4 h-[calc(100vh-2rem)] flex flex-col bg-white rounded-2xl shadow overflow-hidden">
+    <div class="w-full lg:w-5/12 xl:w-4/12 lg:h-full flex flex-col bg-white rounded-2xl shadow overflow-hidden">
 
         {{-- ── Panel header (flex-none) ──────────────────────────── --}}
         <div class="flex-none border-b border-gray-100 p-3">
@@ -98,7 +98,7 @@
         </div>
 
         {{-- ── Customer Info Box (flex-none — never scrolls) ── --}}
-        <div class="flex-none border-b border-gray-100 p-3">
+        <div class="flex-none border-b border-gray-100 p-2">
                 <div id="customer-box"
                      style="border-radius:8px;padding:8px;
                             border:1.5px solid #FFBE54;background:#FFFBF2;">
@@ -123,7 +123,7 @@
                                    placeholder="No. WhatsApp (opsional)…"
                                    autocomplete="off"
                                    inputmode="numeric"
-                                   class="w-full text-sm rounded-lg px-3 py-1.5 focus:outline-none"
+                                   class="w-full text-sm text-gray-800 placeholder-gray-400 rounded-lg px-3 py-1.5 focus:outline-none"
                                    style="border:1px solid #FFD080;background:#fff;">
                             <div id="phone-dropdown"
                                  style="display:none;position:absolute;left:0;right:0;
@@ -135,11 +135,11 @@
                         </div>
 
                         {{-- Name input + dropdown --}}
-                        <div style="position:relative;margin-bottom:5px;" id="name-wrap">
+                        <div style="position:relative;margin-bottom:3px;" id="name-wrap">
                             <input type="text" id="customer-name-input"
                                    placeholder="Nama pelanggan…"
                                    autocomplete="off"
-                                   class="w-full text-sm rounded-lg px-3 py-1.5 focus:outline-none"
+                                   class="w-full text-sm text-gray-800 placeholder-gray-400 rounded-lg px-3 py-1.5 focus:outline-none"
                                    style="border:1px solid #FFD080;background:#fff;">
                             <div id="name-dropdown"
                                  style="display:none;position:absolute;left:0;right:0;
@@ -151,7 +151,7 @@
                         </div>
 
                         {{-- Order type --}}
-                        <div class="flex gap-1.5 mb-1.5">
+                        <div class="flex gap-1.5 mb-1">
                             <label class="flex-1">
                                 <input type="radio" name="order_type" value="dine-in"
                                        class="sr-only order-type-radio">
@@ -223,8 +223,7 @@
                 {{-- Empty state --}}
                 <div id="cart-empty"
                      style="display:flex;flex-direction:column;align-items:center;
-                            justify-content:center;text-align:center;padding:24px 16px;
-                            height:100%;">
+                            justify-content:center;text-align:center;padding:12px 16px;">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          style="width:48px;height:48px;color:#E5E7EB;margin-bottom:10px;"
                          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

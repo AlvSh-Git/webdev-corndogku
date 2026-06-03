@@ -39,6 +39,17 @@ class AuthController extends Controller
         if (Auth::attempt([$field => $identifier, 'password' => $request->password], $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            $user = Auth::user();
+                if ($user && $user->cart_data) {
+                    $savedCart = json_decode($user->cart_data, true);
+                    if (is_array($savedCart)) {
+                        // Masukkan kembali array cart ke dalam session
+                        session()->put('cart', $savedCart);
+                    }
+                    // Kosongkan kembali kolom di database setelah di-restore
+                    $user->update(['cart_data' => null]);
+                }
+
             if (Auth::user()->role === 'customer') {
                 return redirect()->intended('/');
             }
@@ -53,6 +64,14 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        $cart = session()->get('cart', []);
+
+        if ($user) {
+            $user->update([
+                'cart_data' => !empty($cart) ? json_encode($cart) : null
+            ]);
+         }
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

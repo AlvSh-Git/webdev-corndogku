@@ -33,7 +33,6 @@
 
 @section('content')
 
-
 {{-- ══════════════════════════════════════════════════════════════
      CUSTOMIZE CORNDOG BANNER
 ══════════════════════════════════════════════════════════════ --}}
@@ -286,7 +285,6 @@
     <div id="product-grid"
          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
     </div>
-    
 
     {{-- Empty state --}}
     <div id="empty-state" class="hidden py-20 text-center">
@@ -300,7 +298,6 @@
 
     </div>{{-- /.inner container --}}
 </section>
-
 
 {{-- ══════════════════════════════════════════════════════════════
      PRODUCT DETAIL MODAL
@@ -332,17 +329,31 @@
         {{-- RIGHT: Details --}}
         <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between gap-5">
 
-            {{-- Name + price --}}
+            {{-- Name + price + wishlist icon --}}
             <div>
-                <h3 id="modal-title"
-                    class="text-xl font-bold leading-snug mb-2"
-                    style="color: var(--color-black);"></h3>
+                <div class="flex items-start justify-between gap-4 mb-2">
+                    <h3 id="modal-title"
+                        class="text-xl font-bold leading-snug"
+                        style="color: var(--color-black);"></h3>
+                    
+                    {{-- TOMBOL LOVE DI DALAM MODAL (Sesuai Screenshot) --}}
+                    <button id="modal-btn-wishlist" 
+                            class="flex-none w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200" 
+                            data-id="">
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="w-5 h-5 text-gray-400" 
+                             fill="none" 
+                             viewBox="0 0 24 24" 
+                             stroke="currentColor" 
+                             stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                        </svg>
+                    </button>
+                </div>
                 <p id="modal-price"
                    class="text-xl font-black"
                    style="color: var(--color-primary);"></p>
             </div>
-
-            
 
             {{-- Description --}}
             <p id="modal-description"
@@ -414,6 +425,8 @@ $(function () {
 
     var $grid = $('#product-grid');
 
+    
+
     /* ── Current modal product data ─────────────────────── */
     var currentProductId    = null;
     var currentProductPrice = 0;
@@ -439,40 +452,57 @@ $(function () {
         var safeImageUrl = p.image_url ? p.image_url.replace(/"/g, '&quot;') : '';
         var inStock = p.is_available !== false && (p.stock === undefined || p.stock > 0);
 
+        // Cek status kepemilikan wishlist produk dari database array
+        // Menggunakan p.is_wishlisted (sesuaikan dengan properti object dari Backend/Controller Anda)
+        var isWishlisted = p.is_wishlisted === true || p.is_wishlist === true;
+        var loveSvgClass = isWishlisted ? 'text-red-500' : 'text-gray-400';
+        var loveSvgFill = isWishlisted ? 'currentColor' : 'none';
+
+        // Tombol wishlist asli diposisikan melayang (absolute) di atas gambar h-48 tanpa merusak tata letak
+        var wishlistBtn = '<button type="button" class="btn-wishlist absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors" data-id="' + p.id + '">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ' + loveSvgClass + '" fill="' + loveSvgFill + '" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>' +
+            '</svg>' +
+            '</button>';
+
+        // Mengembalikan tombol Pesan dengan style warna asli CSS Variable bawaan aplikasi Anda (--color-accent)
         var orderBtn = inStock
             ? '<button type="button"' +
-              ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
-              ' style="background-color:var(--color-accent);color:var(--color-black);"' +
-              ' data-id="' + p.id + '"' +
-              ' data-name="' + safeName + '"' +
-              ' data-price="' + p.price + '"' +
-              ' data-description="' + safeDesc + '"' +
-              ' data-image="' + safeImageUrl + '">Pesan</button>'
+            ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
+            ' style="background-color:var(--color-accent);color:var(--color-black);"' +
+            ' data-id="' + p.id + '"' +
+            ' data-name="' + safeName + '"' +
+            ' data-price="' + p.price + '"' +
+            ' data-description="' + safeDesc + '"' +
+            ' data-image="' + safeImageUrl + '">Pesan</button>'
             : '<button type="button" disabled' +
-              ' class="flex-none px-3 py-1 rounded-full text-xs font-bold cursor-not-allowed"' +
-              ' style="background-color:#d1d5db;color:#9ca3af;">Habis</button>';
+            ' class="flex-none px-3 py-1 rounded-full text-xs font-bold cursor-not-allowed"' +
+            ' style="background-color:#d1d5db;color:#9ca3af;">Habis</button>';
 
-        return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden' + (inStock ? ' cursor-pointer' : '') + '"' +
-               ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
-               ' data-category="' + htmlEscape(p.category ? p.category.name : '') + '"' +
-               ' data-price="' + p.price + '"' +
-               ' data-name="' + safeName.toLowerCase() + '"' +
-               ' data-id="' + p.id + '">' +
-               '<div class="overflow-hidden rounded-t-2xl relative">' +
-               '<img src="' + safeImageUrl + '"' +
-               ' alt="' + safeName + '"' +
-               ' class="w-full h-48 object-cover rounded-t-2xl transition-transform duration-300' + (inStock ? ' hover:scale-105' : ' opacity-60') + '"' +
-               ' onerror="this.src=\'' + fallback + '\'">' +
-               (!inStock ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl"><span class="text-white text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(0,0,0,0.55);">Habis</span></div>' : '') +
-               '</div>' +
-               '<div class="px-4 pt-3 pb-4 flex flex-col flex-1">' +
-               '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + htmlEscape(p.name) + '</p>' +
-               '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + htmlEscape(p.description) + '</p>' +
-               '<div class="flex items-center justify-between mt-3 gap-2">' +
-               '<p class="text-sm font-black" style="color:var(--color-primary);">' + fmtRp(p.price) + '</p>' +
-               orderBtn +
-               '</div></div></div>';
+        // Return HTML dengan layout h-48 asli agar gambar corndog memanjang utuh dan tidak terpotong
+        return '<div class="product-card bg-white rounded-2xl flex flex-col overflow-hidden relative' + (inStock ? ' cursor-pointer' : '') + '"' +
+            ' style="box-shadow:0 2px 12px rgba(0,0,0,0.08);"' +
+            ' data-category="' + htmlEscape(p.category ? p.category.name : '') + '"' +
+            ' data-price="' + p.price + '"' +
+            ' data-name="' + safeName.toLowerCase() + '"' +
+            ' data-id="' + p.id + '">' +
+            wishlistBtn +
+            '<div class="overflow-hidden rounded-t-2xl relative h-48">' + // Tetap h-48 asli
+            '<img src="' + safeImageUrl + '"' +
+            ' alt="' + safeName + '"' +
+            ' class="w-full h-full object-cover rounded-t-2xl transition-transform duration-300' + (inStock ? ' hover:scale-105' : ' opacity-60') + '"' +
+            ' onerror="this.src=\'' + fallback + '\'">' +
+            (!inStock ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl"><span class="text-white text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(0,0,0,0.55);">Habis</span></div>' : '') +
+            '</div>' +
+            '<div class="px-4 pt-3 pb-4 flex flex-col flex-1">' +
+            '<p class="font-bold text-sm leading-snug" style="color:var(--color-primary);">' + htmlEscape(p.name) + '</p>' +
+            '<p class="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">' + htmlEscape(p.description) + '</p>' +
+            '<div class="flex items-center justify-between mt-3 gap-2">' +
+            '<p class="text-sm font-black" style="color:var(--color-primary);">' + fmtRp(p.price) + '</p>' +
+            orderBtn +
+            '</div></div></div>';
     }
+    
 
     function renderCards(data) {
         $grid.empty();
@@ -493,10 +523,10 @@ $(function () {
         var prevDisabled = (cur === 1) ? 'disabled' : '';
         var prevClass    = (cur === 1) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
         html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + prevClass + '"' +
-                ' data-page="' + (cur - 1) + '" ' + prevDisabled +
-                ' style="border-color:var(--color-border);">&#8592; Prev</button>';
+                 ' data-page="' + (cur - 1) + '" ' + prevDisabled +
+                 ' style="border-color:var(--color-border);">&#8592; Prev</button>';
 
-        // Page number window: first, last, and current ±2
+        // Page number window
         var pages = [];
         for (var i = 1; i <= last; i++) {
             if (i === 1 || i === last || (i >= cur - 2 && i <= cur + 2)) {
@@ -522,8 +552,8 @@ $(function () {
         var nextDisabled = (cur === last) ? 'disabled' : '';
         var nextClass    = (cur === last) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
         html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + nextClass + '"' +
-                ' data-page="' + (cur + 1) + '" ' + nextDisabled +
-                ' style="border-color:var(--color-border);">Next &#8594;</button>';
+                 ' data-page="' + (cur + 1) + '" ' + nextDisabled +
+                 ' style="border-color:var(--color-border);">Next &#8594;</button>';
 
         html += '</div>';
         $nav.html(html);
@@ -552,7 +582,7 @@ $(function () {
                 $('#empty-state').toggleClass('hidden', res.data.length > 0);
             })
             .fail(function () {
-                showCartToast('Gagal memuat produk. Silakan coba lagi.', true);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal memuat produk. Silakan coba lagi.' });
             })
             .always(function () {
                 $grid.css({ opacity: '1', 'pointer-events': '' });
@@ -711,48 +741,112 @@ $(function () {
         $('html, body').animate({ scrollTop: $grid.offset().top - 80 }, 200);
     });
 
-    /* ── Init ──────────────────────────────────────────────── */
+    /* ── Init Awal Halaman ─────────────────────────────────── */
     loadProducts(1);
 
     /* ══════════════════════════════════════════════════════════
        PRODUCT DETAIL MODAL
-    ══════════════════════════════════════════════════════════ */
-    $(document).on('click', '.btn-pesan', function () {
-        if (!isLoggedIn) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Belum Login!',
-                text: 'Silakan login atau daftar untuk memesan.',
-                showCancelButton: true,
-                confirmButtonText: 'Login / Daftar',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#a81d1d'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "{{ route('login') }}?redirect_to=" + encodeURIComponent(window.location.href);
-                }
-            });
-            return;
+       ══════════════════════════════════════════════════════════ */
+    $(document).on('click', '.product-card, .btn-pesan', function (e) {
+        // Intersepsi: Jika yang dklik adalah tombol wishlist bunder, hentikan logic modalbox
+        if ($(e.target).closest('.btn-wishlist').length) return;
+
+        var $targetData = $(this).hasClass('btn-pesan') ? $(this) : $(this).find('.btn-pesan');
+        
+        if (!$targetData.data('id')) return;
+
+        currentProductId    = $targetData.data('id');
+        currentProductPrice = parseInt($targetData.data('price'), 10) || 0;
+        currentProductImage = $targetData.data('image');
+        currentProductDesc  = $targetData.data('description');
+        var currentProductName = $targetData.data('name');
+
+        $('#modal-title').text(currentProductName);
+        $('#modal-price').text(fmtRp(currentProductPrice) + ' / pcs');
+        $('#modal-description').text(currentProductDesc ? currentProductDesc : 'Tidak ada deskripsi produk.');
+        $('#modal-image').attr({ src: currentProductImage ? currentProductImage : '{{ asset("assets/img/CA_ORIGINAL.png") }}', alt: currentProductName });
+        
+        // Simpan id produk aktif saat ini ke DOM data-id wishlist modal
+        $('#modal-btn-wishlist').data('id', currentProductId);
+
+        // Ambil info status warna love dari card katalog pembungkus utama
+        var $cardHeart = $('.product-card[data-id="' + currentProductId + '"]').find('.btn-wishlist svg');
+        var isWishlisted = $cardHeart.hasClass('text-red-500');
+
+        // Sinkronisasi status warna hati instant di dalam modal
+        var $modalSvg = $('#modal-btn-wishlist').find('svg');
+        if (isWishlisted) {
+            $modalSvg.removeClass('text-gray-400').addClass('text-red-500').attr('fill', 'currentColor');
+        } else {
+            $modalSvg.removeClass('text-red-500').addClass('text-gray-400').attr('fill', 'none');
         }
 
-        var $b = $(this);
-        currentProductId    = $b.data('id');
-        currentProductPrice = parseInt($b.data('price'), 10) || 0;
-        currentProductImage = $b.data('image');
-        currentProductDesc  = $b.data('description');
-
-        $('#modal-title').text($b.data('name'));
-        $('#modal-price').text(fmtRp(currentProductPrice) + ' / pcs');
-        $('#modal-description').text(currentProductDesc);
-        $('#modal-image').attr({ src: currentProductImage, alt: $b.data('name') });
-        $('#modal-qty').text('1');
+        modalQty = 1;
+        $('#modal-qty').text(modalQty);
         $('#product-modal').removeClass('hidden').addClass('flex');
         $('body').css('overflow', 'hidden');
     });
 
+    
+
+    /* ── Core Logic Operasional Wishlist Love (Global Event Listener) ── */
+    $(document).on('click', '.btn-wishlist, #modal-btn-wishlist', function (e) {
+        
+        e.stopPropagation(); // Amankan agar modal luar tidak memicu bubbling click
+
+        if (!isLoggedIn) {
+            closeModal();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Login!',
+                text: 'Silakan login terlebih dahulu untuk menyukai produk.',
+                confirmButtonColor: '#EF4444'
+            });
+            return;
+        }
+
+        let $clickedBtn = $(this);
+        let productId = $clickedBtn.data('id');
+
+        // Seleksi kedua tombol secara kolektif (tombol di katalog dan tombol di modal detail)
+        let $bothButtons = $('.btn-wishlist[data-id="' + productId + '"], #modal-btn-wishlist[data-id="' + productId + '"]');
+        let $bothSvgs = $bothButtons.find('svg');
+
+        $bothButtons.prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('wishlist.toggle') }}",
+            type: "POST",
+            data: { product_id: productId },
+            success: function(response) {
+                if(response.success) {
+                    // TAMBAHKAN BARIS INI: Untuk memperbarui angka badge di navbar secara realtime
+                    $('#wishlist-badge').text(response.count);
+
+                    if(response.status === 'added') {
+                        $bothSvgs.removeClass('text-gray-400').addClass('text-red-500').attr('fill', 'currentColor');
+                        showCartToast(response.message);
+                    } else {
+                        $bothSvgs.removeClass('text-red-500').addClass('text-gray-400').attr('fill', 'none');
+                        showCartToast(response.message);
+                    }
+                }
+            },
+            error: function() {
+                Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal memproses wishlist.' });
+            },
+            complete: function() {
+                $bothButtons.prop('disabled', false);
+            }
+        });
+    });
+
+    
+
     /* ── Add to cart (outline button) — stay on page ────── */
     $(document).on('click', '.btn-add-only', function () {
         if (!isLoggedIn) {
+            closeModal();
             Swal.fire({
                 icon: 'warning',
                 title: 'Belum Login!',
@@ -805,6 +899,7 @@ $(function () {
     /* ── Pesan Sekarang (solid button) — add then redirect ─ */
     $(document).on('click', '.btn-order-now', function () {
         if (!isLoggedIn) {
+            closeModal();
             Swal.fire({
                 icon: 'warning',
                 title: 'Belum Login!',
@@ -849,6 +944,8 @@ $(function () {
         });
     });
 
+    /* ── Toast Notification ────────────────────────────────── */
+    style="z-index: 999999;"
     function showCartToast(msg, isError) {
         var bg = isError ? '#c00f0c' : '#A6171C';
         var $t = $('<div>').text(msg).css({
@@ -857,12 +954,13 @@ $(function () {
             background: bg, color: '#fff',
             padding: '11px 28px', borderRadius: '999px',
             fontWeight: '700', fontSize: '14px',
-            zIndex: 99999, boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+            zIndex: 999999, boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
             whiteSpace: 'nowrap'
         }).appendTo('body');
         setTimeout(function () { $t.fadeOut(300, function () { $(this).remove(); }); }, 2500);
     }
 
+    /* ── Modal Qty Plus & Minus ────────────────────────────── */
     $('#modal-qty-plus').on('click', function () {
         var q = parseInt($('#modal-qty').text(), 10);
         $('#modal-qty').text(q + 1);
@@ -873,12 +971,14 @@ $(function () {
         if (q > 1) $('#modal-qty').text(q - 1);
     });
 
+    /* ── Close Modal Helpers ───────────────────────────────── */
     function closeModal() {
         $('#product-modal').addClass('hidden').removeClass('flex');
         $('body').css('overflow', '');
     }
 
     $('#modal-close').on('click', closeModal);
+    
     $('#product-modal').on('click', function (e) {
         if (!$(e.target).closest('#product-modal-box').length) closeModal();
     });
@@ -887,7 +987,7 @@ $(function () {
         if (e.key === 'Escape') closeModal();
     });
 
-    /* Prevent navbar search form from page-navigating on menu (live filter handles it) */
+    /* Mencegah default navbar search submit form */
     $('#navbar-search-form').on('submit', function (e) {
         e.preventDefault();
     });
@@ -895,5 +995,4 @@ $(function () {
 });
 </script>
 @endpush
-
 @endsection

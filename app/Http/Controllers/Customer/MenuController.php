@@ -78,17 +78,23 @@ class MenuController extends Controller
 
         $paginated = $q->paginate(15);
 
+        // Ambil daftar ID produk yang di-wishlist oleh user yang sedang login
+        $wishlistProductIds = [];
+        if (auth()->check()) {
+            $wishlistProductIds = auth()->user()->wishlistProducts()->pluck('products.id')->toArray();
+        }
+
         $data = $paginated->getCollection()->map(fn ($p) => [
-            'id'           => $p->id,
-            'name'         => $p->name,
-            'description'  => $p->description ?? '',
-            'price'        => (int) $p->price,
-            'image_url'    => $p->image
-                                 ? asset($p->image)
-                                 : asset('assets/img/CA_ORIGINAL.png'),
-            'is_available' => (bool) $p->is_available,
-            'stock'        => (int) $p->stock,
-            'category'     => ['name' => $p->category?->name ?? ''],
+            'id'            => $p->id,
+            'name'          => $p->name,
+            'description'   => $p->description ?? '',
+            'price'         => (int) $p->price,
+            'image_url'     => $p->image ? asset($p->image) : asset('assets/img/CA_ORIGINAL.png'),
+            'is_available'  => (bool) $p->is_available,
+            'stock'         => (int) $p->stock,
+            'category'      => ['name' => $p->category?->name ?? ''],
+            // Tambahkan pengecekan ini agar frontend tahu status wishlist-nya
+            'is_wishlisted' => in_array($p->id, $wishlistProductIds),
         ]);
 
         return response()->json([

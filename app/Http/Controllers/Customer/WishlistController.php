@@ -19,25 +19,26 @@ class WishlistController extends Controller
     // Mengontrol tambah/hapus wishlist berbasis AJAX
     public function toggle(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id'
-        ]);
+        $user = auth()->user();
+        $productId = $request->input('product_id');
 
-        $user = Auth::user();
-        $productId = $request->product_id;
+        // ... (Ini kode logika attach/detach kamu yang sudah ada, biarkan tetap seperti itu) ...
+        if ($user->wishlistProducts()->where('product_id', $productId)->exists()) {
+            $user->wishlistProducts()->detach($productId);
+            $status = 'removed';
+            $message = 'Berhasil dihapus dari wishlist!';
+        } else {
+            $user->wishlistProducts()->attach($productId);
+            $status = 'added';
+            $message = 'Berhasil ditambahkan ke wishlist!';
+        }
 
-        // Jika produk sudah di-wishlist, hapus (detach). Jika belum, tambahkan (attach).
-        $isAttached = $user->wishlistProducts()->toggle($productId);
-        
-        $exists = in_array($productId, $isAttached['attached']);
-        $status = $exists ? 'added' : 'removed';
-        $message = $exists ? 'Produk berhasil ditambahkan ke wishlist.' : 'Produk dihapus dari wishlist.';
-
+        // PASTIKAN BAGIAN RETURN JSON KAMU DI BAWAH INI MEMILIKI 'count'
         return response()->json([
             'success' => true,
-            'status' => $status,
+            'status'  => $status,
             'message' => $message,
-            'count' => $user->wishlistProducts()->count()
+            'count'   => $user->wishlistProducts()->count() // <-- Tambahkan/pastikan baris ini ada!
         ]);
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
 @section('title', 'Wishlist Saya - Corndog-Ku')
 
@@ -16,7 +16,8 @@
             @foreach($wishlistItems as $product)
                 <div class="bg-white rounded-2xl p-4 border relative flex flex-col justify-between" style="border-color: var(--color-border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                     <div>
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-40 object-cover rounded-xl mb-4">
+                        
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}">
                         <h3 class="font-bold text-lg mb-1" style="color: var(--color-black);">{{ $product->name }}</h3>
                         <p class="text-sm text-gray-500 mb-4">{{ Str::limit($product->description, 60) }}</p>
                     </div>

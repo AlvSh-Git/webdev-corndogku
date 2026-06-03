@@ -14,6 +14,7 @@ class ProductController extends Controller
         $role       = $this->currentRole();
         $products   = Product::with('category')->where('is_custom', false)->orderBy('category_id')->orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
+        
 
         return view('owner.products', compact('role', 'products', 'categories'));
     }

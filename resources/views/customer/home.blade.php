@@ -216,24 +216,22 @@
          positioned left & right, and centered text. Fluid min-height + py so
          nothing overflows on mobile. --}}
     <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern
-                    min-h-[400px] md:min-h-[500px] flex items-center justify-center
-                    overflow-hidden py-16">
+                    flex items-center justify-center
+                    overflow-hidden py-10">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
-             class="absolute left-[-30px] md:left-[-10px] lg:left-0 top-[55%] lg:top-[60%] -translate-y-1/2
-                    h-[300px] md:h-[450px] lg:h-[550px] xl:h-[650px] w-auto max-w-none object-contain
+             class="absolute top-1/2 -translate-y-1/2 left-0 w-48 md:w-56 lg:w-64 object-contain -translate-x-1/4
                     opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
-             class="absolute right-[-20px] md:right-4 lg:right-12 top-[55%] lg:top-[60%] -translate-y-1/2
-                    h-[200px] md:h-[300px] lg:h-[450px] xl:h-[480px] w-auto max-w-none object-contain
+             class="absolute top-1/2 -translate-y-1/2 right-0 w-48 md:w-56 lg:w-64 object-contain translate-x-1/4
                     opacity-30 md:opacity-100 pointer-events-none z-0">
 
         <div class="relative z-10 flex flex-col items-start text-left px-4 max-w-lg md:max-w-2xl mx-auto">
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">
                 Crispy Corndog,<br>Happy Mood
             </h1>
-            <p class="text-sm md:text-base text-gray-100 mb-8">
+            <p class="text-sm md:text-base text-gray-100 mb-4">
                 Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap gigitan. Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
             </p>
             <a href="{{ route('menu') }}"

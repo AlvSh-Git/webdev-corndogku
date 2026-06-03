@@ -32,7 +32,7 @@
 
             <div class="text-center mb-6">
                 <img src="{{ asset('assets/img/logo.png') }}" alt="Corndog-Ku" class="h-10 w-auto mx-auto mb-4">
-                <h1 class="text-3xl font-extrabold text-gray-900">Daftar</h1>
+                <h1 class="text-3xl font-helvetica font-semibold text-gray-900">Daftar</h1>
             </div>
 
             {{-- Flash error --}}
@@ -70,8 +70,8 @@
 
                     {{-- Nomor Telepon --}}
                     <div>
-                        <input type="tel" name="phone" placeholder="Nomor Telepon (opsional)"
-                               value="{{ old('phone') }}"
+                        <input type="tel" name="phone" placeholder="Nomor WhatsApp"
+                               value="{{ old('phone') }}" required
                                class="w-full px-4 py-2.5 border rounded-md text-sm outline-none focus:border-red-400 transition-colors
                                       @error('phone') border-red-400 @else border-gray-200 @enderror">
                         @error('phone')

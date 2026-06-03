@@ -78,7 +78,7 @@ class ChatbotController extends Controller
                 ->where('is_available', true)
                 ->orderBy('category_id')
                 ->orderBy('name')
-                ->get(['id', 'category_id', 'name', 'price', 'is_custom']);
+                ->get(['id', 'category_id', 'name', 'description', 'price', 'is_custom']);
         } catch (\Throwable $e) {
             Log::error('Chatbot context query failed', ['error' => $e->getMessage()]);
             return 'Data menu sementara tidak tersedia.';
@@ -96,7 +96,12 @@ class ChatbotController extends Controller
                 $priceLabel = $price > 0
                     ? 'Rp' . number_format($price, 0, ',', '.')
                     : 'komponen custom (gratis)';
-                $lines[] = "- {$p->name}: {$priceLabel}";
+
+                // Inject the real composition/ingredients so the model is grounded
+                // and cannot invent what's inside an item.
+                $desc = trim((string) $p->description) ?: $this->fallbackDescription($p->name);
+
+                $lines[] = "- {$p->name} ({$priceLabel}): {$desc}";
             }
         }
 
@@ -104,6 +109,45 @@ class ChatbotController extends Controller
         $lines[] = 'Custom Corndog: rakit sendiri, harga mulai Rp16.000.';
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Last-resort composition text derived from the product name, used only when
+     * the database `description` is empty. Keeps the RAG context from ever
+     * shipping a blank ingredient line (which is what invites hallucination).
+     */
+    private function fallbackDescription(string $name): string
+    {
+        $n = mb_strtolower($name);
+
+        $hints = [
+            'mozza'      => 'mengandung keju mozzarella lumer',
+            'cheese'     => 'mengandung keju',
+            'keju'       => 'mengandung keju',
+            'sosis'      => 'mengandung sosis',
+            'sausage'    => 'mengandung sosis',
+            'potato'     => 'dengan balutan kentang crispy',
+            'ramen'      => 'dengan topping ramen crispy',
+            'choco'      => 'dengan glaze coklat',
+            'coklat'     => 'dengan glaze coklat',
+            'milk'       => 'dengan glaze susu',
+            'greentea'   => 'dengan glaze greentea',
+            'taro'       => 'dengan glaze taro',
+            'strawberry' => 'dengan rasa strawberry',
+            'es teler'   => 'minuman es segar',
+            'bingsoo'    => 'es serut ala Korea',
+        ];
+
+        $matched = [];
+        foreach ($hints as $needle => $phrase) {
+            if (str_contains($n, $needle)) {
+                $matched[] = $phrase;
+            }
+        }
+
+        return $matched
+            ? ('Menu ' . implode(', ', $matched) . '.')
+            : 'Komposisi belum tercatat — sarankan pelanggan tanya admin untuk detail bahan.';
     }
 
     /**
@@ -129,6 +173,7 @@ class ChatbotController extends Controller
             'address' => $this->storeAddress(),
             'hours'   => $this->scheduleHours($schedule),
             'status'  => $statusLine,
+            'phone'   => (string) config('store.phone'),
         ];
     }
 
@@ -142,20 +187,24 @@ class ChatbotController extends Controller
         $alamat  = $storeInfo['address'];
         $jamBuka = $storeInfo['hours'];
         $status  = $storeInfo['status'];
+        $phone   = $storeInfo['phone'];
 
         return "Kamu adalah asisten virtual Corndog-Ku. Panggil pelanggan dengan sebutan 'Kak'. Gunakan bahasa Indonesia santai, ramah, dan luwes (seperti admin sosmed kekinian). Jangan menggunakan bahasa baku atau kaku.\n\n"
-             . "PERANMU: HANYA menjawab tentang menu Corndog-Ku, harga, cara pemesanan, lokasi, dan jam buka.\n\n"
-             . "INFO LOKASI & JAM BUKA (Gunakan bahasa santai saat menjawab):\n"
+             . "PERANMU: HANYA menjawab tentang menu Corndog-Ku, harga, cara pemesanan, lokasi, jam buka, dan nomor telepon/kontak.\n\n"
+             . "INFO LOKASI, JAM BUKA & KONTAK (Gunakan bahasa santai saat menjawab):\n"
              . "- Lokasi: {$alamat}\n"
              . "- Jam Buka: {$jamBuka}\n"
-             . "- Status Saat Ini: {$status}\n\n"
+             . "- Status Saat Ini: {$status}\n"
+             . "- Nomor Telepon/WA: {$phone}\n\n"
              . "INFO MENU SAAT INI:\n"
              . $businessContext . "\n\n"
              . "ATURAN MUTLAK (SANKSI TEGAS):\n"
              . "1. DILARANG KERAS membahas coding, IT, pelajaran, atau topik di luar Corndog-Ku.\n"
              . "2. Jika ditanya hal di luar konteks, tolak dengan kalimat template ini: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'\n"
              . "3. Jawab sesingkat dan seasik mungkin. Jangan bertele-tele.\n"
-             . "4. Kalau ditanya soal buka/tutup sekarang, jawab sesuai 'Status Saat Ini' di atas.\n\n"
+             . "4. Kalau ditanya soal buka/tutup sekarang, jawab sesuai 'Status Saat Ini' di atas.\n"
+             . "5. ANTI-HALUSINASI: Kamu DILARANG KERAS mengarang, menebak, atau menambahkan menu, harga, atau komposisi bahan sendiri. HANYA gunakan informasi yang ada di [INFO MENU SAAT INI]. Jika bahan tidak disebutkan di sana, jangan dikarang!\n"
+             . "6. FILTERING: Jika pelanggan meminta menu TANPA bahan tertentu (misal: 'tanpa keju' atau 'alergi sosis'), kamu WAJIB mengecek deskripsi menu dan DILARANG merekomendasikan menu yang mengandung bahan tersebut.\n\n"
              . "CONTOH PERCAKAPAN:\n"
              . "User: 'Lokasinya dimana min?'\n"
              . "Kamu: 'Lokasi Corndog-Ku ada di {$alamat}, Kak! Mampir yuk! 🌭'\n"
@@ -163,6 +212,10 @@ class ChatbotController extends Controller
              . "Kamu: 'Jam buka kita {$jamBuka} ya Kak. Ditunggu orderannya!'\n"
              . "User: 'Sekarang buka gak?'\n"
              . "Kamu: '{$status}, Kak! 🌭'\n"
+             . "User: 'nomor wa atau teleponnya berapa min?'\n"
+             . "Kamu: 'Kakak bisa hubungi Corndog-Ku di nomor {$phone} ya! Ditunggu orderannya! 🌭'\n"
+             . "User: 'Ada corndog yang gak pake keju?'\n"
+             . "Kamu: 'Ada dong Kak! Kakak bisa pesen Corndog Full Sausage, isinya full sosis tanpa keju ya! 🌭'\n"
              . "User: 'Tolong buatkan kode Java.'\n"
              . "Kamu: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'";
     }

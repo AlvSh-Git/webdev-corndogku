@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Auth\WhatsAppResetController;
 use App\Http\Controllers\Customer\WelcomeController;
 use App\Http\Controllers\Customer\MenuController;
 use App\Http\Controllers\Customer\CartController;
@@ -72,6 +73,16 @@ Route::middleware('guest')->group(function () {
 
     Route::get('auth/google',          [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
+
+    // ── Google SSO onboarding — complete profile for new users ──
+    Route::get('/register/complete-profile',  [SocialiteController::class, 'showCompleteProfile'])->name('register.complete');
+    Route::post('/register/complete-profile', [SocialiteController::class, 'completeProfile'])->name('register.complete.post')->middleware('throttle:10,1');
+
+    // ── WhatsApp OTP password reset (Fonnte) ──
+    Route::get('/forgot-password',           [WhatsAppResetController::class, 'show'])->name('password.wa.request');
+    Route::post('/forgot-password/send-otp',   [WhatsAppResetController::class, 'sendOtp'])->name('password.wa.send')->middleware('throttle:5,1');
+    Route::post('/forgot-password/verify-otp', [WhatsAppResetController::class, 'verifyOtp'])->name('password.wa.verify')->middleware('throttle:10,1');
+    Route::post('/forgot-password/reset',      [WhatsAppResetController::class, 'resetPassword'])->name('password.wa.reset')->middleware('throttle:10,1');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

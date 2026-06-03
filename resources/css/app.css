@@ -25,3 +25,9 @@
     --shadow-card: 3px 4px 20px 0px rgba(0, 0, 0, 0.25);
 }
 
+/* Brand display font — matches the home hero "Crispy Corndog, Happy Mood".
+   Defined globally so auth/branding headings can share it. */
+.font-helvetica {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+

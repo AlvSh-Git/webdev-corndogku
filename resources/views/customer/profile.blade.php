@@ -1,4 +1,5 @@
 @extends('layouts.customer')
+@php use Illuminate\Support\Facades\Storage; @endphp
 
 @section('title', 'Profil Saya — Corndog-Ku')
 
@@ -29,14 +30,32 @@
 
         {{-- Avatar --}}
         <div class="relative flex-none self-center sm:self-auto">
+
+            {{-- Circle: shows initial OR uploaded photo --}}
             <div id="profile-hero-avatar"
-                 class="w-36 h-36 rounded-full flex items-center justify-center
-                        text-white text-5xl font-bold select-none"
+                 class="w-36 h-36 rounded-full overflow-hidden relative select-none"
                  style="background-color: var(--color-primary);
                         box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
-                {{ strtoupper(mb_substr($user->name, 0, 1)) }}
+
+                {{-- Initial letter (hidden when a photo is set) --}}
+                <span id="profile-initial"
+                      class="absolute inset-0 flex items-center justify-center
+                             text-white text-5xl font-bold
+                             {{ $user->profile_photo ? 'hidden' : '' }}">
+                    {{ strtoupper(mb_substr($user->name, 0, 1)) }}
+                </span>
+
+                {{-- Profile photo (hidden when no photo is set) --}}
+                <img id="profile-photo-preview"
+                     src="{{ $user->profile_photo ? Storage::url($user->profile_photo) : '' }}"
+                     alt="Foto Profil"
+                     class="w-full h-full object-cover absolute inset-0
+                            {{ $user->profile_photo ? '' : 'hidden' }}">
             </div>
+
+            {{-- Camera button — triggers the hidden file input --}}
             <button type="button"
+                    id="camera-btn"
                     title="Ganti Foto"
                     class="absolute bottom-0 right-0 w-14 h-14 flex items-center justify-center
                            rounded-full hover:opacity-80 transition-opacity"
@@ -52,6 +71,13 @@
                           d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
             </button>
+
+            {{-- Hidden file input — opened by the camera button click --}}
+            <input type="file"
+                   id="profile-photo-input"
+                   name="profile_photo"
+                   accept="image/jpeg,image/jpg,image/png,image/webp"
+                   class="hidden">
         </div>
 
         {{-- Greeting + logout --}}
@@ -585,8 +611,13 @@ $(function () {
                     if (res.name) {
                         var initial = res.name.charAt(0).toUpperCase();
                         $('[data-hero-name]').text(res.name + '!');
-                        $('#profile-hero-avatar').text(initial);
-                        $('#navbar-user-avatar').text(initial).attr('title', res.name);
+                        // Only update the initial letter span; keep photo visible if present
+                        $('#profile-initial').text(initial);
+                        $('#navbar-user-avatar').attr('title', res.name);
+                        // Update navbar initial only when no photo is showing
+                        if ($('#navbar-user-avatar img').length === 0) {
+                            $('#navbar-user-avatar').text(initial);
+                        }
                         $('#navbar-user-name').text('Halo, ' + res.name);
                     }
 
@@ -610,6 +641,75 @@ $(function () {
                     var msg = xhr.responseJSON?.message || 'Terjadi kesalahan. Silakan coba lagi.';
                     showAlert(msg, 'error');
                 }
+            },
+        });
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       PROFILE PHOTO UPLOAD
+    ═══════════════════════════════════════════════════════════ */
+    $('#camera-btn').on('click', function () {
+        $('#profile-photo-input').trigger('click');
+    });
+
+    $('#profile-photo-input').on('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+
+        // Client-side validation
+        var allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowed.includes(file.type)) {
+            showAlert('Format tidak didukung. Gunakan JPG, PNG, atau WEBP.', 'error');
+            $(this).val('');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            showAlert('Ukuran foto maksimal 2MB.', 'error');
+            $(this).val('');
+            return;
+        }
+
+        // Instant preview using FileReader
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#profile-photo-preview').attr('src', e.target.result).removeClass('hidden');
+            $('#profile-initial').addClass('hidden');
+        };
+        reader.readAsDataURL(file);
+
+        // Upload to server
+        var formData = new FormData();
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+        formData.append('profile_photo', file);
+
+        $.ajax({
+            type        : 'POST',
+            url         : '{{ route("profile.photo.update") }}',
+            data        : formData,
+            processData : false,
+            contentType : false,
+            success     : function (res) {
+                if (res.success) {
+                    showAlert('Foto profil berhasil diperbarui.', 'success');
+                    // Update the navbar avatar to show the uploaded photo
+                    if (res.photo_url) {
+                        $('#navbar-user-avatar')
+                            .css('background-color', 'transparent')
+                            .html('<img src="' + res.photo_url + '" alt="Foto Profil" ' +
+                                  'style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">');
+                    }
+                } else {
+                    showAlert(res.message || 'Gagal mengunggah foto.', 'error');
+                }
+            },
+            error       : function (xhr) {
+                // Revert preview on failure
+                $('#profile-photo-preview').addClass('hidden').attr('src', '');
+                $('#profile-initial').removeClass('hidden');
+                var msg = xhr.responseJSON && xhr.responseJSON.message
+                    ? xhr.responseJSON.message
+                    : 'Gagal mengunggah foto. Silakan coba lagi.';
+                showAlert(msg, 'error');
             },
         });
     });

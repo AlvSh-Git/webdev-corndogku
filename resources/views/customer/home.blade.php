@@ -202,11 +202,17 @@
 
             @auth
                 <a href="{{ route('profile') }}"
-                   class="w-9 h-9 rounded-full flex items-center justify-center
+                   class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
-                   style="background-color: var(--color-primary);"
+                   style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};"
                    title="{{ auth()->user()->name }}">
-                    {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @if (auth()->user()->profile_photo)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                             alt="{{ auth()->user()->name }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @endif
                 </a>
                 <span class="hidden sm:block text-sm font-semibold"
                       style="color: var(--color-black);">
@@ -326,37 +332,75 @@
 ══════════════════════════════════════════════════════════════ --}}
 <div class="relative w-full bg-[#FFFEF0] pb-16">
 
-    {{-- Hero — solid red section with two separate corndog images absolutely
-         positioned left & right, and centered text. Fluid min-height + py so
-         nothing overflows on mobile. --}}
-    {{-- < lg : vertical stack (images on top, centered text, bottom wave).
-         lg+  : original absolute-positioned layout — DO NOT alter the lg: classes. --}}
+    {{-- Hero — red section.
+         Mobile / tablet (< 1024 px): side-by-side row — text left, corndog right (absolute).
+         Desktop (≥ 1024 px): original absolute-positioned layout (unchanged). --}}
     <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern overflow-hidden
-                    flex flex-col items-center justify-center
-                    lg:flex-row lg:items-center lg:justify-center
-                    pt-0 pb-0 lg:py-10">
+                    lg:flex lg:flex-row lg:items-center lg:justify-center
+                    lg:py-10">
 
-        {{-- LEFT corndog (MOBILE) — floating top-left, mobile-specific asset --}}
-        <img src="{{ asset('assets/img/gmbr_banner_mobile_01.png') }}" alt="Corndog Left"
-             class="block lg:hidden absolute left-[15%] top-[5%] h-[260px] w-auto max-w-none object-contain z-0">
+        {{-- ══ MOBILE & TABLET LAYOUT (hidden on lg+) ══
+             Text sits in the left column; corndog is absolutely anchored to the bottom-right.
+             min-height on the wrapper controls the section height — the image matches it exactly.
+        --}}
+        <div class="lg:hidden relative w-full flex flex-row items-stretch overflow-hidden"
+             style="min-height: clamp(290px, 80vw, 430px);">
 
-        {{-- LEFT corndog (DESKTOP) — preserves perfected lg: layout --}}
+            {{-- Text block — left column, above the corndog via z-index --}}
+            <div class="relative z-10 flex flex-col justify-center"
+                 style="width: 57%;
+                        padding-top:    clamp(16px, 4vw,   40px);
+                        padding-bottom: clamp(16px, 4vw,   40px);
+                        padding-left:   clamp(16px, 4.5vw, 36px);
+                        padding-right:  clamp(6px,  1.5vw, 12px);">
+                <h1 class="font-bold text-white leading-tight"
+                    style="font-size: clamp(21px, 6.2vw, 38px);
+                           margin-bottom: clamp(6px, 1.5vw, 12px);">
+                    Crispy<br>Corndog,<br>Happy Mood
+                </h1>
+                <p class="text-white/80 leading-snug"
+                   style="font-size: clamp(10px, 2.8vw, 15px);
+                          margin-bottom: clamp(12px, 3vw, 22px);">
+                    Corndog hangat, topping melimpah, mozzarella lumer di setiap gigitan.
+                </p>
+                <a href="{{ route('menu') }}"
+                   class="self-start bg-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform whitespace-nowrap"
+                   style="color: #8D1818;
+                          font-size: clamp(11px, 3vw, 15px);
+                          padding: clamp(8px, 2vw, 12px) clamp(18px, 4.8vw, 30px);">
+                    TRY NOW
+                </a>
+            </div>
+
+
+
+            {{-- Corndog — absolutely anchored to bottom-right, clipped by overflow:hidden on wrapper --}}
+            <img src="{{ asset('assets/img/gmbr-home-mobile-crndg.png') }}"
+                 alt="Corndog"
+                 class="absolute bottom-0 right-0 pointer-events-none"
+                 style="height: clamp(250px, 68vw, 370px);
+                        width: auto;
+                        object-fit: contain;
+                        object-position: right bottom;">
+        </div>
+
+        {{-- ══ DESKTOP LAYOUT (≥ 1024 px) — original layout preserved unchanged ══ --}}
+
+        {{-- Left corndog (desktop only) --}}
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
              class="hidden lg:block absolute lg:left-0 top-[55%] lg:top-[58%] -translate-y-1/2 lg:h-[135%] w-auto max-w-none object-contain pointer-events-none z-0">
 
-        {{-- RIGHT corndog (MOBILE + DESKTOP) — top-right & tilted on mobile, original on lg --}}
+        {{-- Right corndog (desktop only) --}}
         <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
-             class="absolute right-[15%] lg:right-12 top-[8%] lg:top-[58%] translate-y-0 lg:-translate-y-1/2 h-[220px] lg:h-[105%] w-auto max-w-none object-contain rotate-[15deg] lg:rotate-0 opacity-100 pointer-events-none z-0">
+             class="hidden lg:block absolute lg:right-12 lg:top-[58%] -translate-y-1/2 lg:h-[105%] w-auto max-w-none object-contain pointer-events-none z-0">
 
-        <div class="relative z-10 flex flex-col items-center text-center
-                    lg:items-start lg:text-left
-                    mt-[280px] md:mt-[320px] lg:mt-0
-                    px-6 lg:px-4 max-w-lg md:max-w-2xl mx-auto
-                    pb-14 lg:py-0">
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">
+        {{-- Text content (desktop only) --}}
+        <div class="hidden lg:flex relative z-10 flex-col items-start text-left
+                    px-6 lg:px-4 max-w-lg lg:max-w-2xl mx-auto lg:py-0">
+            <h1 class="text-3xl lg:text-6xl font-bold text-white mb-2 leading-tight">
                 Crispy Corndog,<br>Happy Mood
             </h1>
-            <p class="text-sm md:text-base text-gray-100 mb-4">
+            <p class="text-sm lg:text-base text-gray-100 mb-4">
                 Nikmati corndog hangat dengan topping melimpah dan mozzarella yang lumer di setiap gigitan. Dibuat fresh setiap hari untuk nemenin mood kamu kapan aja.
             </p>
             <a href="{{ route('menu') }}"
@@ -364,13 +408,6 @@
                 TRY NOW
             </a>
         </div>
-
-        {{-- MOBILE-only white wave — transitions the red banner into the page below --}}
-        <svg class="lg:hidden absolute bottom-0 left-0 w-full block" viewBox="0 0 1440 90"
-             preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
-             style="height: 42px;" aria-hidden="true">
-            <path fill="#FFFEF0" d="M0,50 C240,90 480,10 720,40 C960,70 1200,90 1440,45 L1440,90 L0,90 Z"></path>
-        </svg>
     </section>
 
     {{-- Ticker band — z-10 + negative margin so the poster's corndog stick breaks on top of it --}}
@@ -429,10 +466,10 @@
 
                 {{-- Right: 1 large card --}}
                 <div id="section-buy-now" class="flex h-full">
-                    <a href="{{ route('menu') }}" class="group block w-full h-full">
+                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full h-full">
                         <img src="{{ asset('assets/img/home_card_03.png') }}"
                              alt="Promo 3"
-                             class="w-full h-full object-cover rounded-[2rem] shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                             class="w-full h-full object-cover block">
                     </a>
                 </div>
             </div>

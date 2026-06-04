@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -58,6 +59,35 @@ class ProfileController extends Controller
             'message' => 'Profil berhasil disimpan.',
             'name'    => $user->name,
             'phone'   => $user->phone,
+        ]);
+    }
+
+    public function uploadPhoto(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate([
+            'profile_photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $user = auth()->user();
+
+        // Delete the old photo file if one exists
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+        $user->profile_photo = $path;
+        $user->save();
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Foto profil berhasil diperbarui.',
+            'photo_url' => Storage::url($path),
         ]);
     }
 }

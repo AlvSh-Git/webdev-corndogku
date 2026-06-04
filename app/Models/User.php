@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
+        'profile_photo',
         'role',
         'status',
         'cart_data',

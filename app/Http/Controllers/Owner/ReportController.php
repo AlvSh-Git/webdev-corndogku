@@ -128,7 +128,7 @@ class ReportController extends Controller
         $daily = DB::table('orders')
             ->selectRaw('DATE(created_at) as date, SUM(total_price) as revenue')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereNotIn('status', ['Cancelled'])
+            ->where('status', 'Completed')
             ->groupBy('date')
             ->pluck('revenue', 'date')
             ->map(fn($v) => (int) $v)

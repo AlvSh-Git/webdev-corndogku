@@ -33,7 +33,8 @@ class DashboardController extends Controller
                 ->latest()
                 ->get();
 
-            $revenueToday  = (int) $dbOrders->whereNotIn('status', ['Cancelled'])->sum('total_price');
+            // Revenue counts only Completed orders (money actually realized).
+            $revenueToday  = (int) $dbOrders->where('status', 'Completed')->sum('total_price');
             $totalOrders   = $dbOrders->whereNotIn('status', ['Cancelled'])->count();
             $onlineOrders  = $dbOrders->where('order_type', 'online')->whereNotIn('status', ['Cancelled'])->count();
             $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->whereNotIn('status', ['Cancelled'])->count();
@@ -41,7 +42,7 @@ class DashboardController extends Controller
 
             $yesterday        = Carbon::parse($selectedDate)->subDay()->toDateString();
             $revenueYesterday = Order::whereDate('created_at', $yesterday)
-                ->whereNotIn('status', ['Cancelled'])
+                ->where('status', 'Completed')
                 ->sum('total_price');
             $revenueGrowth = $revenueYesterday > 0
                 ? (int) round((($revenueToday - $revenueYesterday) / $revenueYesterday) * 100)
@@ -94,7 +95,7 @@ class DashboardController extends Controller
             $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
                 ->whereDate('created_at', '>=', $weekStart->toDateString())
                 ->whereDate('created_at', '<=', $weekEnd->toDateString())
-                ->whereNotIn('status', ['Cancelled'])
+                ->where('status', 'Completed')
                 ->groupByRaw('DAYOFWEEK(created_at)')
                 ->pluck('rev', 'dow');
 
@@ -202,7 +203,8 @@ class DashboardController extends Controller
                 ->whereDate('created_at', $date)
                 ->get();
 
-            $revenueToday  = (int) $dbOrders->whereNotIn('status', ['Cancelled'])->sum('total_price');
+            // Revenue & profit count only Completed orders (money actually realized).
+            $revenueToday  = (int) $dbOrders->where('status', 'Completed')->sum('total_price');
             $totalOrders   = $dbOrders->whereNotIn('status', ['Cancelled'])->count();
             $onlineOrders  = $dbOrders->where('order_type', 'online')->whereNotIn('status', ['Cancelled'])->count();
             $cashierOrders = $dbOrders->whereIn('order_type', ['dine-in', 'takeaway'])->whereNotIn('status', ['Cancelled'])->count();
@@ -212,13 +214,13 @@ class DashboardController extends Controller
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->join('products', 'order_items.product_id', '=', 'products.id')
                 ->whereDate('orders.created_at', $date)
-                ->whereNotIn('orders.status', ['Cancelled'])
+                ->where('orders.status', 'Completed')
                 ->sum(DB::raw('order_items.quantity * products.cost_price'));
             $profitToday = max(0, (int) ($revenueToday - $totalCostToday));
 
             $yesterday        = Carbon::parse($date)->subDay()->toDateString();
             $revenueYesterday = (int) Order::whereDate('created_at', $yesterday)
-                ->whereNotIn('status', ['Cancelled'])->sum('total_price');
+                ->where('status', 'Completed')->sum('total_price');
             $revenueGrowth = $revenueYesterday > 0
                 ? (int) round((($revenueToday - $revenueYesterday) / $revenueYesterday) * 100)
                 : ($revenueToday > 0 ? 100 : 0);
@@ -252,7 +254,7 @@ class DashboardController extends Controller
             $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
                 ->whereDate('created_at', '>=', $weekStart->toDateString())
                 ->whereDate('created_at', '<=', $weekEnd->toDateString())
-                ->whereNotIn('status', ['Cancelled'])
+                ->where('status', 'Completed')
                 ->groupByRaw('DAYOFWEEK(created_at)')
                 ->pluck('rev', 'dow');
 

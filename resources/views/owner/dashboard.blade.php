@@ -16,28 +16,16 @@
     $pendingOrders = $pendingOrders ?? 0;
     $storeStatus   = $storeStatus   ?? 'available';
 
-    $chartData = $chartData ?? [
-        ['label'=>'Mon','value'=>200000],
-        ['label'=>'Tue','value'=>590000],
-        ['label'=>'Wed','value'=>550000],
-        ['label'=>'Thu','value'=>650000],
-        ['label'=>'Fri','value'=>400000],
-        ['label'=>'Sat','value'=>500000],
-        ['label'=>'Sun','value'=>0],
-    ];
+    // Real weekly revenue is injected by the controller; default to a zero-filled
+    // week (no demo numbers) — the AJAX getChartData repaints it on load.
+    $chartData = $chartData ?? array_map(
+        fn ($label) => ['label' => $label, 'value' => 0],
+        ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    );
 
-    $orders = $orders ?? array_map(fn($o) => (object) $o, [
-        ['db_id'=>null,'id'=>'#C3322','is_new'=>true, 'customer'=>'Gabriella','sub'=>'Customer','source'=>'online','items'=>'2× Mix Mozzarella','status'=>'Pending','time'=>'11:27 AM','total'=>35200,'order_type'=>'takeaway','payment'=>'QRIS',
-         'order_items'=>[['name'=>'Mix Mozzarella','variant'=>'Sosis + Mozza','price'=>15000,'qty'=>2,'subtotal'=>30000,'img'=>'CA_MOZZA.png'],['name'=>'Original Corndog','variant'=>'Sosis + Batter','price'=>5200,'qty'=>1,'subtotal'=>5200,'img'=>'CA_ORIGINAL.png']]],
-        ['db_id'=>null,'id'=>'#C3323','is_new'=>true, 'customer'=>'Olivia','sub'=>'Customer','source'=>'online','items'=>'1× Original','status'=>'Pending','time'=>'11:22 AM','total'=>16000,'order_type'=>'online','payment'=>'QRIS',
-         'order_items'=>[['name'=>'Original Corndog','variant'=>'Sosis + Batter','price'=>16000,'qty'=>1,'subtotal'=>16000,'img'=>'CA_ORIGINAL.png']]],
-        ['db_id'=>null,'id'=>'#C3349','is_new'=>false,'customer'=>'Ricky','sub'=>'Customer','source'=>'online','items'=>'1× Squid Nori','status'=>'Preparing','time'=>'10:16 AM','total'=>18000,'order_type'=>'dine-in','payment'=>'Cash',
-         'order_items'=>[['name'=>'Squid Nori Corndog','variant'=>'Squid Ink + Nori','price'=>18000,'qty'=>1,'subtotal'=>18000,'img'=>'CA_SQUID_NORI.png']]],
-        ['db_id'=>null,'id'=>'#C3340','is_new'=>false,'customer'=>'Siti Anggraeni','sub'=>'Customer','source'=>'cashier','items'=>'2× Mozza Cheese','status'=>'Ready','time'=>'11:05 AM','total'=>24000,'order_type'=>'takeaway','payment'=>'Debit',
-         'order_items'=>[['name'=>'Mozza Cheese','variant'=>'Sosis + Mozza Keju','price'=>12000,'qty'=>2,'subtotal'=>24000,'img'=>'CA_MOZZA.png']]],
-        ['db_id'=>null,'id'=>'#C3350','is_new'=>false,'customer'=>'Nadia','sub'=>'Customer','source'=>'online','items'=>'3× Mie Mozza','status'=>'Completed','time'=>'09:30 AM','total'=>45000,'order_type'=>'online','payment'=>'QRIS',
-         'order_items'=>[['name'=>'Mix Mozzarella','variant'=>'Sosis + Mozza','price'=>15000,'qty'=>3,'subtotal'=>45000,'img'=>'CA_MOZZA.png']]],
-    ]);
+    // Real orders are injected by the controller; default to an empty list so the
+    // board renders true zeros (the AJAX fetchOrders/fetchStats then populate it).
+    $orders = $orders ?? [];
 
     $ordersItems = ($orders instanceof \Illuminate\Contracts\Pagination\Paginator)
         ? collect($orders->items()) : collect($orders);
@@ -343,15 +331,15 @@
             </div>
             <div class="rounded-xl p-3 flex flex-col gap-1" style="background-color:rgba(249,115,22,0.10);">
                 <span class="text-[11px] font-semibold" style="color:#C2410C;">Preparing</span>
-                <span class="text-2xl font-black" style="color:#F97316;">{{ $tabCounts['Preparing'] ?? 0 }}</span>
+                <span id="widget-preparing-orders" class="text-2xl font-black" style="color:#F97316;">{{ $tabCounts['Preparing'] ?? 0 }}</span>
             </div>
             <div class="rounded-xl p-3 flex flex-col gap-1" style="background-color:rgba(34,197,94,0.10);">
                 <span class="text-[11px] font-semibold" style="color:#15803D;">Ready</span>
-                <span class="text-2xl font-black" style="color:#22C55E;">{{ $tabCounts['Ready'] ?? 0 }}</span>
+                <span id="widget-ready-orders" class="text-2xl font-black" style="color:#22C55E;">{{ $tabCounts['Ready'] ?? 0 }}</span>
             </div>
             <div class="rounded-xl p-3 flex flex-col gap-1" style="background-color:rgba(99,102,241,0.10);">
                 <span class="text-[11px] font-semibold" style="color:#4338CA;">Completed</span>
-                <span class="text-2xl font-black" style="color:#6366F1;">{{ $tabCounts['Completed'] ?? 0 }}</span>
+                <span id="widget-completed-orders" class="text-2xl font-black" style="color:#6366F1;">{{ $tabCounts['Completed'] ?? 0 }}</span>
             </div>
         </div>
     </div>
@@ -763,7 +751,8 @@ $(function () {
                 );
 
                 $('#widget-profit').text('Rp ' + Number(res.profit).toLocaleString('id-ID'));
-                $('#widget-pending-orders').text(Number(res.pendingOrders));
+                // Order-status widget counts are driven by fetchOrders (res.counts),
+                // which is carryover-aware; don't overwrite them with the date-scoped stat here.
             });
     }
 
@@ -923,6 +912,13 @@ $(function () {
                     if(res.counts&&res.counts[key]!==undefined)
                         $('.order-tab[data-tab="'+label+'"] .tab-count').text('('+res.counts[key]+')');
                 });
+                // Keep the "Order Status" widget in sync with the live (carryover-aware) counts.
+                if(res.counts){
+                    $('#widget-pending-orders').text(res.counts['Pending']||0);
+                    $('#widget-preparing-orders').text(res.counts['Preparing']||0);
+                    $('#widget-ready-orders').text(res.counts['Ready']||0);
+                    $('#widget-completed-orders').text(res.counts['Completed']||0);
+                }
                 if(!res.items||!res.items.length){
                     $('#owner-orders-tbody').html('<tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA3AF;font-size:13px;">Tidak ada order ditemukan</td></tr>');
                 }else{

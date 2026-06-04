@@ -95,7 +95,7 @@ class DashboardController extends Controller
             $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
                 ->whereDate('created_at', '>=', $weekStart->toDateString())
                 ->whereDate('created_at', '<=', $weekEnd->toDateString())
-                ->whereNotIn('status', ['Cancelled'])
+                ->where('status', 'Completed')
                 ->groupByRaw('DAYOFWEEK(created_at)')
                 ->pluck('rev', 'dow');
 
@@ -105,8 +105,9 @@ class DashboardController extends Controller
                 $chartData[] = ['label' => $label, 'value' => (int) ($rawChart[$dow] ?? 0)];
             }
 
+            // Cost basis matches the revenue basis (Completed only) so profit is consistent.
             $totalCostToday = isset($dbOrders)
-                ? $dbOrders->whereNotIn('status', ['Cancelled'])
+                ? $dbOrders->where('status', 'Completed')
                     ->flatMap(fn ($o) => $o->items)
                     ->sum(fn ($item) => $item->quantity * ($item->product?->cost_price ?? 0))
                 : 0;
@@ -273,7 +274,7 @@ class DashboardController extends Controller
             $rawChart = Order::selectRaw('DAYOFWEEK(created_at) as dow, SUM(total_price) as rev')
                 ->whereDate('created_at', '>=', $weekStart->toDateString())
                 ->whereDate('created_at', '<=', $weekEnd->toDateString())
-                ->whereNotIn('status', ['Cancelled'])
+                ->where('status', 'Completed')
                 ->groupByRaw('DAYOFWEEK(created_at)')
                 ->pluck('rev', 'dow');
 

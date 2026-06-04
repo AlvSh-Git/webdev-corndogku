@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function index()
     {
         $role       = $this->currentRole();
-        $products   = Product::with('category')->where('is_custom', false)->orderBy('category_id')->orderBy('name')->get();
+        $products   = Product::with('category')->orderBy('category_id')->orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
         
 

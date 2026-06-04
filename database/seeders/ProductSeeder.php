@@ -247,11 +247,49 @@ class ProductSeeder extends Seeder
             Product::firstOrCreate(
                 ['name' => $data['name']],
                 [
-                    'category_id' => $categories[$data['category']],
-                    'description' => $data['description'],
-                    'price'       => $data['price'],
-                    'image'       => 'assets/img/' . $data['nama'] . '.png',
-                    'is_custom'   => false,
+                    'category_id'  => $categories[$data['category']],
+                    'description'  => $data['description'],
+                    'price'        => $data['price'],
+                    'image'        => 'assets/img/' . $data['nama'] . '.png',
+                    'stock'        => 50,
+                    'is_available' => true,
+                    'is_custom'    => false,
+                ]
+            );
+        }
+
+        // Custom Corndog ingredients — consumed by the Custom Corndog builder
+        // (see CustomCorndogSeeder for the full rationale on names + image mapping).
+        $customCategoryId = $categories['Custom'] ?? Category::firstOrCreate(['name' => 'Custom'])->id;
+
+        $customComponents = [
+            // Isian (Step 1) — matched by 'sosis' / 'mozza'; extra price not added.
+            ['Sosis & Mozza', 0,    'custom_sosis_mozza.png'],
+            ['Full Mozza',    0,    'custom_mozza.png'],
+            ['Full Sosis',    0,    'custom_sosis.png'],
+
+            // Varian (Step 2) — matched by 'original' / 'potato' / 'ramen'; extra IS added.
+            ['Original',      0,    'custom_original.png'],
+            ['Potato',        4000, 'custom_potato.png'],
+            ['Ramen',         3000, 'custom_ramen.png'],
+
+            // Sauce (Step 3) — matched by 'ketchup' / 'mayo' / 'sauce'; free.
+            ['Ketchup',       0,    'custom_ketchup.png'],
+            ['Mayonnaise',    0,    'custom_mayonnaise.png'],
+            ['Hot Sauce',     0,    'custom_hotsauce.png'],
+            ['Cheese Sauce',  0,    'custom_cheesesauce.png'],
+        ];
+
+        foreach ($customComponents as [$name, $price, $asset]) {
+            Product::firstOrCreate(
+                ['name' => $name, 'category_id' => $customCategoryId],
+                [
+                    'description'  => 'Komponen custom corndog.',
+                    'price'        => $price,
+                    'image'        => 'assets/img/' . $asset,
+                    'stock'        => 50,
+                    'is_available' => true,
+                    'is_custom'    => true,
                 ]
             );
         }

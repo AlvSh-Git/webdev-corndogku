@@ -16,6 +16,7 @@ class CategorySeeder extends Seeder
             'Combo',
             'Es Teler Kwentel',
             'Bingsoo',
+            'Custom',
         ];
 
         foreach ($categories as $name) {

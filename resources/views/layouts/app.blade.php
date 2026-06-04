@@ -36,7 +36,7 @@
     }
 @endphp
 
-<div class="flex h-screen" style="background-color: var(--color-light);">
+<div class="flex min-h-screen lg:h-screen" style="background-color: var(--color-light);">
 
     {{-- Backdrop overlay --}}
     <div id="sidebar-backdrop"
@@ -126,7 +126,7 @@
     {{-- ════════════════════════════════════════════════════════════
          MAIN CONTENT AREA
     ════════════════════════════════════════════════════════════ --}}
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 min-w-0 flex flex-col lg:overflow-hidden">
 
         {{-- TOP NAVBAR --}}
         <header class="flex-none h-16 flex items-center justify-between
@@ -162,7 +162,7 @@
         </header>
 
         {{-- PAGE CONTENT --}}
-        <main class="flex-1 @yield('main-class', 'overflow-y-auto p-4 sm:p-6 lg:p-8')">
+        <main class="flex-1 min-w-0 @yield('main-class', 'lg:overflow-y-auto p-4 sm:p-6 lg:p-8')">
             @yield('content')
         </main>
 

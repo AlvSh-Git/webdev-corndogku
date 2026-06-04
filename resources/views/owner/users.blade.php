@@ -46,7 +46,7 @@
                                 @js($user->email),
                                 @js($user->active ? 'active' : 'inactive')
                             )"
-                            class="hover:opacity-70 transition-opacity">
+                            class="inline-flex items-center justify-center w-10 h-10 -m-2.5 hover:opacity-70 transition-opacity">
                         <img src="{{ asset('assets/ui/icon-edit-user.svg') }}"
                              alt="Edit"
                              class="w-5 h-5">
@@ -55,7 +55,7 @@
                     <button type="button"
                             title="Delete User"
                             onclick="openDeleteUserModal({{ $user->id }}, @js($user->name))"
-                            class="hover:opacity-70 transition-opacity">
+                            class="inline-flex items-center justify-center w-10 h-10 -m-2.5 hover:opacity-70 transition-opacity">
                         <img src="{{ asset('assets/ui/icon-delete-user.svg') }}"
                              alt="Delete"
                              class="w-5 h-5">

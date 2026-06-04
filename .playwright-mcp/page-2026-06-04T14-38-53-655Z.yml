@@ -1,0 +1,18 @@
+- generic [ref=e2]:
+  - img [ref=e4]
+  - link "Kembali" [ref=e5] [cursor=pointer]:
+    - /url: http://webdev-corndogku.test/login
+    - img [ref=e6]
+    - text: Kembali
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - img "Corndog-Ku" [ref=e11]
+      - heading "Reset Password" [level=1] [ref=e12]
+      - paragraph [ref=e13]: Masukkan email kamu untuk menerima kode OTP via WhatsApp.
+    - generic [ref=e14]:
+      - textbox "Email" [active] [ref=e17]
+      - button "KIRIM OTP VIA WA" [ref=e18]
+    - generic [ref=e19]:
+      - text: Ingat password kamu?
+      - link "Masuk" [ref=e20] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/login

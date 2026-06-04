@@ -1,0 +1,54 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Corndog-Ku" [ref=e4] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test
+        - img "Corndog-Ku" [ref=e5]
+      - generic [ref=e7]:
+        - img
+        - searchbox "Cari produk…" [ref=e8]
+      - generic [ref=e9]:
+        - link "0" [ref=e10] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/wishlist
+          - img [ref=e11]
+          - generic [ref=e13]: "0"
+        - link "0" [ref=e14] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/cart
+          - img [ref=e15]
+          - generic [ref=e17]: "0"
+        - link "T" [ref=e18] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/profile
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - heading "Wishlist Saya ❤️" [level=1] [ref=e22]
+      - generic [ref=e23]:
+        - paragraph [ref=e24]: Kamu belum menambahkan produk apa pun ke wishlist.
+        - link "Lihat Menu" [ref=e25] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/menu
+  - contentinfo [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - img "Corndog-Ku" [ref=e30]
+        - generic [ref=e31]:
+          - heading "Contact Us" [level=4] [ref=e32]
+          - list [ref=e33]:
+            - listitem [ref=e34]: "@corndogku_id"
+            - listitem [ref=e35]: +62 823-2511-0652
+            - listitem [ref=e36]: Jl. Rungkut Mejoyo Utara No.61, Surabaya
+        - generic [ref=e37]:
+          - heading "Follow Us" [level=4] [ref=e38]
+          - generic [ref=e39]:
+            - link "WhatsApp" [ref=e40] [cursor=pointer]:
+              - /url: https://api.whatsapp.com/send/?phone=6282325110652&text&type=phone_number&app_absent=0
+              - img [ref=e41]
+            - link "Instagram" [ref=e43] [cursor=pointer]:
+              - /url: https://www.instagram.com/corndogku_id?igsh=cDN6b2w0dGwydjI3
+              - img [ref=e44]
+      - generic [ref=e46]:
+        - generic [ref=e47]: © 2026 Corndog-Ku. All rights reserved.
+        - generic [ref=e48]:
+          - link "Privacy Policy" [ref=e49] [cursor=pointer]:
+            - /url: "#"
+          - generic [ref=e50]: "|"
+          - link "Terms of Service" [ref=e51] [cursor=pointer]:
+            - /url: "#"

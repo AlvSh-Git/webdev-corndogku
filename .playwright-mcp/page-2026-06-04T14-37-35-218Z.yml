@@ -1,0 +1,91 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Corndog-Ku" [ref=e4] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test
+        - img "Corndog-Ku" [ref=e5]
+      - generic [ref=e7]:
+        - img
+        - searchbox "Cari produk…" [ref=e8]
+      - generic [ref=e9]:
+        - link "0" [ref=e10] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/cart
+          - img [ref=e11]
+          - generic [ref=e13]: "0"
+        - link "Log In" [ref=e14] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/login
+  - main [ref=e16]:
+    - generic [ref=e19]:
+      - heading "Keranjang Saya" [level=1] [ref=e20]
+      - paragraph [ref=e21]: Yuk, periksa pesananmu sebelum checkout ♥
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26] [cursor=pointer]:
+              - checkbox "Pilih Semua (0)" [checked] [ref=e27]
+              - generic [ref=e28]: Pilih Semua (0)
+            - button "Hapus Semua" [ref=e29]:
+              - img [ref=e30]
+              - text: Hapus Semua
+          - generic [ref=e33]:
+            - img [ref=e34]
+            - paragraph [ref=e36]: Keranjangmu masih kosong
+            - link "Pilih Menu" [ref=e37] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/menu
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - heading "Mau tambah lagi?" [level=3] [ref=e40]
+            - paragraph [ref=e41]:
+              - text: Yuk pilih Corndog favoritemu
+              - text: dan nikmati kelezatannya!
+          - link "Lanjut Belanja" [ref=e42] [cursor=pointer]:
+            - /url: http://webdev-corndogku.test/menu
+            - text: Lanjut Belanja
+            - img [ref=e43]
+      - generic [ref=e46]:
+        - heading "Rincian Pesanan" [level=2] [ref=e47]
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: Items
+            - generic [ref=e51]: "0"
+          - generic [ref=e52]:
+            - generic [ref=e53]: Sub Total
+            - generic [ref=e54]: Rp 0
+          - generic [ref=e55]:
+            - generic [ref=e56]: Pajak (11%)
+            - generic [ref=e57]: Rp 0
+        - generic [ref=e59]:
+          - generic [ref=e60]: Total
+          - generic [ref=e61]: Rp 0
+        - generic [ref=e62]:
+          - img [ref=e63]
+          - generic [ref=e65]: Toko sedang tutup. Checkout akan diaktifkan kembali saat toko buka.
+        - button "Checkout Sekarang" [disabled] [ref=e66]
+  - contentinfo [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - img "Corndog-Ku" [ref=e71]
+        - generic [ref=e72]:
+          - heading "Contact Us" [level=4] [ref=e73]
+          - list [ref=e74]:
+            - listitem [ref=e75]: "@corndogku_id"
+            - listitem [ref=e76]: +62 823-2511-0652
+            - listitem [ref=e77]: Jl. Rungkut Mejoyo Utara No.61, Surabaya
+        - generic [ref=e78]:
+          - heading "Follow Us" [level=4] [ref=e79]
+          - generic [ref=e80]:
+            - link "WhatsApp" [ref=e81] [cursor=pointer]:
+              - /url: https://api.whatsapp.com/send/?phone=6282325110652&text&type=phone_number&app_absent=0
+              - img [ref=e82]
+            - link "Instagram" [ref=e84] [cursor=pointer]:
+              - /url: https://www.instagram.com/corndogku_id?igsh=cDN6b2w0dGwydjI3
+              - img [ref=e85]
+      - generic [ref=e87]:
+        - generic [ref=e88]: © 2026 Corndog-Ku. All rights reserved.
+        - generic [ref=e89]:
+          - link "Privacy Policy" [ref=e90] [cursor=pointer]:
+            - /url: "#"
+          - generic [ref=e91]: "|"
+          - link "Terms of Service" [ref=e92] [cursor=pointer]:
+            - /url: "#"

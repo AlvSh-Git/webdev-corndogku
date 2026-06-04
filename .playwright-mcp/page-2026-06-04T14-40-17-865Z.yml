@@ -1,0 +1,87 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Corndog-Ku" [ref=e4] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test
+        - img "Corndog-Ku" [ref=e5]
+      - generic [ref=e7]:
+        - img
+        - searchbox "Cari produk…" [ref=e8]
+      - generic [ref=e9]:
+        - link "0" [ref=e10] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/wishlist
+          - img [ref=e11]
+          - generic [ref=e13]: "0"
+        - link "0" [ref=e14] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/cart
+          - img [ref=e15]
+          - generic [ref=e17]: "0"
+        - link "T" [ref=e18] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/profile
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic:
+        - img
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e25]: T
+          - generic [ref=e26]:
+            - paragraph [ref=e27]: Halo Test Customer!
+            - paragraph [ref=e28]: Lihat semua pesanan, status, dan detail transaksimu di sini.
+        - generic [ref=e29]:
+          - link "Profil Saya" [ref=e30] [cursor=pointer]:
+            - /url: http://webdev-corndogku.test/profile
+            - img [ref=e31]
+            - generic [ref=e33]: Profil Saya
+          - link "Riwayat Pesanan" [ref=e34] [cursor=pointer]:
+            - /url: http://webdev-corndogku.test/history
+            - img [ref=e35]
+            - generic [ref=e37]: Riwayat Pesanan
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - img [ref=e42]
+            - heading "Riwayat Pesanan" [level=2] [ref=e44]
+          - generic [ref=e45]:
+            - link "Semua" [ref=e46] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/history
+            - link "Menunggu" [ref=e47] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/history?status=Menunggu
+            - link "Diproses" [ref=e48] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/history?status=Diproses
+            - link "Selesai" [ref=e49] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/history?status=Selesai
+            - link "Dibatalkan" [ref=e50] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/history?status=Dibatalkan
+          - generic [ref=e51]:
+            - img [ref=e53]
+            - paragraph [ref=e55]: Belum ada pesanan
+            - paragraph [ref=e56]: Yuk, pesan corndog favoritmu sekarang!
+            - link "Lihat Menu" [ref=e57] [cursor=pointer]:
+              - /url: http://webdev-corndogku.test/menu
+  - contentinfo [ref=e58]:
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - img "Corndog-Ku" [ref=e62]
+        - generic [ref=e63]:
+          - heading "Contact Us" [level=4] [ref=e64]
+          - list [ref=e65]:
+            - listitem [ref=e66]: "@corndogku_id"
+            - listitem [ref=e67]: +62 823-2511-0652
+            - listitem [ref=e68]: Jl. Rungkut Mejoyo Utara No.61, Surabaya
+        - generic [ref=e69]:
+          - heading "Follow Us" [level=4] [ref=e70]
+          - generic [ref=e71]:
+            - link "WhatsApp" [ref=e72] [cursor=pointer]:
+              - /url: https://api.whatsapp.com/send/?phone=6282325110652&text&type=phone_number&app_absent=0
+              - img [ref=e73]
+            - link "Instagram" [ref=e75] [cursor=pointer]:
+              - /url: https://www.instagram.com/corndogku_id?igsh=cDN6b2w0dGwydjI3
+              - img [ref=e76]
+      - generic [ref=e78]:
+        - generic [ref=e79]: © 2026 Corndog-Ku. All rights reserved.
+        - generic [ref=e80]:
+          - link "Privacy Policy" [ref=e81] [cursor=pointer]:
+            - /url: "#"
+          - generic [ref=e82]: "|"
+          - link "Terms of Service" [ref=e83] [cursor=pointer]:
+            - /url: "#"

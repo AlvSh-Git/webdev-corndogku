@@ -1,0 +1,580 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - button "Close navigation" [ref=e5]:
+        - img [ref=e6]
+      - img "Corndog-Ku" [ref=e8]
+      - generic [ref=e9]: OWNER
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/dashboard
+        - generic [ref=e12]: DASHBOARD
+      - link "PRODUCT" [ref=e13] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/products
+        - generic [ref=e15]: PRODUCT
+      - link "REPORT" [ref=e16] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/reports
+        - generic [ref=e17]: REPORT
+      - link "USER MAINTENANCE" [ref=e18] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/users
+        - generic [ref=e19]: USER MAINTENANCE
+      - link "JADWAL OPERASIONAL" [ref=e20] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/jadwal-operasional
+        - generic [ref=e21]: JADWAL OPERASIONAL
+    - button "Log Out" [ref=e24]
+  - generic [ref=e25]:
+    - banner [ref=e26]:
+      - button "Toggle navigation" [ref=e28]
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - heading "PRODUCT" [level=1] [ref=e35]
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - img
+            - searchbox "Search products..." [ref=e38]
+          - combobox [ref=e39]:
+            - option "All Categories" [selected]
+            - option "Bingsoo"
+            - option "Combo"
+            - option "Corndog Asin"
+            - option "Corndog Manis"
+            - option "Custom"
+            - option "Es Teler Kwentel"
+            - option "Toppoki"
+      - generic [ref=e40]:
+        - button "Add Menu" [ref=e41]:
+          - img [ref=e43]
+          - generic [ref=e45]: Add Menu
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - button "Edit product" [ref=e48]:
+              - img [ref=e49]
+            - button "Delete product" [ref=e52]:
+              - img [ref=e53]
+          - img "Corndog Cheetos" [ref=e59]
+          - generic [ref=e60]:
+            - heading "Corndog Cheetos" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Corndog sosis mozzarella dengan rasa cheetos gurih pedas yang super crunchy.
+            - generic [ref=e63]:
+              - generic [ref=e64]: "Stok: 50"
+              - generic [ref=e65]: Rp 20.000
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - button "Edit product" [ref=e68]:
+              - img [ref=e69]
+            - button "Delete product" [ref=e72]:
+              - img [ref=e73]
+          - img "Corndog Double Cheese" [ref=e79]
+          - generic [ref=e80]:
+            - heading "Corndog Double Cheese" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Full mozzarella dengan saus keju dan taburan keju melimpah yang creamy dan lumer.
+            - generic [ref=e83]:
+              - generic [ref=e84]: "Stok: 50"
+              - generic [ref=e85]: Rp 20.000
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - button "Edit product" [ref=e88]:
+              - img [ref=e89]
+            - button "Delete product" [ref=e92]:
+              - img [ref=e93]
+          - img "Corndog Full Mozza" [ref=e99]
+          - generic [ref=e100]:
+            - heading "Corndog Full Mozza" [level=3] [ref=e101]
+            - paragraph [ref=e102]: Mozzarella full lumer dengan tekstur crispy di luar dan cheesy di dalam.
+            - generic [ref=e103]:
+              - generic [ref=e104]: "Stok: 50"
+              - generic [ref=e105]: Rp 17.000
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - button "Edit product" [ref=e108]:
+              - img [ref=e109]
+            - button "Delete product" [ref=e112]:
+              - img [ref=e113]
+          - img "Corndog Full Sausage" [ref=e119]
+          - generic [ref=e120]:
+            - heading "Corndog Full Sausage" [level=3] [ref=e121]
+            - paragraph [ref=e122]: Sosis utuh dengan lapisan crispy gurih dan saus favorit pilihanmu.
+            - generic [ref=e123]:
+              - generic [ref=e124]: "Stok: 50"
+              - generic [ref=e125]: Rp 17.000
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - button "Edit product" [ref=e128]:
+              - img [ref=e129]
+            - button "Delete product" [ref=e132]:
+              - img [ref=e133]
+          - img "Corndog Mozza Potato" [ref=e139]
+          - generic [ref=e140]:
+            - heading "Corndog Mozza Potato" [level=3] [ref=e141]
+            - paragraph [ref=e142]: Corndog mozzarella dengan balutan potongan kentang crispy yang gurih dan crunchy.
+            - generic [ref=e143]:
+              - generic [ref=e144]: "Stok: 50"
+              - generic [ref=e145]: Rp 20.000
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - button "Edit product" [ref=e148]:
+              - img [ref=e149]
+            - button "Delete product" [ref=e152]:
+              - img [ref=e153]
+          - img "Corndog Original" [ref=e159]
+          - generic [ref=e160]:
+            - heading "Corndog Original" [level=3] [ref=e161]
+            - paragraph [ref=e162]: Perpaduan sosis dan mozzarella lumer dengan balutan tepung crispy khas Korean corndog.
+            - generic [ref=e163]:
+              - generic [ref=e164]: "Stok: 50"
+              - generic [ref=e165]: Rp 16.000
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - button "Edit product" [ref=e168]:
+              - img [ref=e169]
+            - button "Delete product" [ref=e172]:
+              - img [ref=e173]
+          - img "Corndog Original Bubble" [ref=e179]
+          - generic [ref=e180]:
+            - heading "Corndog Original Bubble" [level=3] [ref=e181]
+            - paragraph [ref=e182]: Perpaduan mozzarella dan sosis dengan bubble crumbs renyah yang bikin tekstur makin crunchy.
+            - generic [ref=e183]:
+              - generic [ref=e184]: "Stok: 50"
+              - generic [ref=e185]: Rp 19.000
+        - generic [ref=e186]:
+          - generic [ref=e187]:
+            - button "Edit product" [ref=e188]:
+              - img [ref=e189]
+            - button "Delete product" [ref=e192]:
+              - img [ref=e193]
+          - img "Corndog Ramen Mix" [ref=e199]
+          - generic [ref=e200]:
+            - heading "Corndog Ramen Mix" [level=3] [ref=e201]
+            - paragraph [ref=e202]: Kombinasi sosis dan mozzarella dengan topping ramen crispy yang unik dan gurih.
+            - generic [ref=e203]:
+              - generic [ref=e204]: "Stok: 50"
+              - generic [ref=e205]: Rp 18.000
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - button "Edit product" [ref=e208]:
+              - img [ref=e209]
+            - button "Delete product" [ref=e212]:
+              - img [ref=e213]
+          - img "Corndog Squid Nori" [ref=e219]
+          - generic [ref=e220]:
+            - heading "Corndog Squid Nori" [level=3] [ref=e221]
+            - paragraph [ref=e222]: Perpaduan sosis mozzarella dengan model sosis seperti squid dan taburan nori rumput laut gurih.
+            - generic [ref=e223]:
+              - generic [ref=e224]: "Stok: 50"
+              - generic [ref=e225]: Rp 18.000
+        - generic [ref=e226]:
+          - generic [ref=e227]:
+            - button "Edit product" [ref=e228]:
+              - img [ref=e229]
+            - button "Delete product" [ref=e232]:
+              - img [ref=e233]
+          - img "Corndog Squid Original" [ref=e239]
+          - generic [ref=e240]:
+            - heading "Corndog Squid Original" [level=3] [ref=e241]
+            - paragraph [ref=e242]: Corndog sosis mozzarella dengan model sosis seperti squid crispy khas yang gurih dan unik.
+            - generic [ref=e243]:
+              - generic [ref=e244]: "Stok: 50"
+              - generic [ref=e245]: Rp 16.000
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - button "Edit product" [ref=e248]:
+              - img [ref=e249]
+            - button "Delete product" [ref=e252]:
+              - img [ref=e253]
+          - img "Corndog Squid Potato" [ref=e259]
+          - generic [ref=e260]:
+            - heading "Corndog Squid Potato" [level=3] [ref=e261]
+            - paragraph [ref=e262]: Corndog berbentuk squid dengan balutan kentang crispy yang crunchy di luar dan mozzarella lumer di dalam. Gurih dan super satisfying.
+            - generic [ref=e263]:
+              - generic [ref=e264]: "Stok: 50"
+              - generic [ref=e265]: Rp 17.000
+        - generic [ref=e266]:
+          - generic [ref=e267]:
+            - button "Edit product" [ref=e268]:
+              - img [ref=e269]
+            - button "Delete product" [ref=e272]:
+              - img [ref=e273]
+          - img "Corndog Squid Ramen Mix" [ref=e279]
+          - generic [ref=e280]:
+            - heading "Corndog Squid Ramen Mix" [level=3] [ref=e281]
+            - paragraph [ref=e282]: Corndog berbentuk squid dengan topping ramen crispy yang unik dan penuh tekstur. Crunchy, savory, dan bikin nagih.
+            - generic [ref=e283]:
+              - generic [ref=e284]: "Stok: 50"
+              - generic [ref=e285]: Rp 17.000
+        - generic [ref=e286]:
+          - generic [ref=e287]:
+            - button "Edit product" [ref=e288]:
+              - img [ref=e289]
+            - button "Delete product" [ref=e292]:
+              - img [ref=e293]
+          - img "Corndog Choco Crunch Cheese" [ref=e299]
+          - generic [ref=e300]:
+            - heading "Corndog Choco Crunch Cheese" [level=3] [ref=e301]
+            - paragraph [ref=e302]: Corndog mozzarella dengan glaze coklat premium dan taburan keju parut melimpah.
+            - generic [ref=e303]:
+              - generic [ref=e304]: "Stok: 50"
+              - generic [ref=e305]: Rp 20.000
+        - generic [ref=e306]:
+          - generic [ref=e307]:
+            - button "Edit product" [ref=e308]:
+              - img [ref=e309]
+            - button "Delete product" [ref=e312]:
+              - img [ref=e313]
+          - img "Corndog Greentea Crunchy Biskuit" [ref=e319]
+          - generic [ref=e320]:
+            - heading "Corndog Greentea Crunchy Biskuit" [level=3] [ref=e321]
+            - paragraph [ref=e322]: Corndog mozzarella dengan glaze greentea dan taburan biskuit matcha crunchy yang manis gurih.
+            - generic [ref=e323]:
+              - generic [ref=e324]: "Stok: 50"
+              - generic [ref=e325]: Rp 20.000
+        - generic [ref=e326]:
+          - generic [ref=e327]:
+            - button "Edit product" [ref=e328]:
+              - img [ref=e329]
+            - button "Delete product" [ref=e332]:
+              - img [ref=e333]
+          - img "Corndog Milk Crunch Biskuit" [ref=e339]
+          - generic [ref=e340]:
+            - heading "Corndog Milk Crunch Biskuit" [level=3] [ref=e341]
+            - paragraph [ref=e342]: Corndog mozzarella dengan glaze susu creamy dan topping biskuit crunchy melimpah.
+            - generic [ref=e343]:
+              - generic [ref=e344]: "Stok: 50"
+              - generic [ref=e345]: Rp 20.000
+        - generic [ref=e346]:
+          - generic [ref=e347]:
+            - button "Edit product" [ref=e348]:
+              - img [ref=e349]
+            - button "Delete product" [ref=e352]:
+              - img [ref=e353]
+          - img "Corndog Strawberry Biskuit" [ref=e359]
+          - generic [ref=e360]:
+            - heading "Corndog Strawberry Biskuit" [level=3] [ref=e361]
+            - paragraph [ref=e362]: Glaze strawberry manis segar dengan taburan biskuit crunchy dan mozzarella lumer.
+            - generic [ref=e363]:
+              - generic [ref=e364]: "Stok: 50"
+              - generic [ref=e365]: Rp 20.000
+        - generic [ref=e366]:
+          - generic [ref=e367]:
+            - button "Edit product" [ref=e368]:
+              - img [ref=e369]
+            - button "Delete product" [ref=e372]:
+              - img [ref=e373]
+          - img "Corndog Taro Cheese" [ref=e379]
+          - generic [ref=e380]:
+            - heading "Corndog Taro Cheese" [level=3] [ref=e381]
+            - paragraph [ref=e382]: Perpaduan glaze taro creamy dengan mozzarella lumer dan taburan keju parut.
+            - generic [ref=e383]:
+              - generic [ref=e384]: "Stok: 50"
+              - generic [ref=e385]: Rp 20.000
+        - generic [ref=e386]:
+          - generic [ref=e387]:
+            - button "Edit product" [ref=e388]:
+              - img [ref=e389]
+            - button "Delete product" [ref=e392]:
+              - img [ref=e393]
+          - img "Corndog Tiramisu Biskuit" [ref=e399]
+          - generic [ref=e400]:
+            - heading "Corndog Tiramisu Biskuit" [level=3] [ref=e401]
+            - paragraph [ref=e402]: Corndog mozzarella dengan glaze tiramisu creamy dan topping biskuit crunchy ala dessert.
+            - generic [ref=e403]:
+              - generic [ref=e404]: "Stok: 50"
+              - generic [ref=e405]: Rp 20.000
+        - generic [ref=e406]:
+          - generic [ref=e407]:
+            - button "Edit product" [ref=e408]:
+              - img [ref=e409]
+            - button "Delete product" [ref=e412]:
+              - img [ref=e413]
+          - img "Toppoki Korean" [ref=e419]
+          - generic [ref=e420]:
+            - heading "Toppoki Korean" [level=3] [ref=e421]
+            - paragraph [ref=e422]: Tteok kenyal dengan saus gochujang khas Korea yang gurih pedas, disajikan dengan sosis dan odeng hangat.
+            - generic [ref=e423]:
+              - generic [ref=e424]: "Stok: 50"
+              - generic [ref=e425]: Rp 23.000
+        - generic [ref=e426]:
+          - generic [ref=e427]:
+            - button "Edit product" [ref=e428]:
+              - img [ref=e429]
+            - button "Delete product" [ref=e432]:
+              - img [ref=e433]
+          - img "Toppoki Rose" [ref=e439]
+          - generic [ref=e440]:
+            - heading "Toppoki Rose" [level=3] [ref=e441]
+            - paragraph [ref=e442]: Perpaduan creamy susu dan saus gochujang khas Korea dengan tteok kenyal, sosis, dan odeng yang creamy gurih.
+            - generic [ref=e443]:
+              - generic [ref=e444]: "Stok: 50"
+              - generic [ref=e445]: Rp 26.000
+        - generic [ref=e446]:
+          - generic [ref=e447]:
+            - button "Edit product" [ref=e448]:
+              - img [ref=e449]
+            - button "Delete product" [ref=e452]:
+              - img [ref=e453]
+          - img "Combo 1" [ref=e459]
+          - generic [ref=e460]:
+            - heading "Combo 1" [level=3] [ref=e461]
+            - paragraph [ref=e462]: Kombinasi Korean Toppoki dan pilihan corndog original, full mozzarella, atau full sausage.
+            - generic [ref=e463]:
+              - generic [ref=e464]: "Stok: 50"
+              - generic [ref=e465]: Rp 35.000
+        - generic [ref=e466]:
+          - generic [ref=e467]:
+            - button "Edit product" [ref=e468]:
+              - img [ref=e469]
+            - button "Delete product" [ref=e472]:
+              - img [ref=e473]
+          - img "Combo 2" [ref=e479]
+          - generic [ref=e480]:
+            - heading "Combo 2" [level=3] [ref=e481]
+            - paragraph [ref=e482]: Korean Toppoki dipadukan dengan corndog full mozza potato, ori potato, atau ori bubble yang super crunchy.
+            - generic [ref=e483]:
+              - generic [ref=e484]: "Stok: 50"
+              - generic [ref=e485]: Rp 38.000
+        - generic [ref=e486]:
+          - generic [ref=e487]:
+            - button "Edit product" [ref=e488]:
+              - img [ref=e489]
+            - button "Delete product" [ref=e492]:
+              - img [ref=e493]
+          - img "Combo 3" [ref=e499]
+          - generic [ref=e500]:
+            - heading "Combo 3" [level=3] [ref=e501]
+            - paragraph [ref=e502]: Rose Toppoki creamy dengan pilihan corndog original, full mozzarella, atau full sausage.
+            - generic [ref=e503]:
+              - generic [ref=e504]: "Stok: 50"
+              - generic [ref=e505]: Rp 37.000
+        - generic [ref=e506]:
+          - generic [ref=e507]:
+            - button "Edit product" [ref=e508]:
+              - img [ref=e509]
+            - button "Delete product" [ref=e512]:
+              - img [ref=e513]
+          - img "Combo 4" [ref=e519]
+          - generic [ref=e520]:
+            - heading "Combo 4" [level=3] [ref=e521]
+            - paragraph [ref=e522]: Rose Toppoki creamy dipadukan dengan corndog full mozza potato, ori potato, atau ori bubble.
+            - generic [ref=e523]:
+              - generic [ref=e524]: "Stok: 50"
+              - generic [ref=e525]: Rp 40.000
+        - generic [ref=e526]:
+          - generic [ref=e527]:
+            - button "Edit product" [ref=e528]:
+              - img [ref=e529]
+            - button "Delete product" [ref=e532]:
+              - img [ref=e533]
+          - img "Es Teler Durian" [ref=e539]
+          - generic [ref=e540]:
+            - heading "Es Teler Durian" [level=3] [ref=e541]
+            - paragraph [ref=e542]: Es teler segarl dengan tambahan durian legit dan aroma khas yang menggoda.
+            - generic [ref=e543]:
+              - generic [ref=e544]: "Stok: 50"
+              - generic [ref=e545]: Rp 28.000
+        - generic [ref=e546]:
+          - generic [ref=e547]:
+            - button "Edit product" [ref=e548]:
+              - img [ref=e549]
+            - button "Delete product" [ref=e552]:
+              - img [ref=e553]
+          - img "Es Teler Es Krim Vanilla" [ref=e559]
+          - generic [ref=e560]:
+            - heading "Es Teler Es Krim Vanilla" [level=3] [ref=e561]
+            - paragraph [ref=e562]: Es teler segar dengan tambahan es krim vanila creamy yang bikin makin nikmat.
+            - generic [ref=e563]:
+              - generic [ref=e564]: "Stok: 50"
+              - generic [ref=e565]: Rp 18.000
+        - generic [ref=e566]:
+          - generic [ref=e567]:
+            - button "Edit product" [ref=e568]:
+              - img [ref=e569]
+            - button "Delete product" [ref=e572]:
+              - img [ref=e573]
+          - img "Es Teler Original" [ref=e579]
+          - generic [ref=e580]:
+            - heading "Es Teler Original" [level=3] [ref=e581]
+            - paragraph [ref=e582]: Perpaduan es serut, alpukat, nangka, jelly, mutiara, nata de coco, dan gula aren yang segar.
+            - generic [ref=e583]:
+              - generic [ref=e584]: "Stok: 50"
+              - generic [ref=e585]: Rp 15.000
+        - generic [ref=e586]:
+          - generic [ref=e587]:
+            - button "Edit product" [ref=e588]:
+              - img [ref=e589]
+            - button "Delete product" [ref=e592]:
+              - img [ref=e593]
+          - img "Es Teler Special" [ref=e599]
+          - generic [ref=e600]:
+            - heading "Es Teler Special" [level=3] [ref=e601]
+            - paragraph [ref=e602]: Kombinasi lengkap es teler, durian, dan es krim vanila dalam satu mangkuk spesial.
+            - generic [ref=e603]:
+              - generic [ref=e604]: "Stok: 50"
+              - generic [ref=e605]: Rp 31.000
+        - generic [ref=e606]:
+          - generic [ref=e607]:
+            - button "Edit product" [ref=e608]:
+              - img [ref=e609]
+            - button "Delete product" [ref=e612]:
+              - img [ref=e613]
+          - img "Bingsoo Cookies & Cream" [ref=e619]
+          - generic [ref=e620]:
+            - heading "Bingsoo Cookies & Cream" [level=3] [ref=e621]
+            - paragraph [ref=e622]: Perpaduan es serut, oreo, susu coklat, coco crunch, dan es krim yang creamy dan crunchy.
+            - generic [ref=e623]:
+              - generic [ref=e624]: "Stok: 50"
+              - generic [ref=e625]: Rp 18.000
+        - generic [ref=e626]:
+          - generic [ref=e627]:
+            - button "Edit product" [ref=e628]:
+              - img [ref=e629]
+            - button "Delete product" [ref=e632]:
+              - img [ref=e633]
+          - img "Bingsoo Mango Creamy" [ref=e639]
+          - generic [ref=e640]:
+            - heading "Bingsoo Mango Creamy" [level=3] [ref=e641]
+            - paragraph [ref=e642]: Bingsu es serut Korea dengan mangga segar, jelly mangga, nata de coco, dan es krim creamy.
+            - generic [ref=e643]:
+              - generic [ref=e644]: "Stok: 50"
+              - generic [ref=e645]: Rp 18.000
+        - generic [ref=e646]:
+          - generic [ref=e647]:
+            - button "Edit product" [ref=e648]:
+              - img [ref=e649]
+            - button "Delete product" [ref=e652]:
+              - img [ref=e653]
+          - img "Bingsoo Strawberry Creamy" [ref=e659]
+          - generic [ref=e660]:
+            - heading "Bingsoo Strawberry Creamy" [level=3] [ref=e661]
+            - paragraph [ref=e662]: Bingsu segar dengan potongan stroberi, pudding strawberry, nata de coco, dan es krim vanila.
+            - generic [ref=e663]:
+              - generic [ref=e664]: "Stok: 50"
+              - generic [ref=e665]: Rp 18.000
+        - generic [ref=e666]:
+          - generic [ref=e667]:
+            - button "Edit product" [ref=e668]:
+              - img [ref=e669]
+            - button "Delete product" [ref=e672]:
+              - img [ref=e673]
+          - img "Cheese Sauce" [ref=e679]
+          - generic [ref=e680]:
+            - heading "Cheese Sauce" [level=3] [ref=e681]
+            - paragraph [ref=e682]: Komponen custom corndog.
+            - generic [ref=e683]:
+              - generic [ref=e684]: "Stok: 50"
+              - generic [ref=e685]: Rp 0
+        - generic [ref=e686]:
+          - generic [ref=e687]:
+            - button "Edit product" [ref=e688]:
+              - img [ref=e689]
+            - button "Delete product" [ref=e692]:
+              - img [ref=e693]
+          - img "Full Mozza" [ref=e699]
+          - generic [ref=e700]:
+            - heading "Full Mozza" [level=3] [ref=e701]
+            - paragraph [ref=e702]: Komponen custom corndog.
+            - generic [ref=e703]:
+              - generic [ref=e704]: "Stok: 50"
+              - generic [ref=e705]: Rp 0
+        - generic [ref=e706]:
+          - generic [ref=e707]:
+            - button "Edit product" [ref=e708]:
+              - img [ref=e709]
+            - button "Delete product" [ref=e712]:
+              - img [ref=e713]
+          - img "Full Sosis" [ref=e719]
+          - generic [ref=e720]:
+            - heading "Full Sosis" [level=3] [ref=e721]
+            - paragraph [ref=e722]: Komponen custom corndog.
+            - generic [ref=e723]:
+              - generic [ref=e724]: "Stok: 50"
+              - generic [ref=e725]: Rp 0
+        - generic [ref=e726]:
+          - generic [ref=e727]:
+            - button "Edit product" [ref=e728]:
+              - img [ref=e729]
+            - button "Delete product" [ref=e732]:
+              - img [ref=e733]
+          - img "Hot Sauce" [ref=e739]
+          - generic [ref=e740]:
+            - heading "Hot Sauce" [level=3] [ref=e741]
+            - paragraph [ref=e742]: Komponen custom corndog.
+            - generic [ref=e743]:
+              - generic [ref=e744]: "Stok: 50"
+              - generic [ref=e745]: Rp 0
+        - generic [ref=e746]:
+          - generic [ref=e747]:
+            - button "Edit product" [ref=e748]:
+              - img [ref=e749]
+            - button "Delete product" [ref=e752]:
+              - img [ref=e753]
+          - img "Ketchup" [ref=e759]
+          - generic [ref=e760]:
+            - heading "Ketchup" [level=3] [ref=e761]
+            - paragraph [ref=e762]: Komponen custom corndog.
+            - generic [ref=e763]:
+              - generic [ref=e764]: "Stok: 50"
+              - generic [ref=e765]: Rp 0
+        - generic [ref=e766]:
+          - generic [ref=e767]:
+            - button "Edit product" [ref=e768]:
+              - img [ref=e769]
+            - button "Delete product" [ref=e772]:
+              - img [ref=e773]
+          - img "Mayonnaise" [ref=e779]
+          - generic [ref=e780]:
+            - heading "Mayonnaise" [level=3] [ref=e781]
+            - paragraph [ref=e782]: Komponen custom corndog.
+            - generic [ref=e783]:
+              - generic [ref=e784]: "Stok: 50"
+              - generic [ref=e785]: Rp 0
+        - generic [ref=e786]:
+          - generic [ref=e787]:
+            - button "Edit product" [ref=e788]:
+              - img [ref=e789]
+            - button "Delete product" [ref=e792]:
+              - img [ref=e793]
+          - img "Original" [ref=e799]
+          - generic [ref=e800]:
+            - heading "Original" [level=3] [ref=e801]
+            - paragraph [ref=e802]: Komponen custom corndog.
+            - generic [ref=e803]:
+              - generic [ref=e804]: "Stok: 50"
+              - generic [ref=e805]: Rp 0
+        - generic [ref=e806]:
+          - generic [ref=e807]:
+            - button "Edit product" [ref=e808]:
+              - img [ref=e809]
+            - button "Delete product" [ref=e812]:
+              - img [ref=e813]
+          - img "Potato" [ref=e819]
+          - generic [ref=e820]:
+            - heading "Potato" [level=3] [ref=e821]
+            - paragraph [ref=e822]: Komponen custom corndog.
+            - generic [ref=e823]:
+              - generic [ref=e824]: "Stok: 50"
+              - generic [ref=e825]: Rp 4.000
+        - generic [ref=e826]:
+          - generic [ref=e827]:
+            - button "Edit product" [ref=e828]:
+              - img [ref=e829]
+            - button "Delete product" [ref=e832]:
+              - img [ref=e833]
+          - img "Ramen" [ref=e839]
+          - generic [ref=e840]:
+            - heading "Ramen" [level=3] [ref=e841]
+            - paragraph [ref=e842]: Komponen custom corndog.
+            - generic [ref=e843]:
+              - generic [ref=e844]: "Stok: 50"
+              - generic [ref=e845]: Rp 3.000
+        - generic [ref=e846]:
+          - generic [ref=e847]:
+            - button "Edit product" [ref=e848]:
+              - img [ref=e849]
+            - button "Delete product" [ref=e852]:
+              - img [ref=e853]
+          - img "Sosis & Mozza" [ref=e859]
+          - generic [ref=e860]:
+            - heading "Sosis & Mozza" [level=3] [ref=e861]
+            - paragraph [ref=e862]: Komponen custom corndog.
+            - generic [ref=e863]:
+              - generic [ref=e864]: "Stok: 50"
+              - generic [ref=e865]: Rp 0

@@ -120,15 +120,20 @@
                     ['label' => 'Dibatalkan', 'key' => 'Dibatalkan'],
                 ];
             @endphp
-            <div class="px-6 pt-5 pb-4 flex gap-2 overflow-x-auto hide-scrollbar">
-                @foreach($tabs as $tab)
-                    @php $isActive = $statusFilter === $tab['key']; @endphp
-                    <a href="{{ route('history', $tab['key'] ? ['status' => $tab['key']] : []) }}"
-                       class="filter-tab {{ $isActive ? 'text-white' : 'text-gray-500 bg-gray-100' }}"
-                       style="{{ $isActive ? 'background-color:var(--color-primary);' : '' }}">
-                        {{ $tab['label'] }}
-                    </a>
-                @endforeach
+            <div class="filter-tab-wrap relative pt-5 pb-4">
+                <div class="px-6 flex gap-2 overflow-x-auto hide-scrollbar">
+                    @foreach($tabs as $tab)
+                        @php $isActive = $statusFilter === $tab['key']; @endphp
+                        <a href="{{ route('history', $tab['key'] ? ['status' => $tab['key']] : []) }}"
+                           class="filter-tab {{ $isActive ? 'text-white' : 'text-gray-500 bg-gray-100' }}"
+                           style="{{ $isActive ? 'background-color:var(--color-primary);' : '' }}">
+                            {{ $tab['label'] }}
+                        </a>
+                    @endforeach
+                </div>
+                {{-- Right-edge fade indicating more pills offscreen --}}
+                <div class="pointer-events-none absolute top-0 right-0 h-full w-8" aria-hidden="true"
+                     style="background:linear-gradient(to left, white 30%, rgba(255,255,255,0));"></div>
             </div>
 
             {{-- Order list --}}

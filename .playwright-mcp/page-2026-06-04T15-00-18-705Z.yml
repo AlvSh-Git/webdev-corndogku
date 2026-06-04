@@ -1,0 +1,190 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - button "Close navigation" [ref=e5]:
+        - img [ref=e6]
+      - img "Corndog-Ku" [ref=e8]
+      - generic [ref=e9]: OWNER
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/dashboard
+        - generic [ref=e12]: DASHBOARD
+      - link "PRODUCT" [ref=e13] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/products
+        - generic [ref=e14]: PRODUCT
+      - link "REPORT" [ref=e15] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/reports
+        - generic [ref=e16]: REPORT
+      - link "USER MAINTENANCE" [ref=e17] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/users
+        - generic [ref=e18]: USER MAINTENANCE
+      - link "JADWAL OPERASIONAL" [ref=e19] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/jadwal-operasional
+        - generic [ref=e21]: JADWAL OPERASIONAL
+    - button "Log Out" [ref=e24]
+  - generic [ref=e25]:
+    - banner [ref=e26]:
+      - button "Toggle navigation" [ref=e28]
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - heading "Jadwal Operasional Toko" [level=1] [ref=e37]
+          - paragraph [ref=e38]: Atur hari dan jam buka tutup toko secara rutin
+        - generic [ref=e39]:
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - generic [ref=e45]: Senin
+                  - generic [ref=e46]:
+                    - checkbox [checked] [ref=e47]
+                    - generic [ref=e50]: Buka
+                - generic [ref=e51]:
+                  - generic [ref=e52]:
+                    - generic [ref=e53]: Jam Buka
+                    - generic [ref=e54]:
+                      - textbox [ref=e55]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e56]:
+                    - generic [ref=e57]: Jam Tutup
+                    - generic [ref=e58]:
+                      - textbox [ref=e59]: 21:00
+                      - generic:
+                        - img
+              - generic [ref=e60]:
+                - generic [ref=e61]:
+                  - generic [ref=e62]: Selasa
+                  - generic [ref=e63]:
+                    - checkbox [checked] [ref=e64]
+                    - generic [ref=e67]: Buka
+                - generic [ref=e68]:
+                  - generic [ref=e69]:
+                    - generic [ref=e70]: Jam Buka
+                    - generic [ref=e71]:
+                      - textbox [ref=e72]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e73]:
+                    - generic [ref=e74]: Jam Tutup
+                    - generic [ref=e75]:
+                      - textbox [ref=e76]: 21:00
+                      - generic:
+                        - img
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e79]: Rabu
+                  - generic [ref=e80]:
+                    - checkbox [checked] [ref=e81]
+                    - generic [ref=e84]: Buka
+                - generic [ref=e85]:
+                  - generic [ref=e86]:
+                    - generic [ref=e87]: Jam Buka
+                    - generic [ref=e88]:
+                      - textbox [ref=e89]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e90]:
+                    - generic [ref=e91]: Jam Tutup
+                    - generic [ref=e92]:
+                      - textbox [ref=e93]: 21:00
+                      - generic:
+                        - img
+              - generic [ref=e94]:
+                - generic [ref=e95]:
+                  - generic [ref=e96]: Kamis
+                  - generic [ref=e97]:
+                    - checkbox [checked] [ref=e98]
+                    - generic [ref=e101]: Buka
+                - generic [ref=e102]:
+                  - generic [ref=e103]:
+                    - generic [ref=e104]: Jam Buka
+                    - generic [ref=e105]:
+                      - textbox [ref=e106]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e107]:
+                    - generic [ref=e108]: Jam Tutup
+                    - generic [ref=e109]:
+                      - textbox [ref=e110]: 21:00
+                      - generic:
+                        - img
+              - generic [ref=e111]:
+                - generic [ref=e112]:
+                  - generic [ref=e113]: Jumat
+                  - generic [ref=e114]:
+                    - checkbox [checked] [ref=e115]
+                    - generic [ref=e118]: Buka
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - generic [ref=e121]: Jam Buka
+                    - generic [ref=e122]:
+                      - textbox [ref=e123]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e124]:
+                    - generic [ref=e125]: Jam Tutup
+                    - generic [ref=e126]:
+                      - textbox [ref=e127]: 22:00
+                      - generic:
+                        - img
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]: Sabtu
+                  - generic [ref=e131]:
+                    - checkbox [checked] [ref=e132]
+                    - generic [ref=e135]: Buka
+                - generic [ref=e136]:
+                  - generic [ref=e137]:
+                    - generic [ref=e138]: Jam Buka
+                    - generic [ref=e139]:
+                      - textbox [ref=e140]: 10:00
+                      - generic:
+                        - img
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: Jam Tutup
+                    - generic [ref=e143]:
+                      - textbox [ref=e144]: 22:00
+                      - generic:
+                        - img
+              - generic [ref=e145]:
+                - generic [ref=e146]:
+                  - generic [ref=e147]: Minggu
+                  - generic [ref=e148]:
+                    - checkbox [ref=e149]
+                    - generic [ref=e152]: Tutup
+                - generic [ref=e153]:
+                  - generic [ref=e154]:
+                    - generic [ref=e155]: Jam Buka
+                    - generic [ref=e156]:
+                      - textbox [disabled] [ref=e157]
+                      - generic:
+                        - img
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: Jam Tutup
+                    - generic [ref=e160]:
+                      - textbox [disabled] [ref=e161]
+                      - generic:
+                        - img
+            - generic [ref=e162]:
+              - img [ref=e163]
+              - generic [ref=e165]: Jadwal ini akan diterapkan setiap hari sesuai pengaturan di atas.
+            - button "Simpan Jadwal" [ref=e167]:
+              - img [ref=e168]
+              - text: Simpan Jadwal
+          - generic [ref=e171]:
+            - generic [ref=e172]:
+              - heading "Buka Tutup Manual (Saat Ini)" [level=2] [ref=e173]
+              - paragraph [ref=e174]: Anda dapat menutup atau membuka toko kapan saja.
+            - generic [ref=e178]:
+              - generic [ref=e179]: TOKO TUTUP
+              - generic [ref=e180]: "Buka: Besok, 10:00 WIB"
+            - button "Buka Sekarang" [ref=e181] [cursor=pointer]:
+              - img [ref=e182]
+              - text: Buka Sekarang
+            - button "Tutup Sekarang" [disabled] [ref=e184]:
+              - img [ref=e185]
+              - text: Tutup Sekarang
+            - generic [ref=e187]:
+              - img [ref=e188]
+              - generic [ref=e190]: Jika toko ditutup manual, pelanggan tidak dapat memesan sampai Anda buka kembali.

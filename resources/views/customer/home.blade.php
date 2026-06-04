@@ -359,15 +359,15 @@
                     Crispy<br>Corndog,<br>Happy Mood
                 </h1>
                 <p class="text-white/80 leading-snug"
-                   style="font-size: clamp(10px, 2.8vw, 15px);
+                   style="font-size: clamp(12px, 2.8vw, 15px);
                           margin-bottom: clamp(12px, 3vw, 22px);">
                     Corndog hangat, topping melimpah, mozzarella lumer di setiap gigitan.
                 </p>
                 <a href="{{ route('menu') }}"
-                   class="self-start bg-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform whitespace-nowrap"
+                   class="self-start inline-flex items-center bg-white font-bold rounded-full shadow-lg hover:scale-105 transition-transform whitespace-nowrap min-h-[44px]"
                    style="color: #8D1818;
-                          font-size: clamp(11px, 3vw, 15px);
-                          padding: clamp(8px, 2vw, 12px) clamp(18px, 4.8vw, 30px);">
+                          font-size: clamp(12px, 3vw, 15px);
+                          padding: clamp(10px, 2vw, 14px) clamp(20px, 4.8vw, 30px);">
                     TRY NOW
                 </a>
             </div>
@@ -446,7 +446,7 @@
                              alt="Promo 1"
                              class="w-full block">
                         <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
                                 Order Now 🔥
                             </span>
                         </div>
@@ -457,7 +457,7 @@
                              alt="Promo 2"
                              class="w-full block">
                         <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-[10px] sm:text-xs py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
                                 Order Now 🔥
                             </span>
                         </div>
@@ -520,10 +520,10 @@
                      style="background-color: #F472B6;">S</div>
                 <div>
                     <p class="text-xs font-bold leading-none" style="color: #1a1a1a;">Sarah K.</p>
-                    <p class="text-[10px] mt-0.5" style="color: #888;">Pelanggan Setia</p>
+                    <p class="text-xs mt-0.5" style="color: #888;">Pelanggan Setia</p>
                 </div>
             </div>
-            <p class="text-[10px] leading-relaxed" style="color: #444;">
+            <p class="text-xs leading-relaxed" style="color: #444;">
                 "Corndognya gak ada tandingannya! Crispy di luar, lumer di dalam. Wajib coba!"
             </p>
             <div class="flex items-center gap-0.5 mt-2">
@@ -567,7 +567,7 @@
 
                 {{-- TRY NOW — white outlined pill --}}
                 <a href="#menu"
-                   class="inline-flex px-8 py-3.5 rounded-full font-bold text-sm tracking-widest
+                   class="inline-flex items-center min-h-[44px] px-8 py-3.5 rounded-full font-bold text-sm tracking-widest
                           border-2 transition-all duration-200 hover:bg-white font-helvetica"
                    style="border-color: white; color: white;"
                    onmouseover="this.style.color='var(--color-primary)'"
@@ -779,8 +779,8 @@
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
                class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
-                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-[10px] sm:text-xs font-bold
-                      px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
+                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-xs sm:text-sm font-bold
+                      px-4 min-h-[36px] sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
                       hover:bg-red-800 transition-colors w-auto max-w-fit">
                 Yuk, Buat Corndog Kamu!
                 <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor"
@@ -843,7 +843,7 @@
                     <p class="font-bold text-base" style="color: var(--color-black);">Belum ada produk di kategori ini.</p>
                 </div>
             @else
-                <div class="flex flex-row overflow-x-auto gap-6 pb-12 pt-20 px-8 w-full hide-scrollbar">
+                <div class="flex flex-row overflow-x-auto gap-6 pb-8 sm:pb-12 pt-16 sm:pt-20 px-4 sm:px-8 w-full hide-scrollbar">
                     @foreach ($catProducts as $product)
                         <div class="product-card flex flex-col relative bg-white rounded-[2rem] shadow-md p-5 pt-16 min-w-[240px] w-[240px] shrink-0 justify-between cursor-pointer"
                              data-category="{{ $product->category->name }}"
@@ -862,11 +862,11 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-center mb-1"
+                                    <p class="text-xs font-bold uppercase tracking-widest text-center mb-1"
                                        style="color: var(--color-accent);">{{ $product->category->name }}</p>
                                     <p class="font-bold text-sm text-center leading-snug mb-1"
                                        style="color: var(--color-primary);">{{ $product->name }}</p>
-                                    <p class="text-[11px] text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
+                                    <p class="text-xs text-gray-400 text-center leading-relaxed line-clamp-2 mb-3">
                                         {{ $product->description }}
                                     </p>
                                 </div>
@@ -878,7 +878,7 @@
                                     </p>
                                     @if ($product->is_available && $product->stock > 0)
                                         <button type="button"
-                                                class="btn-pesan flex-none px-3 py-1.5 rounded-full text-xs font-bold
+                                                class="btn-pesan flex-none px-4 min-h-[36px] rounded-full text-xs font-bold
                                                        transition-opacity hover:opacity-80"
                                                 style="background-color: var(--color-accent); color: var(--color-black);"
                                                 data-id="{{ $product->id }}"
@@ -1524,7 +1524,7 @@ $(function () {
             </div>
             <div>
                 <p class="text-white font-semibold text-sm leading-none">Corndog-Ku Assistant</p>
-                <p class="text-white/70 text-[10px] mt-0.5">Online · Biasanya membalas segera</p>
+                <p class="text-white/70 text-xs mt-0.5">Online · Biasanya membalas segera</p>
             </div>
         </div>
         <button id="chatbot-close"

@@ -1,0 +1,190 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - button "Close navigation" [ref=e5]:
+        - img [ref=e6]
+      - img "Corndog-Ku" [ref=e8]
+      - generic [ref=e9]: OWNER
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/dashboard
+        - generic [ref=e12]: DASHBOARD
+      - link "PRODUCT" [ref=e13] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/products
+        - generic [ref=e14]: PRODUCT
+      - link "REPORT" [ref=e15] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/reports
+        - generic [ref=e16]: REPORT
+      - link "USER MAINTENANCE" [ref=e17] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/users
+        - generic [ref=e18]: USER MAINTENANCE
+      - link "JADWAL OPERASIONAL" [ref=e19] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/jadwal-operasional
+        - generic [ref=e21]: JADWAL OPERASIONAL
+    - button "Log Out" [ref=e24]
+  - generic [ref=e25]:
+    - banner [ref=e26]:
+      - button "Toggle navigation" [ref=e28]
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - heading "Jadwal Operasional Toko" [level=1] [ref=e37]
+          - paragraph [ref=e38]: Atur hari dan jam buka tutup toko secara rutin
+        - generic [ref=e39]:
+          - generic [ref=e41]:
+            - table [ref=e43]:
+              - rowgroup [ref=e44]:
+                - row "Hari Status Jam Buka Jam Tutup" [ref=e45]:
+                  - columnheader "Hari" [ref=e46]
+                  - columnheader "Status" [ref=e47]
+                  - columnheader "Jam Buka" [ref=e48]
+                  - columnheader "Jam Tutup" [ref=e49]
+              - rowgroup [ref=e50]:
+                - row "Senin Buka 10:00 - 21:00" [ref=e51]:
+                  - cell "Senin" [ref=e52]
+                  - cell "Buka" [ref=e53]:
+                    - generic [ref=e54]:
+                      - checkbox [checked] [ref=e55]
+                      - generic [ref=e58]: Buka
+                  - cell "10:00 -" [ref=e59]:
+                    - generic [ref=e60]:
+                      - generic [ref=e61]:
+                        - textbox [ref=e62]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e63]: "-"
+                  - cell "21:00" [ref=e64]:
+                    - generic [ref=e65]:
+                      - textbox [ref=e66]: 21:00
+                      - generic:
+                        - img
+                - row "Selasa Buka 10:00 - 21:00" [ref=e67]:
+                  - cell "Selasa" [ref=e68]
+                  - cell "Buka" [ref=e69]:
+                    - generic [ref=e70]:
+                      - checkbox [checked] [ref=e71]
+                      - generic [ref=e74]: Buka
+                  - cell "10:00 -" [ref=e75]:
+                    - generic [ref=e76]:
+                      - generic [ref=e77]:
+                        - textbox [ref=e78]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e79]: "-"
+                  - cell "21:00" [ref=e80]:
+                    - generic [ref=e81]:
+                      - textbox [ref=e82]: 21:00
+                      - generic:
+                        - img
+                - row "Rabu Buka 10:00 - 21:00" [ref=e83]:
+                  - cell "Rabu" [ref=e84]
+                  - cell "Buka" [ref=e85]:
+                    - generic [ref=e86]:
+                      - checkbox [checked] [ref=e87]
+                      - generic [ref=e90]: Buka
+                  - cell "10:00 -" [ref=e91]:
+                    - generic [ref=e92]:
+                      - generic [ref=e93]:
+                        - textbox [ref=e94]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e95]: "-"
+                  - cell "21:00" [ref=e96]:
+                    - generic [ref=e97]:
+                      - textbox [ref=e98]: 21:00
+                      - generic:
+                        - img
+                - row "Kamis Buka 10:00 - 21:00" [ref=e99]:
+                  - cell "Kamis" [ref=e100]
+                  - cell "Buka" [ref=e101]:
+                    - generic [ref=e102]:
+                      - checkbox [checked] [ref=e103]
+                      - generic [ref=e106]: Buka
+                  - cell "10:00 -" [ref=e107]:
+                    - generic [ref=e108]:
+                      - generic [ref=e109]:
+                        - textbox [ref=e110]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e111]: "-"
+                  - cell "21:00" [ref=e112]:
+                    - generic [ref=e113]:
+                      - textbox [ref=e114]: 21:00
+                      - generic:
+                        - img
+                - row "Jumat Buka 10:00 - 22:00" [ref=e115]:
+                  - cell "Jumat" [ref=e116]
+                  - cell "Buka" [ref=e117]:
+                    - generic [ref=e118]:
+                      - checkbox [checked] [ref=e119]
+                      - generic [ref=e122]: Buka
+                  - cell "10:00 -" [ref=e123]:
+                    - generic [ref=e124]:
+                      - generic [ref=e125]:
+                        - textbox [ref=e126]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e127]: "-"
+                  - cell "22:00" [ref=e128]:
+                    - generic [ref=e129]:
+                      - textbox [ref=e130]: 22:00
+                      - generic:
+                        - img
+                - row "Sabtu Buka 10:00 - 22:00" [ref=e131]:
+                  - cell "Sabtu" [ref=e132]
+                  - cell "Buka" [ref=e133]:
+                    - generic [ref=e134]:
+                      - checkbox [checked] [ref=e135]
+                      - generic [ref=e138]: Buka
+                  - cell "10:00 -" [ref=e139]:
+                    - generic [ref=e140]:
+                      - generic [ref=e141]:
+                        - textbox [ref=e142]: 10:00
+                        - generic:
+                          - img
+                      - generic [ref=e143]: "-"
+                  - cell "22:00" [ref=e144]:
+                    - generic [ref=e145]:
+                      - textbox [ref=e146]: 22:00
+                      - generic:
+                        - img
+                - row "Minggu Tutup -" [ref=e147]:
+                  - cell "Minggu" [ref=e148]
+                  - cell "Tutup" [ref=e149]:
+                    - generic [ref=e150]:
+                      - checkbox [ref=e151]
+                      - generic [ref=e154]: Tutup
+                  - cell "-" [ref=e155]:
+                    - generic [ref=e156]:
+                      - generic [ref=e157]:
+                        - textbox [disabled] [ref=e158]
+                        - generic:
+                          - img
+                      - generic [ref=e159]: "-"
+                  - cell [ref=e160]:
+                    - generic [ref=e161]:
+                      - textbox [disabled] [ref=e162]
+                      - generic:
+                        - img
+            - generic [ref=e163]:
+              - img [ref=e164]
+              - generic [ref=e166]: Jadwal ini akan diterapkan setiap hari sesuai pengaturan di atas.
+            - button "Simpan Jadwal" [ref=e168]:
+              - img [ref=e169]
+              - text: Simpan Jadwal
+          - generic [ref=e172]:
+            - generic [ref=e173]:
+              - heading "Buka Tutup Manual (Saat Ini)" [level=2] [ref=e174]
+              - paragraph [ref=e175]: Anda dapat menutup atau membuka toko kapan saja.
+            - generic [ref=e179]:
+              - generic [ref=e180]: TOKO TUTUP
+              - generic [ref=e181]: "Buka: Besok, 10:00 WIB"
+            - button "Buka Sekarang" [ref=e182] [cursor=pointer]:
+              - img [ref=e183]
+              - text: Buka Sekarang
+            - button "Tutup Sekarang" [disabled] [ref=e185]:
+              - img [ref=e186]
+              - text: Tutup Sekarang
+            - generic [ref=e188]:
+              - img [ref=e189]
+              - generic [ref=e191]: Jika toko ditutup manual, pelanggan tidak dapat memesan sampai Anda buka kembali.

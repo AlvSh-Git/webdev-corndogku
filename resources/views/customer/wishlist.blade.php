@@ -23,7 +23,7 @@
                     </div>
                     <div class="flex items-center justify-between mt-4">
                         <span class="font-extrabold text-red-600">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                        <a href="{{ route('menu') }}" class="text-xs font-bold px-4 py-2 rounded-full text-white transition-opacity hover:opacity-90" style="background-color: var(--color-primary);">Pesan</a>
+                        <a href="{{ route('menu') }}" class="inline-flex items-center text-xs font-bold px-4 min-h-[40px] rounded-full text-white transition-opacity hover:opacity-90" style="background-color: var(--color-primary);">Pesan</a>
                     </div>
                 </div>
             @endforeach

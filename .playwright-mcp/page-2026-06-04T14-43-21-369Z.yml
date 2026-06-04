@@ -1,0 +1,49 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - button "Close navigation" [ref=e5]:
+        - img [ref=e6]
+      - img "Corndog-Ku" [ref=e8]
+      - generic [ref=e9]: OWNER
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/dashboard
+        - generic [ref=e12]: DASHBOARD
+      - link "PRODUCT" [ref=e13] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/products
+        - generic [ref=e14]: PRODUCT
+      - link "REPORT" [ref=e15] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/reports
+        - generic [ref=e16]: REPORT
+      - link "USER MAINTENANCE" [ref=e17] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/users
+        - generic [ref=e19]: USER MAINTENANCE
+      - link "JADWAL OPERASIONAL" [ref=e20] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/owner/jadwal-operasional
+        - generic [ref=e21]: JADWAL OPERASIONAL
+    - button "Log Out" [ref=e24]
+  - generic [ref=e25]:
+    - banner [ref=e26]:
+      - button "Toggle navigation" [ref=e28]
+    - main [ref=e33]:
+      - heading "User Maintenance" [level=1] [ref=e34]
+      - generic [ref=e35]:
+        - article [ref=e36]:
+          - generic [ref=e37]:
+            - button "Edit" [ref=e38]:
+              - img "Edit" [ref=e39]
+            - button "Delete" [ref=e40]:
+              - img "Delete" [ref=e41]
+          - generic [ref=e42]:
+            - generic [ref=e43]: Test Owner
+            - generic [ref=e44]: Non Active
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - img [ref=e49]
+              - generic [ref=e51]: 0812-3456-7890
+            - generic [ref=e52]:
+              - img [ref=e54]
+              - generic [ref=e56]: owner@corndog.test
+        - button "Add Add User" [ref=e57]:
+          - img "Add" [ref=e59]
+          - generic [ref=e60]: Add User

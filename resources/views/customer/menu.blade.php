@@ -99,7 +99,7 @@
             {{-- Filter trigger + floating dropdown --}}
             <div class="relative inline-block">
                 <button id="btn-filter-toggle" type="button"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border hover:bg-gray-100 transition-colors"
+                        class="inline-flex items-center justify-center gap-1.5 px-3 min-h-[40px] min-w-[40px] rounded-full text-xs font-semibold border hover:bg-gray-100 transition-colors"
                         style="border-color: var(--color-border); color: var(--color-black);"
                         title="Filter Produk">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 flex-none" fill="none"
@@ -197,7 +197,7 @@
             {{-- Sort trigger + floating dropdown --}}
             <div class="relative inline-block">
                 <button id="btn-sort-toggle" type="button"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border hover:bg-gray-100 transition-colors"
+                        class="inline-flex items-center justify-center gap-1.5 px-3 min-h-[40px] min-w-[40px] rounded-full text-xs font-semibold border hover:bg-gray-100 transition-colors"
                         style="border-color: var(--color-border); color: var(--color-black);"
                         title="Urutkan Produk">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 flex-none" fill="none"
@@ -468,7 +468,7 @@ $(function () {
         // Mengembalikan tombol Pesan dengan style warna asli CSS Variable bawaan aplikasi Anda (--color-accent)
         var orderBtn = inStock
             ? '<button type="button"' +
-            ' class="btn-pesan flex-none px-3 py-1 rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
+            ' class="btn-pesan flex-none px-4 min-h-[36px] rounded-full text-xs font-bold transition-opacity hover:opacity-80"' +
             ' style="background-color:var(--color-accent);color:var(--color-black);"' +
             ' data-id="' + p.id + '"' +
             ' data-name="' + safeName + '"' +
@@ -476,7 +476,7 @@ $(function () {
             ' data-description="' + safeDesc + '"' +
             ' data-image="' + safeImageUrl + '">Pesan</button>'
             : '<button type="button" disabled' +
-            ' class="flex-none px-3 py-1 rounded-full text-xs font-bold cursor-not-allowed"' +
+            ' class="flex-none px-4 min-h-[36px] rounded-full text-xs font-bold cursor-not-allowed"' +
             ' style="background-color:#d1d5db;color:#9ca3af;">Habis</button>';
 
         // Return HTML dengan layout h-48 asli agar gambar corndog memanjang utuh dan tidak terpotong

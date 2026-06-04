@@ -1,0 +1,63 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - button "Close navigation" [ref=e5]:
+        - img [ref=e6]
+      - img "Corndog-Ku" [ref=e8]
+      - generic [ref=e9]: CASHIER
+    - navigation [ref=e10]:
+      - link "DASHBOARD" [ref=e11] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/cashier/dashboard
+        - generic [ref=e12]: DASHBOARD
+      - link "CASHIER" [ref=e13] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/cashier/purchase
+        - generic [ref=e15]: CASHIER
+    - button "Log Out" [ref=e18]
+  - generic [ref=e19]:
+    - banner [ref=e20]:
+      - button "Toggle navigation" [ref=e22]
+    - main [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - heading "Kasir" [level=1] [ref=e31]
+            - generic [ref=e34]: Toko Tutup
+          - generic [ref=e35]:
+            - img
+            - searchbox "Cari produk…" [ref=e36]
+          - generic [ref=e37]:
+            - button "Semua" [ref=e38]
+            - button "Bingsoo" [ref=e39]
+            - button "Combo" [ref=e40]
+            - button "Corndog Asin" [ref=e41]
+            - button "Corndog Manis" [ref=e42]
+            - button "Custom" [ref=e43]
+            - button "Es Teler Kwentel" [ref=e44]
+            - button "Toppoki" [ref=e45]
+        - generic [ref=e80]:
+          - heading "Order Menu" [level=2] [ref=e82]
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - paragraph [ref=e87]: Info Pelanggan
+              - generic [ref=e88]:
+                - img [ref=e89]
+                - text: No. dipakai untuk struk WA
+            - textbox "No. WhatsApp (opsional)…" [ref=e92]
+            - textbox "Nama pelanggan…" [ref=e94]
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - radio "Dine-in" [ref=e97]
+                - generic [ref=e98] [cursor=pointer]: Dine-in
+              - generic [ref=e99]:
+                - radio "Takeaway" [checked] [ref=e100]
+                - generic [ref=e101] [cursor=pointer]: Takeaway
+            - button "Simpan Info Pelanggan" [ref=e102]
+          - generic [ref=e104]:
+            - img [ref=e105]
+            - paragraph [ref=e107]: Belum ada item
+            - paragraph [ref=e108]: Simpan info pelanggan lalu pilih menu
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - paragraph [ref=e112]: Total
+              - paragraph [ref=e113]: Rp 0
+            - button "Toko Sedang Tutup" [ref=e114]

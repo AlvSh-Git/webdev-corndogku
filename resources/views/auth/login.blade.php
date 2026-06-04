@@ -19,7 +19,7 @@
 
     {{-- Back --}}
     <a href="{{ url('/') }}"
-       class="absolute top-6 left-6 md:left-10 text-red-700 hover:text-red-900 flex items-center gap-2 z-50 font-bold">
+       class="absolute top-4 left-4 md:left-10 text-red-700 hover:text-red-900 inline-flex items-center gap-2 z-50 font-bold py-2 px-2 min-h-[44px]">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7"/>
         </svg>
@@ -72,7 +72,7 @@
                 </button>
 
                 <div class="text-center mt-4 text-sm">
-                    <a href="{{ route('password.wa.request') }}" class="text-red-700 hover:underline">Lupa Password</a>
+                    <a href="{{ route('password.wa.request') }}" class="text-red-700 hover:underline inline-block py-2 px-3 -my-2">Lupa Password</a>
                 </div>
             </form>
 

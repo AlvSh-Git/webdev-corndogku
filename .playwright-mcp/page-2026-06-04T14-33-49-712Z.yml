@@ -1,0 +1,323 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Corndog-Ku" [ref=e4] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test
+        - img "Corndog-Ku" [ref=e5]
+      - generic [ref=e6]:
+        - link "0" [ref=e7] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/cart
+          - img [ref=e8]
+          - generic [ref=e10]: "0"
+        - link "Log In" [ref=e11] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/login
+        - button "Buka menu navigasi" [ref=e12]:
+          - img [ref=e13]
+    - generic [ref=e15]:
+      - img [ref=e16]
+      - generic [ref=e18]:
+        - text: Maaf, toko sedang tutup. Toko akan buka kembali pada
+        - strong [ref=e19]: Besok
+        - text: pukul
+        - strong [ref=e20]: 10:00
+        - text: .
+  - generic [ref=e22]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - heading "Crispy Corndog, Happy Mood" [level=1] [ref=e26]:
+          - text: Crispy
+          - text: Corndog,
+          - text: Happy Mood
+        - paragraph [ref=e27]: Corndog hangat, topping melimpah, mozzarella lumer di setiap gigitan.
+        - link "TRY NOW" [ref=e28] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/menu
+      - img "Corndog"
+    - generic [ref=e30]:
+      - generic [ref=e31]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e32]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e33]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e34]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e35]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e36]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e37]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e38]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e39]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e40]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e41]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e42]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e43]: ● ISI HARI MU DENGAN CORNDOG
+      - generic [ref=e44]: ● ISI HARI MU DENGAN CORNDOG
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - link "Promo 1 Order Now 🔥" [ref=e49] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/menu
+          - img "Promo 1" [ref=e50]
+          - generic [ref=e52]: Order Now 🔥
+        - link "Promo 2 Order Now 🔥" [ref=e53] [cursor=pointer]:
+          - /url: http://webdev-corndogku.test/menu
+          - img "Promo 2" [ref=e54]
+          - generic [ref=e56]: Order Now 🔥
+      - link "Promo 3" [ref=e58] [cursor=pointer]:
+        - /url: http://webdev-corndogku.test/menu
+        - img "Promo 3" [ref=e59]
+  - generic [ref=e62]:
+    - img "Custom Corndog – Buat corndog favoritmu sesuai seleramu!" [ref=e63]
+    - link "Yuk, Buat Corndog Kamu!" [ref=e64] [cursor=pointer]:
+      - /url: http://webdev-corndogku.test/customize
+      - text: Yuk, Buat Corndog Kamu!
+      - img [ref=e65]
+  - generic [ref=e67]:
+    - heading "Menu Categories" [level=2] [ref=e69]
+    - generic [ref=e70]:
+      - button "Corndog Asin" [ref=e71]: Corndog Asin
+      - button "Corndog Manis" [ref=e72]
+      - button "Toppoki" [ref=e73]
+      - button "Combo" [ref=e74]
+      - button "Es Teler Kwentel" [ref=e75]
+      - button "Bingsoo" [ref=e76]
+    - generic [ref=e78]:
+      - generic [ref=e79] [cursor=pointer]:
+        - img "Corndog Original" [ref=e81]
+        - generic [ref=e82]:
+          - paragraph [ref=e83]: Corndog Asin
+          - paragraph [ref=e84]: Corndog Original
+          - paragraph [ref=e85]: Perpaduan sosis dan mozzarella lumer dengan balutan tepung crispy khas Korean corndog.
+        - generic [ref=e86]:
+          - paragraph [ref=e87]: Rp 16.000
+          - button "Pesan" [ref=e88]
+      - generic [ref=e89] [cursor=pointer]:
+        - img "Corndog Full Sausage" [ref=e91]
+        - generic [ref=e92]:
+          - paragraph [ref=e93]: Corndog Asin
+          - paragraph [ref=e94]: Corndog Full Sausage
+          - paragraph [ref=e95]: Sosis utuh dengan lapisan crispy gurih dan saus favorit pilihanmu.
+        - generic [ref=e96]:
+          - paragraph [ref=e97]: Rp 17.000
+          - button "Pesan" [ref=e98]
+      - generic [ref=e99] [cursor=pointer]:
+        - img "Corndog Full Mozza" [ref=e101]
+        - generic [ref=e102]:
+          - paragraph [ref=e103]: Corndog Asin
+          - paragraph [ref=e104]: Corndog Full Mozza
+          - paragraph [ref=e105]: Mozzarella full lumer dengan tekstur crispy di luar dan cheesy di dalam.
+        - generic [ref=e106]:
+          - paragraph [ref=e107]: Rp 17.000
+          - button "Pesan" [ref=e108]
+      - generic [ref=e109] [cursor=pointer]:
+        - img "Corndog Mozza Potato" [ref=e111]
+        - generic [ref=e112]:
+          - paragraph [ref=e113]: Corndog Asin
+          - paragraph [ref=e114]: Corndog Mozza Potato
+          - paragraph [ref=e115]: Corndog mozzarella dengan balutan potongan kentang crispy yang gurih dan crunchy.
+        - generic [ref=e116]:
+          - paragraph [ref=e117]: Rp 20.000
+          - button "Pesan" [ref=e118]
+      - generic [ref=e119] [cursor=pointer]:
+        - img "Corndog Ramen Mix" [ref=e121]
+        - generic [ref=e122]:
+          - paragraph [ref=e123]: Corndog Asin
+          - paragraph [ref=e124]: Corndog Ramen Mix
+          - paragraph [ref=e125]: Kombinasi sosis dan mozzarella dengan topping ramen crispy yang unik dan gurih.
+        - generic [ref=e126]:
+          - paragraph [ref=e127]: Rp 18.000
+          - button "Pesan" [ref=e128]
+      - generic [ref=e129] [cursor=pointer]:
+        - img "Corndog Original Bubble" [ref=e131]
+        - generic [ref=e132]:
+          - paragraph [ref=e133]: Corndog Asin
+          - paragraph [ref=e134]: Corndog Original Bubble
+          - paragraph [ref=e135]: Perpaduan mozzarella dan sosis dengan bubble crumbs renyah yang bikin tekstur makin crunchy.
+        - generic [ref=e136]:
+          - paragraph [ref=e137]: Rp 19.000
+          - button "Pesan" [ref=e138]
+      - generic [ref=e139] [cursor=pointer]:
+        - img "Corndog Cheetos" [ref=e141]
+        - generic [ref=e142]:
+          - paragraph [ref=e143]: Corndog Asin
+          - paragraph [ref=e144]: Corndog Cheetos
+          - paragraph [ref=e145]: Corndog sosis mozzarella dengan rasa cheetos gurih pedas yang super crunchy.
+        - generic [ref=e146]:
+          - paragraph [ref=e147]: Rp 20.000
+          - button "Pesan" [ref=e148]
+      - generic [ref=e149] [cursor=pointer]:
+        - img "Corndog Double Cheese" [ref=e151]
+        - generic [ref=e152]:
+          - paragraph [ref=e153]: Corndog Asin
+          - paragraph [ref=e154]: Corndog Double Cheese
+          - paragraph [ref=e155]: Full mozzarella dengan saus keju dan taburan keju melimpah yang creamy dan lumer.
+        - generic [ref=e156]:
+          - paragraph [ref=e157]: Rp 20.000
+          - button "Pesan" [ref=e158]
+      - generic [ref=e159] [cursor=pointer]:
+        - img "Corndog Squid Original" [ref=e161]
+        - generic [ref=e162]:
+          - paragraph [ref=e163]: Corndog Asin
+          - paragraph [ref=e164]: Corndog Squid Original
+          - paragraph [ref=e165]: Corndog sosis mozzarella dengan model sosis seperti squid crispy khas yang gurih dan unik.
+        - generic [ref=e166]:
+          - paragraph [ref=e167]: Rp 16.000
+          - button "Pesan" [ref=e168]
+      - generic [ref=e169] [cursor=pointer]:
+        - img "Corndog Squid Nori" [ref=e171]
+        - generic [ref=e172]:
+          - paragraph [ref=e173]: Corndog Asin
+          - paragraph [ref=e174]: Corndog Squid Nori
+          - paragraph [ref=e175]: Perpaduan sosis mozzarella dengan model sosis seperti squid dan taburan nori rumput laut gurih.
+        - generic [ref=e176]:
+          - paragraph [ref=e177]: Rp 18.000
+          - button "Pesan" [ref=e178]
+      - generic [ref=e179] [cursor=pointer]:
+        - img "Corndog Squid Potato" [ref=e181]
+        - generic [ref=e182]:
+          - paragraph [ref=e183]: Corndog Asin
+          - paragraph [ref=e184]: Corndog Squid Potato
+          - paragraph [ref=e185]: Corndog berbentuk squid dengan balutan kentang crispy yang crunchy di luar dan mozzarella lumer di dalam. Gurih dan super satisfying.
+        - generic [ref=e186]:
+          - paragraph [ref=e187]: Rp 17.000
+          - button "Pesan" [ref=e188]
+      - generic [ref=e189] [cursor=pointer]:
+        - img "Corndog Squid Ramen Mix" [ref=e191]
+        - generic [ref=e192]:
+          - paragraph [ref=e193]: Corndog Asin
+          - paragraph [ref=e194]: Corndog Squid Ramen Mix
+          - paragraph [ref=e195]: Corndog berbentuk squid dengan topping ramen crispy yang unik dan penuh tekstur. Crunchy, savory, dan bikin nagih.
+        - generic [ref=e196]:
+          - paragraph [ref=e197]: Rp 17.000
+          - button "Pesan" [ref=e198]
+  - generic [ref=e201]:
+    - iframe [ref=e203]:
+      - link "Open in Maps (opens in new tab)" [ref=f2e4] [cursor=pointer]:
+        - /url: undefined
+        - text: Open in Maps
+        - img [ref=f2e6]
+    - generic [ref=e204]:
+      - heading "Location & Hours" [level=3] [ref=e205]
+      - generic [ref=e206]:
+        - generic [ref=e207]:
+          - generic [ref=e208]: Monday
+          - generic [ref=e209]: 13:00 – 21:00
+        - generic [ref=e210]:
+          - generic [ref=e211]: Tuesday
+          - generic [ref=e212]: 13:00 – 21:00
+        - generic [ref=e213]:
+          - generic [ref=e214]: Wednesday
+          - generic [ref=e215]: 13:00 – 21:00
+        - generic [ref=e216]:
+          - generic [ref=e217]: Thursday
+          - generic [ref=e218]: 13:00 – 21:00
+        - generic [ref=e219]:
+          - generic [ref=e220]: Friday
+          - generic [ref=e221]: 13:00 – 21:00
+        - generic [ref=e222]:
+          - generic [ref=e223]: Saturday
+          - generic [ref=e224]: 13:00 – 21:00
+        - generic [ref=e225]:
+          - generic [ref=e226]: Sunday
+          - generic [ref=e227]: 13:00 – 21:00
+  - generic [ref=e229]:
+    - generic [ref=e231]: Your trust in us
+    - generic [ref=e234]:
+      - group "1 / 5" [ref=e235]:
+        - generic [ref=e237]:
+          - generic [ref=e238]:
+            - generic [ref=e239]:
+              - img "Aisha Prasetio" [ref=e240]
+              - generic [ref=e241]:
+                - heading "Aisha Prasetio" [level=4] [ref=e242]
+                - paragraph [ref=e243]: 15 October 2025
+            - img [ref=e244]
+          - generic [ref=e249]:
+            - generic [ref=e250]: ★
+            - generic [ref=e251]: ★
+            - generic [ref=e252]: ★
+            - generic [ref=e253]: ★
+            - generic [ref=e254]: ★
+          - paragraph [ref=e255]: "\"langganan setiap pulang ngampus! corndognya enak, menu lain juga pada oke banget. ibunya juga baik sekali 🤗\""
+      - group "2 / 5" [ref=e256]:
+        - generic [ref=e258]:
+          - generic [ref=e259]:
+            - generic [ref=e260]:
+              - img "Zinnia Aprilelloy" [ref=e261]
+              - generic [ref=e262]:
+                - heading "Zinnia Aprilelloy" [level=4] [ref=e263]
+                - paragraph [ref=e264]: 20 October 2025
+            - img [ref=e265]
+          - generic [ref=e270]:
+            - generic [ref=e271]: ★
+            - generic [ref=e272]: ★
+            - generic [ref=e273]: ★
+            - generic [ref=e274]: ★
+            - generic [ref=e275]: ★
+          - paragraph [ref=e276]: "\"langganan bingsoo cookies & cream di sini... rasanya pas ga terlalu manis, toppingnya full ada luaran oreo, koko krunch, jelly, es krim rasa cokelat. Silahkan dicoba gaiss🙆🏻‍♀️👍🏻\""
+      - group "3 / 5" [ref=e277]:
+        - generic [ref=e279]:
+          - generic [ref=e280]:
+            - generic [ref=e281]:
+              - img "anggun singga" [ref=e282]
+              - generic [ref=e283]:
+                - heading "anggun singga" [level=4] [ref=e284]
+                - paragraph [ref=e285]: 31 October 2025
+            - img [ref=e286]
+          - generic [ref=e291]:
+            - generic [ref=e292]: ★
+            - generic [ref=e293]: ★
+            - generic [ref=e294]: ★
+            - generic [ref=e295]: ★
+            - generic [ref=e296]: ★
+          - paragraph [ref=e297]: "\"pelayananya okey, ibuknya ramah rasanya mantul 👍🏻👍🏻 sudah sering kesini karna deket kampus\""
+      - group "4 / 5" [ref=e298]:
+        - generic [ref=e300]:
+          - generic [ref=e301]:
+            - generic [ref=e302]:
+              - img "Selma Aghni" [ref=e303]
+              - generic [ref=e304]:
+                - heading "Selma Aghni" [level=4] [ref=e305]
+                - paragraph [ref=e306]: 19 October 2025
+            - img [ref=e307]
+          - generic [ref=e312]:
+            - generic [ref=e313]: ★
+            - generic [ref=e314]: ★
+            - generic [ref=e315]: ★
+            - generic [ref=e316]: ★
+            - generic [ref=e317]: ★
+          - paragraph [ref=e318]: "\"bingsoo nya enakk, topping nya banyaaakk banget dan ibunya ramaahhh🥰\""
+      - group "5 / 5" [ref=e319]:
+        - generic [ref=e321]:
+          - generic [ref=e322]:
+            - generic [ref=e323]:
+              - img "Aaprilia Mahuzee" [ref=e324]
+              - generic [ref=e325]:
+                - heading "Aaprilia Mahuzee" [level=4] [ref=e326]
+                - paragraph [ref=e327]: 19 October 2025
+            - img [ref=e328]
+          - generic [ref=e333]:
+            - generic [ref=e334]: ★
+            - generic [ref=e335]: ★
+            - generic [ref=e336]: ★
+            - generic [ref=e337]: ★
+            - generic [ref=e338]: ★
+          - paragraph [ref=e339]: "\"Bingsoonya enakk gk terlalu manis dn dibuatnya cepett\""
+  - contentinfo [ref=e340]:
+    - generic [ref=e341]:
+      - generic [ref=e342]:
+        - img "Corndog-Ku" [ref=e344]
+        - generic [ref=e345]:
+          - heading "Contact Us" [level=4] [ref=e346]
+          - list [ref=e347]:
+            - listitem [ref=e348]: "@corndogku_id"
+            - listitem [ref=e349]: +62 823-2511-0652
+            - listitem [ref=e350]: Jl. Rungkut Mejoyo Utara No.61, Surabaya
+        - generic [ref=e351]:
+          - heading "Follow Us" [level=4] [ref=e352]
+          - generic [ref=e353]:
+            - link "WhatsApp" [ref=e354] [cursor=pointer]:
+              - /url: https://api.whatsapp.com/send/?phone=6282325110652&text&type=phone_number&app_absent=0
+              - img [ref=e355]
+            - link "Instagram" [ref=e357] [cursor=pointer]:
+              - /url: https://www.instagram.com/corndogku_id?igsh=cDN6b2w0dGwydjI3
+              - img [ref=e358]
+      - generic [ref=e361]: © 2026 Corndog-Ku. All rights reserved.
+  - button "Buka chat asisten" [ref=e362]:
+    - img [ref=e363]
+    - generic [ref=e365]: Chat
+    - generic [ref=e366]: "1"

@@ -145,12 +145,12 @@
             </p>
             <div class="flex gap-1">
                 <button type="button" id="cal-prev"
-                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold
+                        class="w-9 h-9 rounded flex items-center justify-center text-sm font-bold
                                transition-colors hover:opacity-80"
                         style="background-color:#EAEDF1;color:#555;"
                         title="Hari sebelumnya">&lsaquo;</button>
                 <button type="button" id="cal-next"
-                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold"
+                        class="w-9 h-9 rounded flex items-center justify-center text-sm font-bold"
                         style="{{ $canGoNext
                             ? 'background-color:#EAEDF1;color:#555;cursor:pointer;'
                             : 'background-color:#F3F4F6;color:#D1D5DB;cursor:not-allowed;' }}"
@@ -176,8 +176,8 @@
                 @endphp
                 <button type="button" class="cal-date-btn"
                         data-date="{{ $wdStr }}"
-                        style="width:28px;height:28px;display:flex;align-items:center;
-                               justify-content:center;border-radius:50%;font-size:11px;
+                        style="width:36px;height:36px;display:flex;align-items:center;
+                               justify-content:center;border-radius:50%;font-size:12px;
                                margin:auto;border:none;cursor:pointer;
                                {{ $isSel
                                    ? 'background-color:var(--color-primary);color:#fff;font-weight:700;'
@@ -660,15 +660,15 @@ $(function () {
             const isFut   = dStr > today;
 
             if (isFut) {
-                datesHtml += `<span style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:11px;color:#D1D5DB;margin:auto;">${d.getDate()}</span>`;
+                datesHtml += `<span style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;color:#D1D5DB;margin:auto;">${d.getDate()}</span>`;
             } else if (isSel) {
                 datesHtml += `<button type="button" class="cal-date-btn" data-date="${dStr}"
-                                      style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:11px;font-weight:700;color:#fff;margin:auto;background-color:var(--color-primary);border:none;cursor:pointer;">${d.getDate()}</button>`;
+                                      style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;font-weight:700;color:#fff;margin:auto;background-color:var(--color-primary);border:none;cursor:pointer;">${d.getDate()}</button>`;
             } else {
                 const col = isToday ? 'var(--color-primary)' : 'var(--color-black)';
                 const fw  = isToday ? '700' : '400';
                 datesHtml += `<button type="button" class="cal-date-btn" data-date="${dStr}"
-                                      style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:11px;color:${col};font-weight:${fw};margin:auto;background:transparent;border:none;cursor:pointer;">${d.getDate()}</button>`;
+                                      style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;color:${col};font-weight:${fw};margin:auto;background:transparent;border:none;cursor:pointer;">${d.getDate()}</button>`;
             }
         });
         $('#cal-dates').html(datesHtml);

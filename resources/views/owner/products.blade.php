@@ -72,7 +72,7 @@
         {{-- Edit / Delete --}}
         <div class="absolute -top-2 -right-2 flex items-center gap-1.5 z-10">
             <button type="button"
-                    class="btn-edit w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm
+                    class="btn-edit w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm
                            border border-gray-100 hover:bg-gray-50 transition-colors"
                     data-id="{{ $product->id }}"
                     data-name="{{ $product->name }}"
@@ -93,7 +93,7 @@
                 </svg>
             </button>
             <button type="button"
-                    class="btn-delete w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm
+                    class="btn-delete w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm
                            border border-gray-100 hover:bg-red-50 transition-colors"
                     data-id="{{ $product->id }}"
                     data-name="{{ $product->name }}"

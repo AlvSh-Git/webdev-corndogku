@@ -57,89 +57,84 @@
             <form method="POST" action="{{ route('owner.jadwal.save') }}">
                 @csrf
 
-                {{-- Table (scrollable on small screens) --}}
-                <div class="m-6 border border-gray-200 rounded-2xl overflow-x-auto">
-                    <table class="w-full" style="min-width:480px;">
-                        <thead>
-                            <tr style="background-color:#fff8e4;border-bottom:1px solid #e5e7eb;">
-                                <th class="text-left text-sm font-bold text-gray-800 px-4 py-3" style="width:5.5rem;">Hari</th>
-                                <th class="text-left text-sm font-bold text-gray-800 px-4 py-3" style="width:9rem;">Status</th>
-                                <th class="text-center text-sm font-bold text-gray-800 px-4 py-3">Jam Buka</th>
-                                <th class="text-center text-sm font-bold text-gray-800 px-4 py-3">Jam Tutup</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($schedule as $i => $day)
-                            @php $dayOpen = $day['open'] ?? false; @endphp
-                            <tr class="jadwal-row" data-day="{{ $day['key'] }}"
-                                style="{{ $i < count($schedule) - 1 ? 'border-bottom:1px solid #f3f4f6;' : '' }}">
+                {{-- Schedule rows — stacked on mobile, table-like grid on md+ --}}
+                <div class="m-4 sm:m-6 border border-gray-200 rounded-2xl overflow-hidden">
+                    {{-- Column headers (desktop only) --}}
+                    <div class="hidden md:grid md:grid-cols-[5.5rem_9rem_1fr_1fr] md:items-center md:gap-2 px-4 py-3"
+                         style="background-color:#fff8e4;border-bottom:1px solid #e5e7eb;">
+                        <div class="text-sm font-bold text-gray-800">Hari</div>
+                        <div class="text-sm font-bold text-gray-800">Status</div>
+                        <div class="text-sm font-bold text-gray-800 text-center">Jam Buka</div>
+                        <div class="text-sm font-bold text-gray-800 text-center">Jam Tutup</div>
+                    </div>
 
-                                {{-- Day name --}}
-                                <td class="px-4 py-3">
-                                    <span class="text-sm font-bold text-gray-800">{{ $day['label'] }}</span>
-                                </td>
+                    @foreach ($schedule as $i => $day)
+                    @php $dayOpen = $day['open'] ?? false; @endphp
+                    <div class="jadwal-row px-4 py-3 md:grid md:grid-cols-[5.5rem_9rem_1fr_1fr] md:items-center md:gap-2"
+                         data-day="{{ $day['key'] }}"
+                         style="{{ $i < count($schedule) - 1 ? 'border-bottom:1px solid #f3f4f6;' : '' }}">
 
-                                {{-- Toggle switch + label --}}
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <input type="checkbox"
-                                               name="open_{{ $day['key'] }}"
-                                               class="sr-only day-toggle"
-                                               {{ $dayOpen ? 'checked' : '' }}>
-                                        <div class="toggle-pill relative cursor-pointer"
-                                             style="width:40px;height:20px;border-radius:9999px;flex-shrink:0;transition:background-color .2s;background-color:{{ $dayOpen ? '#930c0e' : '#d1d5db' }};">
-                                            <div class="toggle-knob absolute bg-white rounded-full"
-                                                 style="width:16px;height:16px;top:2px;transition:left .2s;left:{{ $dayOpen ? '22px' : '2px' }};border:1px solid {{ $dayOpen ? 'white' : '#d1d5db' }};"></div>
-                                        </div>
-                                        <span class="toggle-label-text text-sm font-medium {{ $dayOpen ? 'text-gray-700' : 'text-red-500' }}">
-                                            {{ $dayOpen ? 'Buka' : 'Tutup' }}
-                                        </span>
-                                    </div>
-                                </td>
+                        {{-- Day name + status toggle row (mobile: stacked on its own row with toggle inline) --}}
+                        <div class="flex items-center justify-between md:contents">
+                            <span class="text-sm font-bold text-gray-800">{{ $day['label'] }}</span>
 
-                                {{-- Jam Buka (input + clock icon + dash) --}}
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <div class="relative flex-1">
-                                            <input type="time"
-                                                   name="buka_{{ $day['key'] }}"
-                                                   class="buka-input w-full border rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-red-800 transition-colors"
-                                                   style="padding-right:2rem;border-color:#e5e7eb;background-color:{{ $dayOpen ? 'white' : '#f3f4f6' }};color:{{ $dayOpen ? '#1e293b' : '#9ca3af' }};"
-                                                   value="{{ $dayOpen ? ($day['buka'] ?? '') : '' }}"
-                                                   {{ !$dayOpen ? 'disabled' : '' }}>
-                                            <span class="clock-icon absolute top-1/2 -translate-y-1/2 pointer-events-none"
-                                                  style="right:7px;color:{{ $dayOpen ? '#9ca3af' : '#d1d5db' }};">
-                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <span class="text-base select-none flex-none" style="color:#d1d5db;">-</span>
-                                    </div>
-                                </td>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox"
+                                       name="open_{{ $day['key'] }}"
+                                       class="sr-only day-toggle"
+                                       {{ $dayOpen ? 'checked' : '' }}>
+                                <div class="toggle-pill relative cursor-pointer"
+                                     style="width:40px;height:20px;border-radius:9999px;flex-shrink:0;transition:background-color .2s;background-color:{{ $dayOpen ? '#930c0e' : '#d1d5db' }};">
+                                    <div class="toggle-knob absolute bg-white rounded-full"
+                                         style="width:16px;height:16px;top:2px;transition:left .2s;left:{{ $dayOpen ? '22px' : '2px' }};border:1px solid {{ $dayOpen ? 'white' : '#d1d5db' }};"></div>
+                                </div>
+                                <span class="toggle-label-text text-sm font-medium {{ $dayOpen ? 'text-gray-700' : 'text-red-500' }}">
+                                    {{ $dayOpen ? 'Buka' : 'Tutup' }}
+                                </span>
+                            </div>
+                        </div>
 
-                                {{-- Jam Tutup (input + clock icon) --}}
-                                <td class="px-4 py-3">
-                                    <div class="relative">
-                                        <input type="time"
-                                               name="tutup_{{ $day['key'] }}"
-                                               class="tutup-input w-full border rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-red-800 transition-colors"
-                                               style="padding-right:2rem;border-color:#e5e7eb;background-color:{{ $dayOpen ? 'white' : '#f3f4f6' }};color:{{ $dayOpen ? '#1e293b' : '#9ca3af' }};"
-                                               value="{{ $dayOpen ? ($day['tutup'] ?? '') : '' }}"
-                                               {{ !$dayOpen ? 'disabled' : '' }}>
-                                        <span class="clock-icon absolute top-1/2 -translate-y-1/2 pointer-events-none"
-                                              style="right:7px;color:{{ $dayOpen ? '#9ca3af' : '#d1d5db' }};">
-                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </td>
+                        {{-- Time inputs: side by side on mobile, separate cells on md+ --}}
+                        <div class="grid grid-cols-2 gap-2 mt-3 md:mt-0 md:contents">
+                            <div class="md:flex md:items-center md:gap-2">
+                                <label class="block md:hidden text-[11px] font-semibold text-gray-500 mb-1">Jam Buka</label>
+                                <div class="relative md:flex-1">
+                                    <input type="time"
+                                           name="buka_{{ $day['key'] }}"
+                                           class="buka-input w-full border rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-red-800 transition-colors"
+                                           style="padding-right:2rem;border-color:#e5e7eb;background-color:{{ $dayOpen ? 'white' : '#f3f4f6' }};color:{{ $dayOpen ? '#1e293b' : '#9ca3af' }};"
+                                           value="{{ $dayOpen ? ($day['buka'] ?? '') : '' }}"
+                                           {{ !$dayOpen ? 'disabled' : '' }}>
+                                    <span class="clock-icon absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                                          style="right:7px;color:{{ $dayOpen ? '#9ca3af' : '#d1d5db' }};">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <span class="hidden md:inline text-base select-none flex-none" style="color:#d1d5db;">-</span>
+                            </div>
 
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            <div>
+                                <label class="block md:hidden text-[11px] font-semibold text-gray-500 mb-1">Jam Tutup</label>
+                                <div class="relative">
+                                    <input type="time"
+                                           name="tutup_{{ $day['key'] }}"
+                                           class="tutup-input w-full border rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-red-800 transition-colors"
+                                           style="padding-right:2rem;border-color:#e5e7eb;background-color:{{ $dayOpen ? 'white' : '#f3f4f6' }};color:{{ $dayOpen ? '#1e293b' : '#9ca3af' }};"
+                                           value="{{ $dayOpen ? ($day['tutup'] ?? '') : '' }}"
+                                           {{ !$dayOpen ? 'disabled' : '' }}>
+                                    <span class="clock-icon absolute top-1/2 -translate-y-1/2 pointer-events-none"
+                                          style="right:7px;color:{{ $dayOpen ? '#9ca3af' : '#d1d5db' }};">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
 
                 {{-- Info banner --}}

@@ -12,7 +12,10 @@ class UserMaintenanceController extends Controller
 {
     public function index()
     {
-        $users = User::whereIn('role', ['owner', 'employee'])
+        // User Maintenance manages cashier accounts. Match both the canonical
+        // 'cashier' role and the legacy 'employee' alias so every cashier the
+        // store has ever had shows up here.
+        $users = User::whereIn('role', ['cashier', 'employee'])
                      ->orderBy('created_at', 'desc')
                      ->get();
 
@@ -33,7 +36,10 @@ class UserMaintenanceController extends Controller
             'name'     => $validated['name'],
             'username' => $validated['username'],
             'email'    => $validated['email'],
-            'role'     => 'employee',
+            // Use the canonical 'cashier' role so the new account passes the
+            // cashier route middleware (role:cashier,...) and can log in to
+            // the cashier view without registering first.
+            'role'     => 'cashier',
             'status'   => $validated['status'],
             'password' => Hash::make($validated['password']),
         ]);

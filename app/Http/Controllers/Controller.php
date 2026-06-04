@@ -20,6 +20,135 @@ abstract class Controller
     }
 
     /**
+     * Order statuses that are still "in progress". These orders stay visible in
+     * the cashier/owner order lists across day boundaries so an unfinished order
+     * never silently disappears when the date rolls over.
+     */
+    protected function activeOrderStatuses(): array
+    {
+        return ['Pending', 'Preparing', 'Ready'];
+    }
+
+    /**
+     * Constrain an Order query to a given day PLUS any still-active order from
+     * earlier days — but ONLY when viewing today's board, so an unfinished order
+     * never disappears on the date rollover. A deliberately selected past date
+     * stays strictly scoped to that day for accurate historical review.
+     * Used for the order LIST only — financial stats/charts stay date-scoped.
+     */
+    protected function ordersForDay($query, string $date)
+    {
+        $isToday = $date === today()->toDateString();
+
+        return $query->where(function ($q) use ($date, $isToday) {
+            $q->whereDate('created_at', $date);
+            if ($isToday) {
+                $q->orWhereIn('status', $this->activeOrderStatuses());
+            }
+        });
+    }
+
+    /**
+     * Tab counts matching the order-list scope. Computed with two grouped
+     * queries (date-scoped tally + active-carryover tally) instead of one
+     * COUNT per status, to keep the polled dashboard cheap.
+     */
+    protected function orderTabCounts(string $date): array
+    {
+        $isToday = $date === today()->toDateString();
+        $active  = $this->activeOrderStatuses();
+
+        // Counts of the selected day's orders, grouped by status.
+        $byStatusOnDate = \App\Models\Order::whereDate('created_at', $date)
+            ->selectRaw('status, COUNT(*) as c')
+            ->groupBy('status')
+            ->pluck('c', 'status');
+
+        // On the live board, active statuses carry over from every day.
+        $activeAll = $isToday
+            ? \App\Models\Order::whereIn('status', $active)
+                ->selectRaw('status, COUNT(*) as c')
+                ->groupBy('status')
+                ->pluck('c', 'status')
+            : collect();
+
+        // Per-status: active statuses use the carryover tally on the live board,
+        // terminal statuses always use the date-scoped tally.
+        $count = fn (string $s) => (int) ($isToday && in_array($s, $active, true)
+            ? ($activeAll[$s] ?? 0)
+            : ($byStatusOnDate[$s] ?? 0));
+
+        // 'all' = orders on the date, plus active orders from other days (live only),
+        // avoiding double-counting the date's own active orders.
+        $allOnDate    = (int) $byStatusOnDate->sum();
+        $activeOnDate = (int) collect($active)->sum(fn ($s) => $byStatusOnDate[$s] ?? 0);
+        $activeTotal  = (int) $activeAll->sum();
+        $all = $isToday ? ($allOnDate + ($activeTotal - $activeOnDate)) : $allOnDate;
+
+        return [
+            'all'       => $all,
+            'Pending'   => $count('Pending'),
+            'Preparing' => $count('Preparing'),
+            'Ready'     => $count('Ready'),
+            'Completed' => $count('Completed'),
+            'Cancelled' => $count('Cancelled'),
+        ];
+    }
+
+    /**
+     * Map an order's line items for the order-detail drawer (shared by the
+     * cashier and owner dashboards).
+     *
+     * Non-custom products carry their product image + name. Custom corndogs
+     * (identified by custom_notes) carry a layered preview image (varian base +
+     * first sauce overlay, mirroring the customer order-history thumbnail) plus
+     * a readable "isi · varian · sauces" breakdown. Item text is rendered into
+     * innerHTML on the client, so the dashboards must escape it.
+     */
+    protected function mapOrderItems(\App\Models\Order $order): array
+    {
+        $customVarianMap = config('corndog.varian_images', []);
+        $customSauceMap  = config('corndog.sauce_images', []);
+        $fallbackImage   = config('corndog.fallback_image', 'assets/img/CA_ORIGINAL.png');
+
+        return $order->items->map(function ($i) use ($customVarianMap, $customSauceMap, $fallbackImage) {
+            $isCustom = !empty($i->custom_notes);
+            $custom   = $isCustom ? (json_decode($i->custom_notes, true) ?: []) : [];
+
+            $customInfo = '';
+            $baseImg    = '';
+            $sauceImg   = '';
+
+            if ($isCustom) {
+                $customInfo = implode(' · ', array_filter([
+                    !empty($custom['isi'])    ? $custom['isi']    : null,
+                    !empty($custom['varian']) ? $custom['varian'] : null,
+                    !empty($custom['sauces']) ? $custom['sauces'] : null,
+                ]));
+
+                $varianKey = strtoupper(trim($custom['varian'] ?? ''));
+                $baseImg   = asset($customVarianMap[$varianKey] ?? $fallbackImage);
+
+                $firstSauce = strtoupper(trim(explode(',', $custom['sauces'] ?? '')[0] ?? ''));
+                $sauceImg   = isset($customSauceMap[$firstSauce]) ? asset($customSauceMap[$firstSauce]) : '';
+            }
+
+            return [
+                'name'        => $i->product_name ?? $i->product?->name ?? 'Item',
+                'is_custom'   => $isCustom,
+                'custom_info' => $customInfo,
+                'variant'     => '',
+                'price'       => $i->quantity > 0 ? (int) ($i->subtotal / $i->quantity) : 0,
+                'qty'         => $i->quantity,
+                'subtotal'    => $i->subtotal,
+                'img'         => $i->product?->image ? asset($i->product->image) : '',
+                'base_img'    => $baseImg,
+                'sauce_img'   => $sauceImg,
+            ];
+        })->values()->toArray();
+    }
+
+    /**
      * Single source of truth for the store's opening hours before an owner
      * customizes them. Shared by the status calc, the chatbot, and the Owner UI
      * so every surface agrees on the same default state.

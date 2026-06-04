@@ -141,18 +141,21 @@
                         </svg>
                     </div>
                     <div>
+                        {{-- Where the order came from --}}
+                        <p id="drawer-order-type"
+                           style="font-size:11px;font-weight:600;color:#9CA3AF;margin:0 0 1px;">
+                            -
+                        </p>
+                        {{-- Customer name --}}
                         <p id="drawer-customer-name"
                            style="font-size:13px;font-weight:700;
                                   color:var(--color-black);
                                   line-height:1.3;margin:0;">
                             Customer
                         </p>
-                        <p id="drawer-order-type"
-                           style="font-size:11px;color:#9CA3AF;margin:0;">
-                            -
-                        </p>
+                        {{-- Customer phone number --}}
                         <p id="drawer-customer-phone"
-                           style="font-size:11px;color:#9CA3AF;margin:0;">
+                           style="font-size:11px;color:#9CA3AF;margin:1px 0 0;">
                             -
                         </p>
                     </div>

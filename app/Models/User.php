@@ -38,6 +38,15 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Virtual `active` flag derived from the `status` enum, so views can use
+     * $user->active (true when status === 'active').
+     */
+    public function getActiveAttribute(): bool
+    {
+        return $this->status === 'active';
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);

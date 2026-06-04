@@ -37,7 +37,7 @@ class ChatbotController extends Controller
         try {
             $response = Http::withoutVerifying()
                 ->timeout(15)
-                ->withHeaders(['Authorization' => 'Bearer ' . env('GROQ_API_KEY')])
+                ->withHeaders(['Authorization' => 'Bearer ' . config('services.groq.key')])
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model'    => 'llama-3.1-8b-instant',
                     'messages' => $messages,

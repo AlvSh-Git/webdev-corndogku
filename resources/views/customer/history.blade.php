@@ -153,17 +153,10 @@
             @endphp
 
             @php
-                $customVarianMap = [
-                    'ORIGINAL'    => asset('assets/img/custom_original.png'),
-                    'POTATO'      => asset('assets/img/custom_potato.png'),
-                    'RAMEN'       => asset('assets/img/custom_ramen.png'),
-                ];
-                $customSauceMap = [
-                    'KETCHUP'      => asset('assets/img/custom_ketchup.png'),
-                    'MAYONNAISE'   => asset('assets/img/custom_mayonnaise.png'),
-                    'HOT SAUCE'    => asset('assets/img/custom_hotsauce.png'),
-                    'CHEESE SAUCE' => asset('assets/img/custom_cheesesauce.png'),
-                ];
+                // Image maps centralized in config/corndog.php (shared with the
+                // cashier/owner order-detail drawers via Controller::mapOrderItems).
+                $customVarianMap = collect(config('corndog.varian_images', []))->map(fn($p) => asset($p))->all();
+                $customSauceMap  = collect(config('corndog.sauce_images', []))->map(fn($p) => asset($p))->all();
             @endphp
             @forelse($orders as $order)
                 @php

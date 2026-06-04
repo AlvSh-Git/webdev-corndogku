@@ -39,6 +39,28 @@
             transform: translateY(-2px);
         }
 
+        /* ── Auto-running product marquee ───────────────────── */
+        .marquee-viewport { overflow: hidden; }
+        .marquee-track {
+            width: max-content;
+            will-change: transform;
+        }
+        .marquee-track.is-running {
+            animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+        }
+        /* Pause while hovering so cards stay clickable */
+        .marquee-viewport:hover .marquee-track.is-running {
+            animation-play-state: paused;
+        }
+        @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(-1 * var(--marquee-shift, 0px))); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .marquee-track.is-running { animation: none; }
+            .marquee-viewport { overflow-x: auto; }
+        }
+
         /* Hero Pattern 08 — wave overlay */
         .hero-pattern::before {
             content: '';
@@ -437,39 +459,55 @@
 
         <div class="relative z-10 container mx-auto px-4 max-w-5xl">
 
+            @php
+                // Map each promo poster to a real product. Clicking a card opens
+                // the Menu (Varian Rasa) page with ?product=<id> so that page can
+                // auto-open the matching product detail popup. Falls back to the
+                // plain menu link when a product can't be matched.
+                $promoFind = function (string $needle) use ($products) {
+                    return $products->first(fn ($p) => str_contains(mb_strtolower($p->name), mb_strtolower($needle)));
+                };
+                $promoFullMozza = $promoFind('full mozza');     // home_card_01 → Corndog Full Mozza
+                $promoBingsoo   = $promoFind('bingsoo mango');  // home_card_02 → Bingsoo Mango Creamy
+                $promoPotato    = $promoFind('mozza potato');   // home_card_03 → Corndog Mozza Potato
+
+                $promoLink = fn ($p) => $p
+                    ? route('menu') . '?product=' . $p->id
+                    : route('menu');
+            @endphp
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {{-- Left: 2 stacked cards with floating Order Now buttons --}}
                 <div id="section-best-seller" class="flex flex-col gap-6">
-                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+                    {{-- Card 01 → Corndog Full Mozza --}}
+                    <a href="{{ $promoLink($promoFullMozza) }}"
+                       class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <img src="{{ asset('assets/img/home_card_01.png') }}"
-                             alt="Promo 1"
-                             class="w-full block">
+                             alt="{{ $promoFullMozza->name ?? 'Promo 1' }}" class="w-full block">
                         <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
-                                Order Now 🔥
-                            </span>
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">Order Now 🔥</span>
                         </div>
                     </a>
 
-                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    {{-- Card 02 → Bingsoo Mango Creamy --}}
+                    <a href="{{ $promoLink($promoBingsoo) }}"
+                       class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <img src="{{ asset('assets/img/home_card_02.png') }}"
-                             alt="Promo 2"
-                             class="w-full block">
+                             alt="{{ $promoBingsoo->name ?? 'Promo 2' }}" class="w-full block">
                         <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
-                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">
-                                Order Now 🔥
-                            </span>
+                            <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">Order Now 🔥</span>
                         </div>
                     </a>
                 </div>
 
-                {{-- Right: 1 large card --}}
+                {{-- Right: 1 large card → Corndog Mozza Potato --}}
                 <div id="section-buy-now" class="flex h-full">
-                    <a href="{{ route('menu') }}" class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full h-full">
+                    <a href="{{ $promoLink($promoPotato) }}"
+                       class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full h-full">
                         <img src="{{ asset('assets/img/home_card_03.png') }}"
-                             alt="Promo 3"
-                             class="w-full h-full object-cover block">
+                             alt="{{ $promoPotato->name ?? 'Promo 3' }}" class="w-full h-full object-cover block">
                     </a>
                 </div>
             </div>
@@ -843,7 +881,8 @@
                     <p class="font-bold text-base" style="color: var(--color-black);">Belum ada produk di kategori ini.</p>
                 </div>
             @else
-                <div class="flex flex-row overflow-x-auto gap-6 pb-8 sm:pb-12 pt-16 sm:pt-20 px-4 sm:px-8 w-full hide-scrollbar">
+                <div class="marquee-viewport w-full pb-8 sm:pb-12 pt-16 sm:pt-20">
+                  <div class="marquee-track flex flex-row gap-6">
                     @foreach ($catProducts as $product)
                         <div class="product-card flex flex-col relative bg-white rounded-[2rem] shadow-md p-5 pt-16 min-w-[240px] w-[240px] shrink-0 justify-between cursor-pointer"
                              data-category="{{ $product->category->name }}"
@@ -898,6 +937,7 @@
                                 </div>
                         </div>
                     @endforeach
+                  </div>
                 </div>
             @endif
 
@@ -1239,6 +1279,62 @@ $(function () {
     var currentProductImage = '';
     var currentProductDesc  = '';
 
+    /* ── Auto-running product marquee ──────────────────────── */
+    var MARQUEE_SPEED = 70; // pixels per second
+
+    function buildMarquee($track) {
+        var viewport = $track.closest('.marquee-viewport')[0];
+        if (!viewport) return;
+        var viewportWidth = viewport.clientWidth;
+        if (!viewportWidth) return; // container hidden — can't measure yet
+
+        // Stop any running animation while we re-measure
+        $track.removeClass('is-running').css('animation', 'none');
+
+        // Keep a pristine copy of the original cards
+        var originals = $track.data('marquee-originals');
+        if (!originals) {
+            originals = $track.children().clone();
+            $track.data('marquee-originals', originals);
+        }
+
+        // Reset to a single original set
+        $track.empty().append(originals.clone());
+
+        var gap = parseFloat(getComputedStyle($track[0]).columnGap) || 0;
+        var baseWidth = $track[0].scrollWidth;
+        if (baseWidth <= 0) return;
+
+        // Clone the set until it fills at least twice the viewport,
+        // so the row is never empty even with only a few products.
+        var guard = 0;
+        while ($track[0].scrollWidth < viewportWidth * 2 && guard < 60) {
+            $track.append(originals.clone());
+            guard++;
+        }
+
+        // Width of the repeating unit (cards + the gap that joins the next copy)
+        var unitWidth = $track[0].scrollWidth + gap;
+
+        // Duplicate the whole unit once more so the loop reset is seamless
+        $track.append($track.children().clone());
+
+        var duration = unitWidth / MARQUEE_SPEED;
+        $track.css({
+            '--marquee-shift': unitWidth + 'px',
+            '--marquee-duration': duration + 's',
+            'animation': ''
+        });
+        // Force reflow so the restarted animation begins cleanly
+        void $track[0].offsetWidth;
+        $track.addClass('is-running');
+    }
+
+    function activateMarquee(container) {
+        var $track = $(container).find('.marquee-track');
+        if ($track.length) buildMarquee($track);
+    }
+
     /* ── Category tab → product row switcher ───────────────── */
     $('.category-btn').on('click', function () {
         var target = $(this).data('target');
@@ -1259,7 +1355,26 @@ $(function () {
 
         // Swap product row containers
         $('.category-marquee-container').addClass('hidden');
-        $('#' + target).removeClass('hidden');
+        var $shown = $('#' + target).removeClass('hidden');
+
+        // (Re)build the marquee for the now-visible row
+        activateMarquee($shown);
+    });
+
+    // Build the initially-visible marquee on load
+    $('.category-marquee-container').not('.hidden').each(function () {
+        activateMarquee(this);
+    });
+
+    // Rebuild visible marquee on resize (debounced) so widths stay correct
+    var marqueeResizeTimer;
+    $(window).on('resize', function () {
+        clearTimeout(marqueeResizeTimer);
+        marqueeResizeTimer = setTimeout(function () {
+            $('.category-marquee-container').not('.hidden').each(function () {
+                activateMarquee(this);
+            });
+        }, 250);
     });
 
     function fmtRp(n) {

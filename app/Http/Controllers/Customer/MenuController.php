@@ -54,6 +54,12 @@ class MenuController extends Controller
             ->where('is_custom', false)
             ->whereHas('category', fn($c) => $c->whereRaw('LOWER(name) != ?', ['custom']));
 
+        // Direct lookup by id (used to auto-open a product popup from the home
+        // promo cards). Short-circuits the other filters.
+        if ($request->filled('id')) {
+            $q->where('id', (int) $request->input('id'));
+        }
+
         if (!empty($cats)) {
             $q->whereHas('category', fn ($c) => $c->whereIn('name', (array) $cats));
         } elseif ($category && $category !== 'Semua') {

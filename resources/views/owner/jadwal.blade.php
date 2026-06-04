@@ -11,6 +11,29 @@
     $isManual   = ($reason === 'manual');
 @endphp
 
+<style>
+    /* The native <input type="time"> renders its own clock/picker icon,
+       which collided with the custom clock SVG → two clock icons per
+       field (most obvious on mobile). Hide the native indicator but keep
+       it as an invisible, clickable overlay on the right so tapping the
+       custom clock still opens the time picker. */
+    .buka-input::-webkit-calendar-picker-indicator,
+    .tutup-input::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2rem;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    /* Firefox / others: hide any spin controls so the field stays clean. */
+    .buka-input::-moz-clear,
+    .tutup-input::-moz-clear { display: none; }
+</style>
+
 {{-- Full-page wrapper: cream background + decorative blobs ──────────── --}}
 <div class="relative overflow-hidden -m-4 sm:-m-6 lg:-m-8 p-4 sm:p-6 lg:p-8" style="background-color:#fffef0;min-height:calc(100vh - 4rem);">
 

@@ -706,7 +706,6 @@ $(function () {
 
                     if (lastTotalOrders !== -1 && currentTotal > lastTotalOrders) {
                         const newCount = currentTotal - lastTotalOrders;
-                        console.log('[Poll] 🔔 Pesanan baru terdeteksi! +' + newCount + ' order.');
 
                         // FIX 1: Web Audio API beep — replaces new Audio(externalURL) which
                         // is always blocked by autoplay policy when called outside a gesture.
@@ -979,20 +978,52 @@ $(function () {
         });
     }
 
+    // Escape text before interpolating into innerHTML. Order item fields like
+    // the custom-corndog notes (isi/varian/sauces) originate from customer input
+    // and must never be injected raw, or they become stored XSS in this dashboard.
+    function escHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     function buildItemsHTML(order) {
         const items = order.order_items || [];
         if (!items.length) return '<p style="font-size:12px;color:#9CA3AF;text-align:center;padding:16px 0;">No items available</p>';
         return items.map(function (item) {
-            // item.img is already a full URL (asset()) from the backend
-            const imgSrc = item.img || '';
-            const imgTag = imgSrc
-                ? `<img src="${imgSrc}" alt="${item.name}" onerror="this.style.display='none';this.parentElement.style.background='#F3F4F6';" style="width:100%;height:100%;object-fit:cover;">`
+            const name = escHtml(item.name);
+            let thumbInner, thumbBg;
+            if (item.is_custom && item.base_img) {
+                // Custom corndog → layered preview (varian base + sauce overlay),
+                // matching the customer order-history thumbnail.
+                thumbBg = '#FDECD8';
+                thumbInner =
+                    `<img src="${escHtml(item.base_img)}" alt="${name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">`
+                    + (item.sauce_img
+                        ? `<img src="${escHtml(item.sauce_img)}" alt="sauce" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;">`
+                        : '');
+            } else {
+                thumbBg = '#F3F4F6';
+                const imgSrc = item.img || '';
+                thumbInner = imgSrc
+                    ? `<img src="${escHtml(imgSrc)}" alt="${name}" onerror="this.style.display='none';this.parentElement.style.background='#F3F4F6';" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">`
+                    : '';
+            }
+
+            // Subtitle: custom → "isi · varian · sauce"; otherwise nothing extra.
+            const subtitle = item.is_custom ? (item.custom_info || 'Custom Corndog') : (item.variant || '');
+            const subtitleHTML = subtitle
+                ? `<p style="font-size:11px;color:#9CA3AF;margin:0;line-height:1.35;">${escHtml(subtitle)}</p>`
                 : '';
+
             return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #F5F5F5;">
-                <div style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#F3F4F6;border:1px solid #EFEFEF;">${imgTag}</div>
+                <div style="position:relative;width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;background:${thumbBg};border:1px solid #EFEFEF;">${thumbInner}</div>
                 <div style="flex:1;min-width:0;padding-top:2px;">
-                    <p style="font-size:13px;font-weight:700;color:var(--color-black);margin:0 0 2px;">${item.name}</p>
-                    <p style="font-size:11px;color:#9CA3AF;margin:0;">${item.variant || '-'}</p>
+                    <p style="font-size:13px;font-weight:700;color:var(--color-black);margin:0 0 2px;">${name}</p>
+                    ${subtitleHTML}
                 </div>
                 <div style="flex-shrink:0;text-align:right;padding-top:2px;">
                     <p style="font-size:12px;font-weight:700;color:var(--color-black);margin:0 0 3px;">Rp ${Number(item.price || 0).toLocaleString('id-ID')}</p>
@@ -1011,7 +1042,7 @@ $(function () {
         $('#drawer-payment').text(payMap[order.payment] || order.payment || '-');
         $('#drawer-source').text(order.source === 'online' ? 'Online Order' : 'Kasir');
         $('#drawer-time').text(order.time || '-');
-        $('#drawer-date').text(new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }));
+        $('#drawer-date').text(order.date || new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }));
         const grandTotal = Number(order.total || 0), subtotal = Math.round(grandTotal / 1.11), tax = grandTotal - subtotal;
         $('#drawer-subtotal').text('Rp ' + subtotal.toLocaleString('id-ID'));
         $('#drawer-tax').text('Rp ' + tax.toLocaleString('id-ID'));
@@ -1199,7 +1230,6 @@ $(function () {
     ═══════════════════════════════════════════════════════════ */
     setInterval(function () {
         if (SELECTED_DATE !== todayISO()) return;
-        console.log('[Poll] Memeriksa pesanan baru...');
         fetchStats(SELECTED_DATE);
         fetchOrders(currentStatus, currentPage, true);
     }, 15000);

@@ -37,6 +37,15 @@ class AuthController extends Controller
         $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         if (Auth::attempt([$field => $identifier, 'password' => $request->password], $request->boolean('remember'))) {
+            // Block deactivated accounts (e.g. a cashier set to "Non Active"
+            // in User Maintenance) from logging in.
+            if (Auth::user()->status !== 'active') {
+                Auth::logout();
+                return back()
+                    ->withErrors(['login' => 'Akun Anda non-aktif. Silakan hubungi pemilik toko.'])
+                    ->withInput($request->only('login', 'remember'));
+            }
+
             $request->session()->regenerate();
 
             $user = Auth::user();

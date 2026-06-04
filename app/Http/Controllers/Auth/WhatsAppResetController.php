@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\NormalizesPhone;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class WhatsAppResetController extends Controller
 {
+    use NormalizesPhone;
+
     /** OTP validity window. */
     private const OTP_TTL_MINUTES = 5;
 
@@ -188,12 +191,4 @@ class WhatsAppResetController extends Controller
     /**
      * Normalize a phone number to Fonnte's expected 62XXXXXXXXXX form.
      */
-    private function normalizePhone(string $phone): string
-    {
-        $digits = preg_replace('/[^0-9]/', '', $phone);
-
-        if (str_starts_with($digits, '62')) return $digits;
-        if (str_starts_with($digits, '0'))  return '62' . substr($digits, 1);
-        return '62' . $digits;
-    }
 }

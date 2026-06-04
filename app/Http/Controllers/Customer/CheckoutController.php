@@ -128,8 +128,9 @@ class CheckoutController extends Controller
 
         DB::transaction(function () use ($cart, $orderNumber, $total, &$createdOrderId) {
             $user  = auth()->user();
-            // Prefer the dedicated phone column; fall back to username (stored as phone for walk-in users)
-            $phone = $user->phone ?? $user->username ?? null;
+            // Only store a real phone number; never fall back to the username
+            // (which is derived from the email and is not a phone).
+            $phone = $user->phone ?: null;
 
             $order = Order::create([
                 'user_id'        => $user->id,

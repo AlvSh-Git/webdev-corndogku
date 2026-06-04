@@ -787,7 +787,60 @@ $(function () {
         $('body').css('overflow', 'hidden');
     });
 
-    
+    /* ── Auto-open a product popup when arriving from a home promo card
+          (e.g. /menu?product=12). Fetches that single product and opens the
+          detail modal directly, independent of the current grid/pagination. ── */
+    function openProductModalById(productId) {
+        $.get('/api/products', { id: productId }).done(function (res) {
+            var p = (res.data || [])[0];
+            if (!p) return;
+
+            // Don't open the order modal for an unavailable product (same
+            // in-stock rule as the catalog cards). Otherwise the ?product= link
+            // would bypass the disabled "Habis" state and let it be ordered.
+            var inStock = p.is_available !== false && (p.stock === undefined || p.stock > 0);
+            if (!inStock) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Stok Habis',
+                    text: 'Produk ini sedang tidak tersedia.',
+                    confirmButtonColor: 'var(--color-primary)',
+                });
+                return;
+            }
+
+            currentProductId    = p.id;
+            currentProductPrice = parseInt(p.price, 10) || 0;
+            currentProductImage = p.image_url || '';
+            currentProductDesc  = p.description || '';
+            var name = p.name || '';
+
+            $('#modal-title').text(name);
+            $('#modal-price').text(fmtRp(currentProductPrice) + ' / pcs');
+            $('#modal-description').text(currentProductDesc ? currentProductDesc : 'Tidak ada deskripsi produk.');
+            $('#modal-image').attr({ src: currentProductImage ? currentProductImage : '{{ asset("assets/img/CA_ORIGINAL.png") }}', alt: name });
+
+            $('#modal-btn-wishlist').data('id', currentProductId);
+            var $modalSvg = $('#modal-btn-wishlist').find('svg');
+            if (p.is_wishlisted === true) {
+                $modalSvg.removeClass('text-gray-400').addClass('text-red-500').attr('fill', 'currentColor');
+            } else {
+                $modalSvg.removeClass('text-red-500').addClass('text-gray-400').attr('fill', 'none');
+            }
+
+            modalQty = 1;
+            $('#modal-qty').text(modalQty);
+            $('#product-modal').removeClass('hidden').addClass('flex');
+            $('body').css('overflow', 'hidden');
+        });
+    }
+
+    (function () {
+        var pid = new URLSearchParams(window.location.search).get('product');
+        if (pid) openProductModalById(pid);
+    })();
+
+
 
     /* ── Core Logic Operasional Wishlist Love (Global Event Listener) ── */
     $(document).on('click', '.btn-wishlist, #modal-btn-wishlist', function (e) {

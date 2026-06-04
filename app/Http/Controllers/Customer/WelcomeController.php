@@ -23,8 +23,8 @@ class WelcomeController extends Controller
         $storeInfo  = $this->calcStoreStatus();
 
         $googleReviews = Cache::remember('google_reviews_corndogku', 86400, function () {
-            $apiKey  = env('GOOGLE_PLACES_API_KEY');
-            $placeId = env('GOOGLE_PLACE_ID');
+            $apiKey  = config('services.google_places.key');
+            $placeId = config('services.google_places.place_id');
 
             if (!$apiKey || !$placeId) {
                 return [];

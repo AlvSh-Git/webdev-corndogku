@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\NormalizesPhone;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 
 class HistoryController extends Controller
 {
+    use NormalizesPhone;
+
     public function index(Request $request)
     {
         if (!auth()->check()) {
@@ -155,12 +158,4 @@ class HistoryController extends Controller
         }
     }
 
-    private function normalizePhone(string $phone): string
-    {
-        $digits = preg_replace('/[^0-9]/', '', $phone);
-
-        if (str_starts_with($digits, '62')) return $digits;
-        if (str_starts_with($digits, '0'))  return '62' . substr($digits, 1);
-        return '62' . $digits;
-    }
 }

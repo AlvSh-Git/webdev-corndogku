@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\ManagesOrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
+    use ManagesOrderStatus;
+
     public function index(Request $request)
     {
         $role        = 'cashier';
@@ -44,6 +47,9 @@ class DashboardController extends Controller
                 ? (int) round((($revenueToday - $revenueYesterday) / $revenueYesterday) * 100)
                 : ($revenueToday > 0 ? 100 : 0);
 
+            // Initial server-rendered table from the already-fetched $dbOrders
+            // (no extra query). The on-load AJAX getOrders() is authoritative and
+            // applies the active-order carryover.
             if ($dbOrders->isNotEmpty()) {
                 $orders = $dbOrders->map(function ($o) {
                     $source       = $o->order_type === 'online' ? 'online' : 'cashier';
@@ -52,26 +58,20 @@ class DashboardController extends Controller
                         fn($i) => $i->quantity . '× ' . ($i->product_name ?? $i->product?->name ?? 'Item')
                     )->implode(', ');
 
-                    $orderItems = $o->items->map(fn($i) => [
-                        'name'     => $i->product_name ?? $i->product?->name ?? 'Item',
-                        'variant'  => $i->custom_notes ?? '',
-                        'price'    => $i->quantity > 0 ? (int) ($i->subtotal / $i->quantity) : 0,
-                        'qty'      => $i->quantity,
-                        'subtotal' => $i->subtotal,
-                        'img'      => $i->product?->image ? asset($i->product->image) : '',
-                    ])->values()->toArray();
+                    $orderItems = $this->mapOrderItems($o);
 
                     return (object) [
                         'db_id'=> $o->id,
                         'id'  => '#' . $o->order_number,
                         'is_new' => $o->created_at->gte(now()->subMinutes(30)),
                         'customer'=> $o->user?->name ?? 'Walk-in Customer',
-                        'phone'=> $o->customer_phone,
+                        'phone'=> $o->user?->phone ?? $o->customer_phone,
                         'sub' => $o->user ? 'Customer' : '',
                         'source' => $source,
                         'items'=> $itemsSummary ?: '-',
                         'status' => $o->status,
                         'time' => $o->created_at->format('h:i A'),
+                        'date' => $o->created_at->translatedFormat('j M Y'),
                         'total' => $o->total_price,
                         'order_type' => $o->order_type,
                         'payment'=> $payment,
@@ -123,19 +123,13 @@ class DashboardController extends Controller
         $date    = Carbon::parse($rawDate)->min(today())->toDateString();
 
         try {
-            $allRows = Order::whereDate('created_at', $date)->get(['status']);
-            $counts  = [
-                'all'       => $allRows->count(),
-                'Pending'   => $allRows->where('status', 'Pending')->count(),
-                'Preparing' => $allRows->where('status', 'Preparing')->count(),
-                'Ready'     => $allRows->where('status', 'Ready')->count(),
-                'Completed' => $allRows->where('status', 'Completed')->count(),
-                'Cancelled' => $allRows->where('status', 'Cancelled')->count(),
-            ];
+            $counts = $this->orderTabCounts($date);
 
-            $query = Order::with(['user', 'cashier', 'items.product', 'payment'])
-                ->whereDate('created_at', $date)
-                ->latest();
+            // List = today's orders + still-active carryover (see ordersForDay).
+            $query = $this->ordersForDay(
+                Order::with(['user', 'cashier', 'items.product', 'payment']),
+                $date
+            )->latest();
 
             if ($status !== 'all') {
                 $query->where('status', ucfirst(strtolower($status)));
@@ -150,14 +144,7 @@ class DashboardController extends Controller
                     fn($i) => $i->quantity . '× ' . ($i->product_name ?? $i->product?->name ?? 'Item')
                 )->implode(', ');
 
-                $orderItems = $o->items->map(fn($i) => [
-                    'name'     => $i->product_name ?? $i->product?->name ?? 'Item',
-                    'variant'  => $i->custom_notes ?? '',
-                    'price'    => $i->quantity > 0 ? (int) ($i->subtotal / $i->quantity) : 0,
-                    'qty'      => $i->quantity,
-                    'subtotal' => $i->subtotal,
-                    'img'      => $i->product?->image ? asset($i->product->image) : '',
-                ])->values()->toArray();
+                $orderItems = $this->mapOrderItems($o);
 
                 return [
                     'db_id'=> $o->id,
@@ -165,11 +152,12 @@ class DashboardController extends Controller
                     'is_new' => $o->created_at->gte(now()->subMinutes(30)),
                     'customer'=> $o->user?->name ?? 'Walk-in Customer',
                     'sub'=> $o->user ? 'Customer' : '',
-                    'phone'=> $o->customer_phone,
+                    'phone'=> $o->user?->phone ?? $o->customer_phone,
                     'source'  => $source,
                     'items' => $itemsSummary ?: '-',
                     'status' => $o->status,
                     'time' => $o->created_at->format('h:i A'),
+                    'date' => $o->created_at->translatedFormat('j M Y'),
                     'total' => $o->total_price,
                     'order_type'          => $o->order_type,
                     'payment'=> $payment,
@@ -284,116 +272,4 @@ class DashboardController extends Controller
         }
     }
 
-    public function updateOrderStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status'              => ['required', 'in:Pending,Preparing,Ready,Completed,Cancelled'],
-            'cancellation_reason' => ['nullable', 'string', 'max:500'],
-        ]);
-
-        // Tambahkan 'payment' agar data pembayarannya ikut terpanggil
-        $order = Order::with(['items.product', 'payment'])->findOrFail($id);
-
-        $updateData = ['status' => $request->status];
-
-        // Assign the processing cashier the first time a staff member touches this order
-        if (!$order->cashier_id) {
-            $updateData['cashier_id'] = auth()->id();
-        }
-
-        if ($request->status === 'Cancelled') {
-            $updateData['cancellation_reason'] = $request->cancellation_reason;
-
-            // --- AWAL LOGIKA REFUND MIDTRANS ---
-            $isRefundedViaMidtrans = false;
-
-            // Cek apakah order lunas dibayar online (QRIS/E-Wallet)
-            if ($order->payment && $order->payment->status === 'Paid' && in_array(strtolower($order->payment->payment_method), ['qris', 'gopay', 'shopeepay'])) {
-                
-                $serverKey = config('services.midtrans.server_key');
-                $isProduction = config('services.midtrans.is_production', false);
-                $baseUrl = $isProduction ? 'https://api.midtrans.com/v2' : 'https://api.sandbox.midtrans.com/v2';
-
-                $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
-                    ->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                    ])
-                    ->post("{$baseUrl}/{$order->order_number}/refund", [
-                        'refund_key' => 'REF-' . $order->order_number . '-' . time(),
-                        'amount'     => (int) $order->payment->amount,
-                        'reason'     => $request->cancellation_reason ?? 'Dibatalkan oleh Kasir'
-                    ]);
-
-                // Batalkan proses Cancel jika Midtrans menolak refund (misal saldo merchant kurang)
-                if ($response->failed() && $response->status() !== 200) {
-                    \Illuminate\Support\Facades\Log::error('Midtrans Refund Failed', [
-                        'order_id' => $order->order_number,
-                        'response' => $response->json()
-                    ]);
-
-                    return response()->json([
-                        'error' => 'refund_failed',
-                        'message' => 'Gagal Refund Midtrans: ' . ($response->json('status_message') ?? 'Terjadi kesalahan jaringan.')
-                    ], 422);
-                }
-
-                // Jika sukses, ubah status payment menjadi Refunded
-                $order->payment->update(['status' => 'Refunded']);
-                $isRefundedViaMidtrans = true;
-            }
-            // --- AKHIR LOGIKA REFUND MIDTRANS ---
-
-
-            // Restore stock for every item in the cancelled order (KODE ASLI)
-            foreach ($order->items as $item) {
-                if ($item->product_id) {
-                    Product::where('id', $item->product_id)
-                        ->update(['stock' => DB::raw('stock + ' . (int) $item->quantity)]);
-                } elseif ($item->custom_notes) {
-                    $notes       = json_decode($item->custom_notes, true) ?? [];
-                    $ingredients = array_values(array_filter([
-                        $notes['isi']    ?? null,
-                        $notes['varian'] ?? null,
-                    ]));
-                    if (!empty($notes['sauces'])) {
-                        foreach (array_map('trim', explode(',', $notes['sauces'])) as $sauce) {
-                            if ($sauce !== '') {
-                                $ingredients[] = $sauce;
-                            }
-                        }
-                    }
-                    foreach ($ingredients as $ingredientName) {
-                        Product::whereHas('category', fn($c) => $c->whereRaw('LOWER(name) = ?', ['custom']))
-                            ->whereRaw('UPPER(name) = ?', [strtoupper(trim($ingredientName))])
-                            ->update(['stock' => DB::raw('stock + ' . (int) $item->quantity)]);
-                    }
-                }
-            }
-
-            if (!$isRefundedViaMidtrans) {
-                $order->payment()->delete();
-            }
-        }
-
-        $order->update($updateData);
-
-        // Ensure every completed order has a payment record so the Sales Report
-        // can always join on payments without missing rows.
-        if ($request->status === 'Completed' && !$order->payment()->exists()) {
-            $method = $order->order_type === 'online' ? 'QRIS' : 'Cash';
-            Payment::create([
-                'order_id'       => $order->id,
-                'payment_method' => $method,
-                'amount'         => $order->total_price,
-                'status'         => 'Paid',
-            ]);
-        }
-
-        return response()->json([
-            'success'  => true,
-            'status'   => $request->status,
-            'order_id' => (int) $id,
-        ]);
-    }
 }

@@ -601,17 +601,22 @@
          button-area → relative + margin-top:auto (natural bottom anchor)
        ════════════════════════════════════════════════════════════ */
 
-    /* ── 1. Lock page to one screen ───────────────────────────── */
+    /* ── 1. Allow natural vertical scroll on mobile ───────────────
+       Previously the page was locked to one screen (100dvh + overflow
+       hidden). On short phones — and on step 3 where the "Add Sauce"
+       block adds height — that clipped the bottom CTA button.
+       We now let the page grow and scroll so nothing is ever cut off. */
     body {
-        height: 100dvh !important;
-        overflow: hidden !important;
+        height: auto !important;
+        min-height: 100dvh !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
     }
 
     .custom-page {
-        /* flex:1 from Tailwind already fills calc(100dvh - 64px) */
-        min-height: 0 !important;
+        min-height: calc(100dvh - 64px) !important;
         height: auto !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         display: flex;
         flex-direction: column;
     }
@@ -635,6 +640,11 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        /* The title block (z-index:20) sat above the fixed #btn-back
+           (trapped in .custom-layout's z-index:10 stacking context) and
+           swallowed its taps. It's purely decorative, so let taps fall
+           through to the back button beneath it. */
+        pointer-events: none !important;
     }
 
     .custom-title {
@@ -703,8 +713,8 @@
         flex: 1 !important;
         min-height: 0 !important;
         width: 100%;
-        overflow: hidden;
-        padding-bottom: 0;
+        overflow: visible;
+        padding-bottom: 12px;
     }
 
     /* ── 6. Preview wrapper: sized to leave room for card + button ─ */
@@ -827,10 +837,11 @@
         width: calc(100% - 28px) !important;
         max-width: 500px !important;
         margin: 4px auto;
-        /* Allow internal scroll on review step if content is tall */
-        max-height: 34dvh;
-        overflow-y: auto;
-        flex-shrink: 1;
+        /* Page scrolls now, so let the panel grow fully instead of
+           nesting an inner scroll that can hide content. */
+        max-height: none !important;
+        overflow: visible !important;
+        flex-shrink: 0;
     }
 
     /* ── 12. CTA button: in flow, pushed to bottom by margin-top:auto */
@@ -841,8 +852,9 @@
         right: auto !important;
         transform: none !important;
         width: calc(100% - 28px) !important;
-        /* margin-top:auto pushes this block to the bottom of the flex column */
-        margin: auto auto 10px !important;
+        /* margin-top:auto keeps the CTA pinned to the bottom when the
+           content is short; when content is tall the page just scrolls. */
+        margin: auto auto 16px !important;
         padding: 0;
         background: transparent;
         border-top: none;
@@ -881,6 +893,29 @@
     .corndog-red-accent {
         right: 6% !important;
         top: 18% !important;
+    }
+}
+
+/* ── Extra-small phones: shrink the corndog preview so its edges
+      never get clipped on ~320 px wide screens ──────────────────── */
+@media (max-width: 360px) {
+    .custom-preview-area {
+        width: 240px !important;
+        height: 250px !important;
+    }
+    .preview-with-arrows {
+        height: 250px;
+    }
+    .corndog-blob {
+        width: 205px;
+        height: 172px;
+    }
+    #base-corndog,
+    #middle-varian {
+        height: 230px !important;
+    }
+    #overlay-sauce {
+        height: 240px !important;
     }
 }
     </style>

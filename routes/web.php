@@ -12,7 +12,6 @@ use App\Http\Controllers\Customer\HistoryController;
 use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboard;
 use App\Http\Controllers\Owner\ProductController;
-use App\Http\Controllers\Owner\UserController;
 use App\Http\Controllers\Owner\ReportController;
 use App\Http\Controllers\Owner\CategoryController;
 use App\Http\Controllers\Owner\JadwalController;
@@ -32,7 +31,9 @@ Route::get('/api/orders/{id}', [HistoryController::class, 'show'])->name('api.or
 Route::post('/orders/{id}/send-whatsapp', [HistoryController::class, 'sendReceipt'])->name('orders.send-whatsapp');
 
 // ── Chatbot ──────────────────────────────────────────────────────
-Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])
+    ->middleware('throttle:20,1')
+    ->name('chatbot.send');
 
 // ── Midtrans server-to-server payment notification (webhook) ─────
 // Public + CSRF-exempt (see bootstrap/app.php); authenticated via signature_key.
@@ -121,7 +122,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 });
 
 // ── Cashier routes — operational access (auth + cashier/owner) ──
-Route::middleware(['auth', 'role:cashier,owner'])->prefix('cashier')->name('cashier.')->group(function () {
+Route::middleware(['auth', 'role:cashier,employee,owner'])->prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/dashboard',           [CashierDashboard::class, 'index'])->name('dashboard');
     Route::get('/get-orders',          [CashierDashboard::class, 'getOrders'])->name('get-orders');
     Route::get('/get-stats',           [CashierDashboard::class, 'getStats'])->name('get-stats');

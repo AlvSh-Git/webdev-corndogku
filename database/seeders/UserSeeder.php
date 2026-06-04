@@ -16,21 +16,18 @@ class UserSeeder extends Seeder
                 'name'     => 'Test Customer',
                 'email'    => 'customer@corndog.test',
                 'role'     => 'customer',
-                'branch'   => null,
             ],
             [
                 'username' => 'owner',
                 'name'     => 'Test Owner',
                 'email'    => 'owner@corndog.test',
                 'role'     => 'owner',
-                'branch'   => null,
             ],
             [
                 'username' => 'cashier',
                 'name'     => 'Test Cashier',
                 'email'    => 'cashier@corndog.test',
                 'role'     => 'cashier',
-                'branch'   => 'Cabang Utama',
             ],
         ];
 

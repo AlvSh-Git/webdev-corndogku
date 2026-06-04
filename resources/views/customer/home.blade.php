@@ -232,8 +232,35 @@
                    style="background-color: var(--color-primary); color: var(--color-white);">Log In</a>
             @endauth
 
+            {{-- Mobile hamburger toggle — shown only < md (desktop uses the inline <nav>) --}}
+            <button id="mobile-menu-btn" type="button"
+                    aria-label="Buka menu navigasi" aria-controls="mobile-menu" aria-expanded="false"
+                    class="md:hidden w-9 h-9 flex items-center justify-center rounded-full
+                           hover:bg-gray-100 transition-colors flex-none">
+                <svg id="mobile-menu-icon-open" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2" style="color: var(--color-black);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg id="mobile-menu-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2" style="color: var(--color-black);">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
         </div>{{-- /.right flex --}}
     </div>{{-- /.navbar row --}}
+
+    {{-- Mobile slide-down menu — vanilla JS toggle (Alpine.js is disallowed per project rules) --}}
+    <div id="mobile-menu" class="md:hidden hidden border-t bg-white" style="border-color: var(--color-border);">
+        <nav class="flex flex-col px-4 sm:px-8 py-1">
+            <a href="{{ route('welcome') }}"
+               class="py-3 text-sm font-semibold border-b"
+               style="color: var(--color-primary); border-color: var(--color-border);">Beranda</a>
+            <a href="{{ route('menu') }}"
+               class="py-3 text-sm font-medium transition-colors hover:opacity-70"
+               style="color: var(--color-black);">Menu &amp; Varian Rasa</a>
+        </nav>
+    </div>
 
     {{-- Banner Toko Tutup ditaruh tepat di bawah content navbar namun masih di dalam <header> --}}
     @php $storeInfo = $storeInfo ?? ['is_open' => true, 'reason' => 'schedule', 'reopen_day' => '', 'reopen_time' => '']; @endphp
@@ -259,6 +286,37 @@
     @endif
 </header>
 
+{{-- Mobile navbar toggle — vanilla JS (no Alpine, per project rules) --}}
+<script>
+    (function () {
+        var btn   = document.getElementById('mobile-menu-btn');
+        var menu  = document.getElementById('mobile-menu');
+        var iOpen = document.getElementById('mobile-menu-icon-open');
+        var iClose= document.getElementById('mobile-menu-icon-close');
+        if (!btn || !menu) return;
+
+        function setOpen(open) {
+            menu.classList.toggle('hidden', !open);
+            iOpen.classList.toggle('hidden', open);
+            iClose.classList.toggle('hidden', !open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setOpen(menu.classList.contains('hidden'));
+        });
+
+        // Close when tapping outside or resizing up to desktop
+        document.addEventListener('click', function (e) {
+            if (!menu.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+        });
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 768) setOpen(false);
+        });
+    })();
+</script>
+
 {{-- Spacer: pushes content below the fixed header.
      64px = navbar only | 112px = navbar + store-closed banner --}}
 <div style="height: {{ !($storeInfo['is_open'] ?? true) ? '112px' : '64px' }};"></div>
@@ -271,17 +329,30 @@
     {{-- Hero — solid red section with two separate corndog images absolutely
          positioned left & right, and centered text. Fluid min-height + py so
          nothing overflows on mobile. --}}
-    <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern
-                    flex items-center justify-center
-                    overflow-hidden py-10">
+    {{-- < lg : vertical stack (images on top, centered text, bottom wave).
+         lg+  : original absolute-positioned layout — DO NOT alter the lg: classes. --}}
+    <section class="relative z-20 w-full mt-0 md:mt-4 bg-[#8D1818] hero-pattern overflow-hidden
+                    flex flex-col items-center justify-center
+                    lg:flex-row lg:items-center lg:justify-center
+                    pt-0 pb-0 lg:py-10">
 
+        {{-- LEFT corndog (MOBILE) — floating top-left, mobile-specific asset --}}
+        <img src="{{ asset('assets/img/gmbr_banner_mobile_01.png') }}" alt="Corndog Left"
+             class="block lg:hidden absolute left-[15%] top-[5%] h-[260px] w-auto max-w-none object-contain z-0">
+
+        {{-- LEFT corndog (DESKTOP) — preserves perfected lg: layout --}}
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
-             class="absolute left-[-20px] md:left-[-10px] lg:left-0 top-[55%] lg:top-[58%] -translate-y-1/2 h-[110%] md:h-[125%] lg:h-[135%] w-auto max-w-none object-contain opacity-30 md:opacity-100 pointer-events-none z-0">
+             class="hidden lg:block absolute lg:left-0 top-[55%] lg:top-[58%] -translate-y-1/2 lg:h-[135%] w-auto max-w-none object-contain pointer-events-none z-0">
 
+        {{-- RIGHT corndog (MOBILE + DESKTOP) — top-right & tilted on mobile, original on lg --}}
         <img src="{{ asset('assets/img/gmbr_banner_corndog_01.png') }}" alt="Corndog Right"
-             class="absolute right-[-10px] md:right-4 lg:right-12 top-[55%] lg:top-[58%] -translate-y-1/2 h-[85%] md:h-[95%] lg:h-[105%] w-auto max-w-none object-contain opacity-30 md:opacity-100 pointer-events-none z-0">
+             class="absolute right-[15%] lg:right-12 top-[8%] lg:top-[58%] translate-y-0 lg:-translate-y-1/2 h-[220px] lg:h-[105%] w-auto max-w-none object-contain rotate-[15deg] lg:rotate-0 opacity-100 pointer-events-none z-0">
 
-        <div class="relative z-10 flex flex-col items-start text-left px-4 max-w-lg md:max-w-2xl mx-auto">
+        <div class="relative z-10 flex flex-col items-center text-center
+                    lg:items-start lg:text-left
+                    mt-[280px] md:mt-[320px] lg:mt-0
+                    px-6 lg:px-4 max-w-lg md:max-w-2xl mx-auto
+                    pb-14 lg:py-0">
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">
                 Crispy Corndog,<br>Happy Mood
             </h1>
@@ -293,6 +364,13 @@
                 TRY NOW
             </a>
         </div>
+
+        {{-- MOBILE-only white wave — transitions the red banner into the page below --}}
+        <svg class="lg:hidden absolute bottom-0 left-0 w-full block" viewBox="0 0 1440 90"
+             preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+             style="height: 42px;" aria-hidden="true">
+            <path fill="#FFFEF0" d="M0,50 C240,90 480,10 720,40 C960,70 1200,90 1440,45 L1440,90 L0,90 Z"></path>
+        </svg>
     </section>
 
     {{-- Ticker band — z-10 + negative margin so the poster's corndog stick breaks on top of it --}}

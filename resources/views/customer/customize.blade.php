@@ -591,131 +591,296 @@
 }
 
 @media (max-width: 900px) {
+    /* ════════════════════════════════════════════════════════════
+       NO-SCROLL MOBILE LAYOUT
+       Goal: everything fits in one screen height without scrolling.
+       Strategy:
+         body       → 100dvh, overflow:hidden  (restores Tailwind defaults)
+         custom-page→ flex:1, overflow:hidden  (fills space below 64px header)
+         custom-layout → flex:1, min-height:0  (fills remaining space)
+         button-area → relative + margin-top:auto (natural bottom anchor)
+       ════════════════════════════════════════════════════════════ */
+
+    /* ── 1. Lock page to one screen ───────────────────────────── */
     body {
-        overflow: auto !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
     }
 
     .custom-page {
-        min-height: 1080px;
-        overflow: hidden;
+        /* flex:1 from Tailwind already fills calc(100dvh - 64px) */
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
     }
 
+    /* ── 2. Hide decorative circles & accent lines ─────────────── */
+    .deco-circle-left,
+    .deco-circle-right,
+    .title-accent-lines {
+        display: none;
+    }
+
+    /* ── 3. Title: compact, centered, in document flow ──────────── */
     .custom-title-wrap {
-        top: 24px;
-        left: 22px;
-        transform: scale(0.78);
-        transform-origin: top left;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        flex-shrink: 0;
+        width: 100%;
+        padding: 16px 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .custom-title {
+        transform: rotate(-3deg);
+        transform-origin: center;
+        text-align: center;
+    }
+
+    /* Smaller fonts so the title block fits within ~90 px total */
+    .custom-title .black {
+        font-size: clamp(27px, 7.2vw, 36px);
+    }
+
+    .custom-title .red {
+        font-size: clamp(25px, 6.8vw, 34px);
+        margin-left: 0 !important;
+    }
+
+    .title-brush {
+        width: clamp(130px, 36vw, 170px);
+        height: 16px;
+        margin-top: 0;
+        margin-left: 0;
+        align-self: center;
+    }
+
+    .subtitle-blob {
+        width: clamp(188px, 52vw, 230px);
+        height: 50px;
+        padding: 8px 36px 8px 18px;
+        margin-top: 4px;
+        margin-left: 0;
+        align-self: center;
+    }
+
+    .subtitle-text {
+        font-size: 11px;
+        line-height: 1.1;
+    }
+
+    /* ── 4. Stepper: compact, in flow ──────────────────────────── */
+    .step-line {
+        min-width: 20px !important;
     }
 
     #stepper {
-        top: 190px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%) scale(0.78);
-        transform-origin: top center;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        flex-shrink: 0;
+        transform: scale(0.72) !important;
+        transform-origin: top center !important;
+        width: 100%;
+        max-width: 400px;
+        margin: 16px auto 0; /* ← increase this value to push stepper further down */
+        align-self: center;
+        justify-content: center;
     }
 
+    /* ── 5. Layout: flex column, fills all remaining height ──────── */
+    .custom-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+        width: 100%;
+        overflow: hidden;
+        padding-bottom: 0;
+    }
+
+    /* ── 6. Preview wrapper: sized to leave room for card + button ─ */
+    .preview-with-arrows {
+        position: relative;
+        width: 100%;
+        /* height: controls how tall the corndog area is.
+           Raise this value to make the corndog bigger; lower it to save room.
+           All six values below should stay proportional to each other. */
+        height: 285px;
+        max-width: 420px;
+        margin: 5px auto 0;
+        flex-shrink: 0;
+    }
+
+    /* ── 7. Corndog preview: centred inside the wrapper ─────────── */
     .custom-preview-area {
-        top: 57%;
-        width: 90vw;
-        height: 470px;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 276px !important;  /* ≈ original 230 px × 1.20 */
+        height: 285px !important; /* ≈ original 240 px × 1.19 */
     }
 
     .corndog-blob {
-        width: 300px;
-        height: 250px;
+        /* Scale up proportionally so the blob still frames the corndog nicely */
+        width: 238px;  /* ≈ 198 × 1.20 */
+        height: 199px; /* ≈ 166 × 1.20 */
     }
 
+    /* height values here control corndog image size on mobile */
     #base-corndog {
-        height: 350px !important;
+        height: 269px !important; /* ≈ 224 px × 1.20 */
+        max-height: none !important;
+    }
+
+    #middle-varian {
+        height: 269px !important;
+        max-height: none !important;
     }
 
     #overlay-sauce {
-        height: 360px !important;
+        height: 281px !important; /* ≈ 234 px × 1.20 */
+        max-height: none !important;
     }
 
+    /* ── 8. Arrow buttons: sides of the wrapper ─────────────────── */
     #btn-prev {
-        left: 18px;
-        top: 58%;
-        width: 56px !important;
-        height: 56px !important;
+        position: absolute !important;
+        left: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 30px !important;
     }
 
     #btn-next {
-        right: 18px;
-        top: 58%;
-        width: 56px !important;
-        height: 56px !important;
+        position: absolute !important;
+        right: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 30px !important;
     }
 
+    /* ── 9. Selection pill ──────────────────────────────────────── */
     .selection-pill {
-        left: 22px;
-        bottom: 165px;
-        min-width: 220px;
-        height: 68px;
-        padding: 0 20px !important;
+        position: relative !important;
+        left: auto !important;
+        bottom: auto !important;
+        min-width: 160px !important;
+        height: 44px !important;
+        margin: 4px auto;
+        padding: 0 16px !important;
+        flex-shrink: 0;
     }
 
     #carousel-label-text {
-        font-size: 18px !important;
+        font-size: 13px !important;
     }
 
-    #carousel-dots {
-        bottom: 36px;
-    }
-
+    /* ── 10. Instruction card ───────────────────────────────────── */
     #step-card {
-        right: 22px;
-        bottom: 155px;
-        width: 260px;
-        padding: 18px 18px !important;
+        position: relative !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: calc(100% - 28px) !important;
+        max-width: 500px !important;
+        margin: 4px auto;
+        padding: 11px 14px !important;
+        flex-shrink: 0;
     }
 
     #step-card-num {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 20px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 15px !important;
     }
 
     #step-card-title {
-        font-size: 18px !important;
+        font-size: 14px !important;
+        line-height: 1.2 !important;
     }
 
     #step-card-desc {
-        font-size: 13px !important;
+        font-size: 11.5px !important;
         line-height: 1.18 !important;
-        margin-top: 8px !important;
+        margin-top: 4px !important;
     }
 
+    /* ── 11. Review panel (step 4) ──────────────────────────────── */
     #review-panel {
-        left: 22px;
-        right: 22px;
-        bottom: 145px;
-        width: auto;
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: calc(100% - 28px) !important;
+        max-width: 500px !important;
+        margin: 4px auto;
+        /* Allow internal scroll on review step if content is tall */
+        max-height: 34dvh;
+        overflow-y: auto;
+        flex-shrink: 1;
     }
 
+    /* ── 12. CTA button: in flow, pushed to bottom by margin-top:auto */
     .button-area-custom {
-        width: 86vw;
-        bottom: 28px;
-    }
-
-    #btn-back {
-        position: static;
-        width: 100%;
-        height: auto;
-        margin-bottom: 10px;
-        justify-content: center;
-        padding: 12px 20px;
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        width: calc(100% - 28px) !important;
+        /* margin-top:auto pushes this block to the bottom of the flex column */
+        margin: auto auto 10px !important;
+        padding: 0;
+        background: transparent;
+        border-top: none;
+        z-index: 40;
+        flex-shrink: 0;
     }
 
     #btn-next-step {
-        font-size: 20px !important;
-        padding: 13px 20px !important;
+        font-size: 15px !important;
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
     }
 
+    /* ── 13. Back button: small pill fixed at top-left ──────────── */
+    /* position:fixed pulls it out of .button-area-custom flow.
+       JS still controls the .hidden class — no logic change needed. */
+    #btn-back {
+        position: fixed !important;
+        top: 72px !important;
+        left: 12px !important;
+        bottom: auto !important;
+        right: auto !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 5px 12px 5px 9px !important;
+        border-radius: 20px !important;
+        font-size: 12px !important;
+        gap: 4px;
+        z-index: 60;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10) !important;
+        background: rgba(255, 253, 235, 0.95) !important;
+    }
+
+    /* ── 14. Red decorative accent ──────────────────────────────── */
     .corndog-red-accent {
-        right: 8%;
-        top: 26%;
+        right: 6% !important;
+        top: 18% !important;
     }
 }
     </style>
@@ -768,11 +933,17 @@
                     Halo, {{ auth()->user()->name }}
                 </span>
                 <a href="{{ route('profile') }}"
-                   class="w-9 h-9 rounded-full flex items-center justify-center
+                   class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
-                   style="background-color: var(--color-primary);"
+                   style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};"
                    title="{{ auth()->user()->name }}">
-                    {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @if (auth()->user()->profile_photo)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                             alt="{{ auth()->user()->name }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @endif
                 </a>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
@@ -847,78 +1018,87 @@
     {{-- Rendered by JS --}}
 </div>
 
-    {{-- Stepper --}}
-    <div id="stepper">
-        {{-- Rendered by JS --}}
-    </div>
-
     <div class="custom-layout">
 
-        {{-- Left arrow --}}
-        <button id="btn-prev"
-                type="button"
-                aria-label="Previous item">
-            &#8249;
-        </button>
+        {{-- Preview + arrows wrapper.
+             Desktop: position:static → children remain absolute relative to .custom-layout.
+             Mobile:  position:relative → arrows position relative to this wrapper. --}}
+        <div class="preview-with-arrows">
 
-        {{-- Main corndog preview --}}
-        <div id="carousel-center" class="custom-preview-area">
+            {{-- Left arrow --}}
+            <button id="btn-prev"
+                    type="button"
+                    aria-label="Previous item">
+                &#8249;
+            </button>
 
-            <div class="corndog-blob"></div>
+            {{-- Main corndog preview --}}
+            <div id="carousel-center" class="custom-preview-area">
 
-            {{-- Base corndog --}}
-            <img id="base-corndog"
-                 src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
-                 alt="Corndog preview"
-                 style="transform: scale(1.15);"
-                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                        select-none pointer-events-none transition-transform duration-300">
+                <div class="corndog-blob"></div>
 
-            {{-- Varian layer --}}
-            <div id="middle-varian-wrap"
-                 class="absolute inset-0 flex items-center justify-center pointer-events-none"
-                 style="display:none; z-index:6;">
-                <img id="middle-varian"
-                     src=""
-                     alt=""
-                     style="transform: scale(1.0);"
+                {{-- Base corndog --}}
+                <img id="base-corndog"
+                     src="{{ asset('assets/img/custom_sosis_mozza.png') }}"
+                     alt="Corndog preview"
+                     style="transform: scale(1.15);"
                      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                             select-none pointer-events-none transition-transform duration-300">
-            </div>
 
-            {{-- Sauce overlay --}}
-            <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <img id="overlay-sauce"
-                     alt=""
-                     style="transform: scale(0.9) translateY(-1rem);"
-                     class="select-none pointer-events-none transition-transform duration-300">
-            </div>
+                {{-- Varian layer --}}
+                <div id="middle-varian-wrap"
+                     class="absolute inset-0 flex items-center justify-center pointer-events-none"
+                     style="display:none; z-index:6;">
+                    <img id="middle-varian"
+                         src=""
+                         alt=""
+                         style="transform: scale(1.0);"
+                         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                                select-none pointer-events-none transition-transform duration-300">
+                </div>
 
-            {{-- Red accent --}}
-            <div class="corndog-red-accent pointer-events-none">
-                <svg width="54" height="54" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 4L7 35" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
-                    <path d="M36 17L18 39" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
-                    <path d="M50 38L27 43" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
-                </svg>
-            </div>
+                {{-- Sauce overlay --}}
+                <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <img id="overlay-sauce"
+                         alt=""
+                         style="transform: scale(0.9) translateY(-1rem);"
+                         class="select-none pointer-events-none transition-transform duration-300">
+                </div>
 
-            {{-- Dot indicators --}}
-            <div id="carousel-dots"></div>
+                {{-- Red accent --}}
+                <div class="corndog-red-accent pointer-events-none">
+                    <svg width="54" height="54" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 4L7 35" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M36 17L18 39" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M50 38L27 43" stroke="#A6171C" stroke-width="8" stroke-linecap="round"/>
+                    </svg>
+                </div>
 
-            {{-- Step 3 sauce chips --}}
-            <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center max-w-xs"></div>
+                {{-- Dot indicators --}}
+                <div id="carousel-dots"></div>
 
-            {{-- OOS overlay badge --}}
-            <div id="oos-badge"
-                 class="hidden absolute pointer-events-none flex items-center justify-center"
-                 style="top: 42%; left: 50%; transform: translate(-50%, -50%); z-index: 22;">
-                <div class="text-white font-black text-xl px-6 py-2 rounded-full shadow-lg"
-                     style="background-color: #dc2626; transform: rotate(-12deg); letter-spacing: 3px;">
-                    HABIS
+                {{-- Step 3 sauce chips --}}
+                <div id="sauce-chips" class="hidden flex-wrap gap-2 justify-center max-w-xs"></div>
+
+                {{-- OOS overlay badge --}}
+                <div id="oos-badge"
+                     class="hidden absolute pointer-events-none flex items-center justify-center"
+                     style="top: 42%; left: 50%; transform: translate(-50%, -50%); z-index: 22;">
+                    <div class="text-white font-black text-xl px-6 py-2 rounded-full shadow-lg"
+                         style="background-color: #dc2626; transform: rotate(-12deg); letter-spacing: 3px;">
+                        HABIS
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {{-- Right arrow --}}
+            <button id="btn-next"
+                    type="button"
+                    aria-label="Next item">
+                &#8250;
+            </button>
+
+        </div>{{-- /.preview-with-arrows --}}
 
         {{-- Selection name pill --}}
         <div class="selection-pill" id="carousel-label">
@@ -928,13 +1108,6 @@
             <div id="carousel-label-price" class="text-xs font-semibold mt-0.5 hidden"
                  style="color: var(--color-primary);"></div>
         </div>
-
-        {{-- Right arrow --}}
-        <button id="btn-next"
-                type="button"
-                aria-label="Next item">
-            &#8250;
-        </button>
 
         {{-- Step instruction card --}}
         <div id="step-card">
@@ -1225,28 +1398,50 @@ $(function () {
 }
 
 function getBaseTransform(display) {
+    var isMobile = window.innerWidth <= 900;
+    if (isMobile) {
+        var mobileMap = {
+            'SOSIS & MOZZA' : 'scale(1.10) translateY(-5px)',
+            'FULL MOZZA'    : 'scale(1.05) translateY(-5px)',
+            'FULL SOSIS'    : 'scale(1.05) translateY(-5px)',
+            'ORIGINAL'      : 'scale(1.18) translateY(-5px)',
+            'POTATO'        : 'scale(1.18) translateY(-5px)',
+            'RAMEN'         : 'scale(1.18) translateY(-5px)'
+        };
+        return mobileMap[display] || 'scale(1.0)';
+    }
     var map = {
         'SOSIS & MOZZA' : 'scale(1.15) translateY(-8px)',
         'FULL MOZZA'    : 'scale(1.10) translateY(-8px)',
         'FULL SOSIS'    : 'scale(1.10) translateY(-8px)',
-
         'ORIGINAL'      : 'scale(1.30) translateY(-8px)',
         'POTATO'        : 'scale(1.30) translateY(-8px)',
         'RAMEN'         : 'scale(1.30) translateY(-8px)'
     };
-
     return map[display] || 'scale(1.0)';
 }
 
 function getSauceTransform(sauceDisplay, variantDisplay) {
-    var defaultMap = {
+    var isMobile = window.innerWidth <= 900;
+
+    var defaultMap = isMobile ? {
+        'KETCHUP'      : 'scale(1.10) translate(0px, -9px)',
+        'MAYONNAISE'   : 'scale(1.06) translate(0px, -9px)',
+        'HOT SAUCE'    : 'scale(1.10) translate(0px, -9px)',
+        'CHEESE SAUCE' : 'scale(1.10) translate(0px, -9px)'
+    } : {
         'KETCHUP'      : 'scale(1.15) translate(0px, -16px)',
         'MAYONNAISE'   : 'scale(1.10) translate(0px, -16px)',
         'HOT SAUCE'    : 'scale(1.15) translate(0px, -16px)',
         'CHEESE SAUCE' : 'scale(1.15) translate(0px, -16px)'
     };
 
-    var ramenMap = {
+    var ramenMap = isMobile ? {
+        'KETCHUP'      : 'scale(1.04) translate(4px, -10px)',
+        'MAYONNAISE'   : 'scale(1.04) translate(4px, -4px)',
+        'HOT SAUCE'    : 'scale(1.04) translate(4px, -10px)',
+        'CHEESE SAUCE' : 'scale(1.04) translate(4px, -10px)'
+    } : {
         'KETCHUP'      : 'scale(1.08) translate(6px, -18px)',
         'MAYONNAISE'   : 'scale(1.08) translate(6px, -8px)',
         'HOT SAUCE'    : 'scale(1.08) translate(6px, -18px)',
@@ -1254,10 +1449,9 @@ function getSauceTransform(sauceDisplay, variantDisplay) {
     };
 
     if (variantDisplay === 'RAMEN') {
-        return ramenMap[sauceDisplay] || 'scale(1.08) translate(6px, -18px)';
+        return ramenMap[sauceDisplay] || (isMobile ? 'scale(1.04) translate(4px, -10px)' : 'scale(1.08) translate(6px, -18px)');
     }
-
-    return defaultMap[sauceDisplay] || 'scale(1.15) translate(0px, -16px)';
+    return defaultMap[sauceDisplay] || (isMobile ? 'scale(1.10) translate(0px, -9px)' : 'scale(1.15) translate(0px, -16px)');
 }
 
     /* ─── Render carousel ───────────────────────────────────── */
@@ -1760,6 +1954,7 @@ if (animate) {
 
 });
 </script>
+
 
 </body>
 </html>

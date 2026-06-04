@@ -70,11 +70,17 @@
             </a>
             @auth
                 <a href="{{ route('profile') }}"
-                   class="w-9 h-9 rounded-full flex items-center justify-center
+                   class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
-                   style="background-color: var(--color-primary);"
+                   style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};"
                    title="{{ auth()->user()->name }}">
-                    {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @if (auth()->user()->profile_photo)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                             alt="{{ auth()->user()->name }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @endif
                 </a>
                 <span class="hidden sm:block text-sm font-semibold" style="color: var(--color-black);">
                     Halo, {{ auth()->user()->name }}

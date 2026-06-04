@@ -31,11 +31,17 @@
 
             {{-- Avatar --}}
             <div class="flex-none self-center sm:self-auto">
-                <div class="w-36 h-36 rounded-full flex items-center justify-center
+                <div class="w-36 h-36 rounded-full overflow-hidden flex items-center justify-center
                             text-white text-5xl font-bold select-none"
-                     style="background-color: var(--color-primary);
+                     style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};
                             box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
-                    {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @if (auth()->user()->profile_photo)
+                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                             alt="{{ auth()->user()->name }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                    @endif
                 </div>
             </div>
 

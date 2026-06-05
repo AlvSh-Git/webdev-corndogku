@@ -1032,22 +1032,17 @@ $(function () {
             order.cashier_name || (order.source === 'online' ? 'Online Order' : '-')
         );
 
-        // Cancellation reason + lock stepper if Cancelled
-        if(order.status==='Cancelled'){
-            if(order.cancellation_reason){
-                $('#drawer-cancel-reason-text').text(order.cancellation_reason);
-                $('#drawer-cancel-reason-line').show();
-            }else{
-                $('#drawer-cancel-reason-line').hide();
-            }
-            // Disable stepper & cancel button
-            $('#drawer-stepper-wrapper').css({opacity:'0.45','pointer-events':'none'});
-            $('#btn-batalkan-order').css({opacity:'0.45','pointer-events':'none',cursor:'not-allowed'});
+        // Owner board is VIEW-ONLY for order status (only the cashier may change
+        // it). Show the cancellation reason when present, but the stepper stays
+        // non-interactive and the cancel button is hidden.
+        if(order.status==='Cancelled' && order.cancellation_reason){
+            $('#drawer-cancel-reason-text').text(order.cancellation_reason);
+            $('#drawer-cancel-reason-line').show();
         }else{
             $('#drawer-cancel-reason-line').hide();
-            $('#drawer-stepper-wrapper').css({opacity:'1','pointer-events':'auto'});
-            $('#btn-batalkan-order').css({opacity:'1','pointer-events':'auto',cursor:'pointer'});
         }
+        $('#drawer-stepper-wrapper').css({'pointer-events':'none'});
+        $('#btn-batalkan-order').hide();
 
         $('#drawer-items').html(buildItemsHTML(order));
         renderStepperForStatus(order.status);
@@ -1068,79 +1063,11 @@ $(function () {
     $(document).on('click','#order-detail-drawer',function(e){e.stopPropagation();});
     $(document).on('keydown',function(e){if(e.key==='Escape')closeDrawer();});
 
-    /* ── Step-item: update order status with SweetAlert2 ─────── */
-    $(document).on('click','.step-item',function(e){
-        e.stopPropagation();
-        if(!drawerOrder||!drawerOrder.db_id)return;
-        var newStatus=$(this).data('step');
-        if(!newStatus||newStatus===drawerOrder.status)return;
-
-        Swal.fire({
-            title:'Ubah Status Order',
-            text:'Yakin ingin mengubah status menjadi "'+newStatus+'"?',
-            icon:'question',
-            showCancelButton:true,
-            confirmButtonText:'Ya, Ubah',
-            cancelButtonText:'Batal',
-            confirmButtonColor:'#A6171C',
-            cancelButtonColor:'#6B7280',
-        }).then(function(result){
-            if(!result.isConfirmed)return;
-            $.ajax({
-                url:'/owner/orders/'+drawerOrder.db_id+'/status',
-                method:'POST',
-                data:{status:newStatus,_token:'{{ csrf_token() }}'},
-                success:function(res){
-                    if(!res.success)return;
-                    drawerOrder.status=newStatus;
-                    renderStepperForStatus(newStatus);
-                    fetchOrders(currentStatus,currentPage||1);
-                },
-                error:function(){
-                    Swal.fire('Gagal','Tidak dapat memperbarui status. Coba lagi.','error');
-                }
-            });
-        });
-    });
-
-    /* ── Batalkan Order with SweetAlert2 textarea ────────────── */
-    $(document).on('click','#btn-batalkan-order',function(e){
-        e.stopPropagation();
-        if(!drawerOrder||!drawerOrder.db_id)return;
-
-        Swal.fire({
-            title:'Batalkan Order',
-            html:'<p style="color:#555;font-size:13px;margin-bottom:6px;">Masukkan alasan pembatalan untuk <strong>'+drawerOrder.id+'</strong>:</p>',
-            input:'textarea',
-            inputPlaceholder:'Tuliskan alasan pembatalan...',
-            inputAttributes:{style:'font-size:13px;border-radius:8px;border:1px solid #E5E7EB;padding:8px;'},
-            showCancelButton:true,
-            confirmButtonText:'Batalkan Order',
-            cancelButtonText:'Tidak',
-            confirmButtonColor:'#DC2626',
-            cancelButtonColor:'#6B7280',
-            inputValidator:function(value){
-                if(!value||!value.trim())return'Alasan pembatalan wajib diisi!';
-            }
-        }).then(function(result){
-            if(!result.isConfirmed)return;
-            $.ajax({
-                url:'/owner/orders/'+drawerOrder.db_id+'/status',
-                method:'POST',
-                data:{status:'Cancelled',cancellation_reason:result.value,_token:'{{ csrf_token() }}'},
-                success:function(res){
-                    if(!res.success)return;
-                    drawerOrder.status='Cancelled';
-                    drawerOrder.cancellation_reason=result.value;
-                    closeDrawer();
-                    fetchOrders(currentStatus,currentPage||1);
-                },
-                error:function(){
-                    Swal.fire('Gagal','Tidak dapat membatalkan order. Coba lagi.','error');
-                }
-            });
-        });
-    });
+    /* ── Order status is cashier-only ─────────────────────────────
+       The owner board is view-only for order status: the stepper-advance
+       and Batalkan-Order handlers were removed so the owner can read an
+       order's progress but never mutate it. The server also blocks
+       /owner/orders/{id}/status with a 403 as defence in depth. */
 });
 </script>
 

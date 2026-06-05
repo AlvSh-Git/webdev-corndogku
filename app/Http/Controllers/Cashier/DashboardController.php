@@ -16,6 +16,19 @@ class DashboardController extends Controller
 {
     use ManagesOrderStatus;
 
+    /**
+     * Cashier-only: notify the customer over WhatsApp when their order is marked
+     * Ready, or Cancelled with a reason. The owner board leaves this a no-op.
+     */
+    protected function dispatchOrderStatusNotification(Order $order, string $status, ?string $reason): void
+    {
+        if ($status === 'Ready') {
+            $this->notifyOrderStatusViaWhatsApp($order, 'Ready');
+        } elseif ($status === 'Cancelled' && filled($reason)) {
+            $this->notifyOrderStatusViaWhatsApp($order, 'Cancelled', $reason);
+        }
+    }
+
     public function index(Request $request)
     {
         $role        = 'cashier';

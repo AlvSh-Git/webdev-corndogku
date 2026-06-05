@@ -519,11 +519,15 @@ function sendFonnteWhatsApp(button) {
     })
     .done(function (res) {
         if (res.success) {
-            alert('Struk berhasil dikirim via WhatsApp!');
+            // Inline success feedback — no popup
+            $(button)
+                .html('✓ Struk Terkirim!')
+                .prop('disabled', true)
+                .css({ background: '#16A34A', opacity: '1' });
         } else {
             alert(res.message || 'Gagal mengirim struk.');
+            $(button).html(originalText).prop('disabled', false);
         }
-        $(button).html(originalText).prop('disabled', false);
     })
     .fail(function (xhr) {
         let errorMsg = xhr.responseJSON && xhr.responseJSON.message

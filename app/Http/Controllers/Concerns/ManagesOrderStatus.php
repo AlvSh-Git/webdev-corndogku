@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 trait ManagesOrderStatus
 {
     use RestoresOrderStock;
+    use NormalizesPhone;
 
     public function updateOrderStatus(Request $request, $id)
     {
@@ -26,7 +27,7 @@ trait ManagesOrderStatus
             'cancellation_reason' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $order = Order::with(['items.product', 'payment'])->findOrFail($id);
+        $order = Order::with(['items.product', 'payment', 'user'])->findOrFail($id);
 
         $updateData = ['status' => $request->status];
 
@@ -99,10 +100,81 @@ trait ManagesOrderStatus
             ]);
         }
 
+        // Customer WhatsApp notifications are cashier-only. This hook is a no-op
+        // on the owner board and overridden by the cashier controller.
+        $this->dispatchOrderStatusNotification($order, $request->status, $request->cancellation_reason);
+
         return response()->json([
             'success'  => true,
             'status'   => $request->status,
             'order_id' => (int) $id,
         ]);
+    }
+
+    /**
+     * Hook fired after an order's status changes. No-op by default (owner board);
+     * the cashier controller overrides it to send Ready / Cancelled WhatsApp
+     * notifications, so only the cashier path messages the customer.
+     */
+    protected function dispatchOrderStatusNotification(Order $order, string $status, ?string $reason): void
+    {
+        // Intentionally empty — overridden by the cashier controller.
+    }
+
+    /**
+     * Send a WhatsApp (Fonnte) notification to the customer when their order is
+     * marked Ready or Cancelled. Resolves the number from the order's captured
+     * phone, falling back to the linked user's profile phone. Any failure is
+     * logged but swallowed so it never blocks the status update or refund.
+     */
+    protected function notifyOrderStatusViaWhatsApp(Order $order, string $status, ?string $reason = null): void
+    {
+        $rawPhone = $order->customer_phone ?? $order->user?->phone ?? null;
+        $token    = config('services.fonnte.token');
+
+        // Nothing to send to (walk-in without a number) or no API key configured.
+        if (!$token || !$rawPhone || !preg_match('/\d/', $rawPhone)) {
+            return;
+        }
+
+        $name = $order->user?->name ?? 'Pelanggan';
+
+        if ($status === 'Ready') {
+            $message  = "🌽 *CORNDOG-KU*\n";
+            $message .= "Halo {$name}! 👋\n\n";
+            $message .= "Pesanan kamu *{$order->order_number}* sudah *SIAP* ✅\n";
+            $message .= "Silakan diambil/dinikmati ya.\n\n";
+            $message .= $this->storeAddress() . "\n";
+            $message .= "Terima kasih sudah memesan di Corndog-Ku! 🌽";
+        } elseif ($status === 'Cancelled') {
+            $message  = "🌽 *CORNDOG-KU*\n";
+            $message .= "Halo {$name},\n\n";
+            $message .= "Mohon maaf, pesanan kamu *{$order->order_number}* telah *DIBATALKAN*.\n";
+            $message .= "Alasan: " . ($reason ?: 'Tidak disebutkan') . "\n\n";
+            $message .= "Jika ada pertanyaan, silakan hubungi kami. Terima kasih 🙏";
+        } else {
+            return;
+        }
+
+        try {
+            $response = Http::withHeaders(['Authorization' => $token])
+                ->post('https://api.fonnte.com/send', [
+                    'target'  => $this->normalizePhone($rawPhone),
+                    'message' => $message,
+                ]);
+
+            Log::info('Fonnte WA status notification', [
+                'order_id' => $order->id,
+                'status'   => $status,
+                'http'     => $response->status(),
+                'body'     => $response->json(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Fonnte WA status notification error', [
+                'order_id' => $order->id,
+                'status'   => $status,
+                'error'    => $e->getMessage(),
+            ]);
+        }
     }
 }

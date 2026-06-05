@@ -16,6 +16,19 @@ class DashboardController extends Controller
 {
     use ManagesOrderStatus;
 
+    /**
+     * Order-status changes are cashier-only. The owner board is read-only for
+     * order status, so this endpoint is intentionally blocked here — overriding
+     * the trait's mutation — even though the route still exists.
+     */
+    public function updateOrderStatus(Request $request, $id)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Hanya kasir yang dapat mengubah status pesanan.',
+        ], 403);
+    }
+
     public function index(Request $request)
     {
         $role        = 'owner';

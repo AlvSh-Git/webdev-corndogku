@@ -120,7 +120,7 @@
             top: 50%;                                  /* vertical centre — tweak % to shift up/down */
             opacity: 0;
             pointer-events: none;
-            z-index: 0;                                /* behind cards content (cards use z-10) */
+            z-index: 20;                               /* in front of cards content (cards use z-10) */
             transition: opacity 0.6s ease, transform 0.6s ease;
             display: none;                             /* ← hidden on mobile by default */
         }

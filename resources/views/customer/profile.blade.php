@@ -560,8 +560,13 @@ $(function () {
             var curr = $.trim($('#current_password').val());
             var newP = $.trim($('#new_password').val());
             var conf = $.trim($('#confirm_password').val());
-            if (!curr || !newP || !conf) {
-                showAlert('Harap isi semua kolom password.', 'error');
+            if (!curr) {
+                showAlert('Harap masukkan password lama Anda terlebih dahulu.', 'error');
+                $('#current_password').focus();
+                return;
+            }
+            if (!newP || !conf) {
+                showAlert('Harap isi password baru dan konfirmasinya.', 'error');
                 return;
             }
             if (newP.length < 8) {

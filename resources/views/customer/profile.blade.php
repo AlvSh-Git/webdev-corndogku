@@ -72,6 +72,23 @@
                 </svg>
             </button>
 
+            {{-- Delete photo button — only when an UPLOADED photo exists
+                 (the remote Google avatar isn't a deletable file). --}}
+            <button type="button"
+                    id="delete-photo-btn"
+                    title="Hapus Foto"
+                    class="absolute bottom-0 left-0 w-14 h-14 flex items-center justify-center
+                           rounded-full hover:opacity-80 transition-opacity {{ $user->profile_photo ? '' : 'hidden' }}"
+                    style="background-color: #DC2626;
+                           border: 3px solid var(--color-white);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5
+                             7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
+
             {{-- Hidden file input — opened by the camera button click --}}
             <input type="file"
                    id="profile-photo-input"
@@ -696,6 +713,8 @@ $(function () {
             success     : function (res) {
                 if (res.success) {
                     showAlert('Foto profil berhasil diperbarui.', 'success');
+                    // An uploaded photo now exists → expose the delete button.
+                    $('#delete-photo-btn').removeClass('hidden');
                     // Update the navbar avatar to show the uploaded photo
                     if (res.photo_url) {
                         $('#navbar-user-avatar')
@@ -716,6 +735,64 @@ $(function () {
                     : 'Gagal mengunggah foto. Silakan coba lagi.';
                 showAlert(msg, 'error');
             },
+        });
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       PROFILE PHOTO DELETE
+    ═══════════════════════════════════════════════════════════ */
+    $('#delete-photo-btn').on('click', function () {
+        Swal.fire({
+            title: 'Hapus Foto Profil?',
+            text: 'Foto profil kamu akan dihapus.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#6B7280',
+        }).then(function (result) {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                type : 'POST',
+                url  : '{{ route("profile.photo.delete") }}',
+                data : { _method: 'DELETE', _token: $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    if (!res.success) {
+                        showAlert(res.message || 'Gagal menghapus foto.', 'error');
+                        return;
+                    }
+
+                    showAlert(res.message, 'success');
+                    $('#delete-photo-btn').addClass('hidden');
+
+                    var initial = $.trim($('#profile-initial').text());
+
+                    if (res.photo_url) {
+                        // Fell back to the linked Google avatar — keep an image.
+                        $('#profile-photo-preview').attr('src', res.photo_url).removeClass('hidden');
+                        $('#profile-initial').addClass('hidden');
+                        $('#navbar-user-avatar')
+                            .css('background-color', 'transparent')
+                            .html('<img src="' + res.photo_url + '" alt="Foto Profil" ' +
+                                  'style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">');
+                    } else {
+                        // No fallback — show the name initial everywhere.
+                        $('#profile-photo-preview').addClass('hidden').attr('src', '');
+                        $('#profile-initial').removeClass('hidden');
+                        $('#navbar-user-avatar')
+                            .css('background-color', 'var(--color-primary)')
+                            .text(initial);
+                    }
+                },
+                error: function (xhr) {
+                    var msg = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message
+                        : 'Gagal menghapus foto. Silakan coba lagi.';
+                    showAlert(msg, 'error');
+                },
+            });
         });
     });
 

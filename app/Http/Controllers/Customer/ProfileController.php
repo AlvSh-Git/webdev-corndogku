@@ -90,4 +90,32 @@ class ProfileController extends Controller
             'photo_url' => Storage::url($path),
         ]);
     }
+
+    public function deletePhoto(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $user = auth()->user();
+
+        // Delete the stored file (if any) and clear the column.
+        if ($user->profile_photo) {
+            if (Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $user->profile_photo = null;
+            $user->save();
+        }
+
+        // After removal the avatar falls back to the Google picture (if linked)
+        // or the name initial. Return that resolved URL (null → show initial) so
+        // the UI can update without a reload.
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Foto profil berhasil dihapus.',
+            'photo_url' => $user->profile_picture_url,
+        ]);
+    }
 }

@@ -41,16 +41,16 @@
                 <span id="profile-initial"
                       class="absolute inset-0 flex items-center justify-center
                              text-white text-5xl font-bold
-                             {{ $user->profile_photo ? 'hidden' : '' }}">
+                             {{ $user->profile_picture_url ? 'hidden' : '' }}">
                     {{ strtoupper(mb_substr($user->name, 0, 1)) }}
                 </span>
 
                 {{-- Profile photo (hidden when no photo is set) --}}
                 <img id="profile-photo-preview"
-                     src="{{ $user->profile_photo ? Storage::url($user->profile_photo) : '' }}"
+                     src="{{ $user->profile_picture_url ?: '' }}"
                      alt="Foto Profil"
                      class="w-full h-full object-cover absolute inset-0
-                            {{ $user->profile_photo ? '' : 'hidden' }}">
+                            {{ $user->profile_picture_url ? '' : 'hidden' }}">
             </div>
 
             {{-- Camera button — triggers the hidden file input --}}

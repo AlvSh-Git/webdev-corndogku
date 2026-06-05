@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use App\Models\ChatbotLog;
 
 class User extends Authenticatable
@@ -45,6 +46,20 @@ class User extends Authenticatable
     public function getActiveAttribute(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * Best available profile picture URL for the avatar: a locally uploaded
+     * photo wins, then the Google SSO avatar (already a full URL), otherwise
+     * null so views fall back to the initial. Use $user->profile_picture_url.
+     */
+    public function getProfilePictureUrlAttribute(): ?string
+    {
+        if ($this->profile_photo) {
+            return Storage::url($this->profile_photo);
+        }
+
+        return $this->avatar ?: null;
     }
 
     public function orders()

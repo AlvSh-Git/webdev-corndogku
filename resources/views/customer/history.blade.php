@@ -33,10 +33,10 @@
             <div class="flex-none self-center sm:self-auto">
                 <div class="w-36 h-36 rounded-full overflow-hidden flex items-center justify-center
                             text-white text-5xl font-bold select-none"
-                     style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};
+                     style="background-color: {{ auth()->user()->profile_picture_url ? 'transparent' : 'var(--color-primary)' }};
                             box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
-                    @if (auth()->user()->profile_photo)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                    @if (auth()->user()->profile_picture_url)
+                        <img src="{{ auth()->user()->profile_picture_url }}"
                              alt="{{ auth()->user()->name }}"
                              class="w-full h-full object-cover">
                     @else

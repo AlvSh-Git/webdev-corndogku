@@ -95,10 +95,10 @@
                    id="navbar-user-avatar"
                    class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center
                           text-white text-sm font-extrabold transition-opacity hover:opacity-80"
-                   style="background-color: {{ auth()->user()->profile_photo ? 'transparent' : 'var(--color-primary)' }};"
+                   style="background-color: {{ auth()->user()->profile_picture_url ? 'transparent' : 'var(--color-primary)' }};"
                    title="{{ auth()->user()->name }}">
-                    @if (auth()->user()->profile_photo)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->profile_photo) }}"
+                    @if (auth()->user()->profile_picture_url)
+                        <img src="{{ auth()->user()->profile_picture_url }}"
                              alt="{{ auth()->user()->name }}"
                              class="w-full h-full object-cover">
                     @else

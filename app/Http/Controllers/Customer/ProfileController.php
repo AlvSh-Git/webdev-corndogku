@@ -46,6 +46,13 @@ class ProfileController extends Controller
                     'message' => 'Password saat ini tidak sesuai.',
                 ], 422);
             }
+            // The new password must differ from the current one.
+            if (Hash::check($request->new_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Password baru tidak boleh sama dengan password lama.',
+                ], 422);
+            }
             $user->password = Hash::make($request->new_password);
         }
 

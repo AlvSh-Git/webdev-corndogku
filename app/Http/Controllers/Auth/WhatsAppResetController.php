@@ -173,6 +173,14 @@ class WhatsAppResetController extends Controller
             ], 404);
         }
 
+        // The new password must differ from the current one.
+        if ($user->password && Hash::check($request->input('password'), $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password baru tidak boleh sama dengan password lama.',
+            ], 422);
+        }
+
         $user->update(['password' => Hash::make($request->input('password'))]);
         $request->session()->forget(['otp_verified_email', 'wa_reset_email']);
 

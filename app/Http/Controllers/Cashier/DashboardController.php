@@ -32,7 +32,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $role        = 'cashier';
-        $storeStatus = Cache::get('store_status', 'available');
+        // Store status must mirror the single source of truth used by the
+        // customer (checkout/cart gating) and the owner's Jadwal page:
+        // calcStoreStatus() (manual_override + jadwal_operasional). The old
+        // 'store_status' cache key was a disconnected toggle that left the
+        // cashier board out of sync when the owner opened/closed the store.
+        $storeStatus = $this->calcStoreStatus()['is_open'] ? 'available' : 'unavailable';
 
         $rawDate      = $request->query('date', today()->toDateString());
         $selectedDate = Carbon::parse($rawDate)->min(today())->toDateString();

@@ -661,6 +661,18 @@ $(function () {
     /* ══════════════════════════════════════════════════════════════
        CUSTOMER SEARCH — shared dropdown builder
     ══════════════════════════════════════════════════════════════ */
+    /* Resolve a customer's WhatsApp number. Prefer the real `phone` column.
+       Google SSO users have an email-derived `username` (NOT a phone), so we
+       must never fall back to it for them. Legacy walk-in customers, however,
+       stored their phone AS the username (all digits) before the `phone`
+       column was populated — so fall back to username only when it looks like
+       a phone number. */
+    function phoneOf(u) {
+        if (u.phone) return u.phone;
+        if (u.username && /^[0-9+]{6,}$/.test(u.username)) return u.username;
+        return '';
+    }
+
     function buildCustomerDropdown($dd, users, onSelect) {
         $dd.empty();
         if (!users.length) {
@@ -670,7 +682,7 @@ $(function () {
             );
         } else {
             users.forEach(function (u) {
-                const displayPhone = u.username || '';
+                const displayPhone = phoneOf(u);
                 const label = u.name + (displayPhone ? ' — ' + displayPhone : '');
                 $dd.append(
                     $('<div>')
@@ -701,7 +713,7 @@ $(function () {
                 buildCustomerDropdown($('#phone-dropdown'), users, function (u) {
                     customerId = u.id;
                     $('#customer-name-input').val(u.name);
-                    $('#customer-phone-input').val(u.username || '');
+                    $('#customer-phone-input').val(phoneOf(u));
                     $('#name-dropdown').hide();
                 });
             });
@@ -721,7 +733,7 @@ $(function () {
                 buildCustomerDropdown($('#name-dropdown'), users, function (u) {
                     customerId = u.id;
                     $('#customer-name-input').val(u.name);
-                    $('#customer-phone-input').val(u.username || '');
+                    $('#customer-phone-input').val(phoneOf(u));
                     $('#phone-dropdown').hide();
                 });
             });

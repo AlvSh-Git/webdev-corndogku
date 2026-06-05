@@ -28,10 +28,14 @@ class ProfileController extends Controller
 
         $request->validate([
             'name'             => ['required', 'string', 'max:255'],
+            'username'         => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9._-]+$/', 'unique:users,username,' . $user->id],
             'phone'            => ['nullable', 'string', 'max:20'],
             'email'            => ['nullable', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'current_password' => ['required_with:new_password', 'string'],
             'new_password'     => ['nullable', 'string', 'min:8', 'same:confirm_password'],
+        ], [
+            'username.regex'  => 'Username hanya boleh berisi huruf, angka, titik, garis bawah, dan tanda hubung.',
+            'username.unique' => 'Username tersebut sudah digunakan.',
         ]);
 
         // Verify current password before allowing a change
@@ -45,8 +49,9 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->new_password);
         }
 
-        $user->name  = $request->name;
-        $user->phone = $request->phone ?? null;
+        $user->name     = $request->name;
+        $user->username = $request->username;
+        $user->phone    = $request->phone ?? null;
 
         if ($request->filled('email')) {
             $user->email = $request->email;
@@ -55,10 +60,11 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json([
-            'success' => true,
-            'message' => 'Profil berhasil disimpan.',
-            'name'    => $user->name,
-            'phone'   => $user->phone,
+            'success'  => true,
+            'message'  => 'Profil berhasil disimpan.',
+            'name'     => $user->name,
+            'username' => $user->username,
+            'phone'    => $user->phone,
         ]);
     }
 

@@ -309,7 +309,7 @@
             @endforelse
         </ul>
         <a href="{{ route('owner.products') }}"
-           class="w-full py-2 rounded-lg font-bold text-sm transition-opacity hover:opacity-80
+           class="w-full mt-auto py-2 rounded-lg font-bold text-sm transition-opacity hover:opacity-80
                   flex items-center justify-center"
            style="background-color:var(--color-primary);color:var(--color-white);">
             Restock Item

@@ -234,6 +234,44 @@
                         </div>
                     </div>
 
+                    {{-- Username --}}
+                    <div>
+                        <label for="username"
+                               class="block text-xs font-semibold mb-1.5"
+                               style="color: #9c9c9c;">Username</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-[14px] pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                     fill="none" viewBox="0 0 24 24"
+                                     stroke="#9c9c9c" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0
+                                             005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                                </svg>
+                            </span>
+                            <input type="text"
+                                   id="username" name="username"
+                                   value="{{ $user->username }}"
+                                   autocomplete="username"
+                                   class="w-full py-3 pl-10 pr-11 text-sm outline-none"
+                                   style="border: 1px solid #d9d9d9;
+                                          border-radius: 5px;
+                                          background-color: var(--color-white);
+                                          color: var(--color-black);">
+                            <button type="button"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-[14px]
+                                           hover:opacity-60 transition-opacity"
+                                    title="Edit Username">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                     viewBox="0 0 24 24" stroke="#9c9c9c" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0
+                                             113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                     {{-- Email --}}
                     <div>
                         <label for="email"
@@ -561,14 +599,19 @@ $(function () {
        SAVE INFO — AJAX PUT
     ═══════════════════════════════════════════════════════════ */
     $('#save-info-btn').on('click', function () {
-        var $btn  = $(this);
-        var name  = $.trim($('#name').val());
-        var email = $.trim($('#email').val());
-        var phone = $.trim($('#phone').val());
+        var $btn     = $(this);
+        var name     = $.trim($('#name').val());
+        var username = $.trim($('#username').val());
+        var email    = $.trim($('#email').val());
+        var phone    = $.trim($('#phone').val());
 
         // Client-side guard
         if (!name) {
             showAlert('Nama tidak boleh kosong.', 'error');
+            return;
+        }
+        if (!username) {
+            showAlert('Username tidak boleh kosong.', 'error');
             return;
         }
 
@@ -609,6 +652,7 @@ $(function () {
             _method          : 'PUT',
             _token           : $('meta[name="csrf-token"]').attr('content'),
             name             : name,
+            username         : username,
             email            : email,
             phone            : phone,
         };

@@ -244,7 +244,7 @@
 <script>
     $.ajaxSetup({
         headers: {
-            'X-CSR-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 </script>

@@ -859,8 +859,11 @@
         </h2>
     </div>
 
-    {{-- ── Category tab buttons ───────────────────────────────── --}}
-    <div class="flex flex-row overflow-x-auto hide-scrollbar gap-4 px-4 pb-6 justify-center">
+    {{-- ── Category tab buttons ─────────────────────────────────
+         flex-wrap so the buttons wrap to a centered second line on narrow
+         screens instead of overflowing the centered row (which clipped the
+         first/last button on mobile). --}}
+    <div class="flex flex-row flex-wrap overflow-x-auto hide-scrollbar gap-4 px-4 pb-6 justify-center">
         @foreach ($categories as $category)
             @if (strtolower($category->name) === 'custom') @continue @endif
             <button type="button"

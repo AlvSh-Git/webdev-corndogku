@@ -50,10 +50,11 @@ class PurchaseController extends Controller
             $users = User::where('role', 'customer')
                 ->where(function ($query) use ($term) {
                     $query->where('name', 'like', '%' . $term . '%')
-                          ->orWhere('username', 'like', '%' . $term . '%');
+                          ->orWhere('username', 'like', '%' . $term . '%')
+                          ->orWhere('phone', 'like', '%' . $term . '%');
                 })
                 ->limit(8)
-                ->get(['id', 'name', 'username']);
+                ->get(['id', 'name', 'username', 'phone']);
 
             return response()->json($users);
         } catch (\Exception $e) {
@@ -189,6 +190,7 @@ class PurchaseController extends Controller
                         'name'     => $request->customer_name,
                         'username' => $phone,
                         'email'    => $email,
+                        'phone'    => $this->normalizePhone($phone),
                         'password' => Str::random(16),
                         'role'     => 'customer',
                         'status'   => 'active',

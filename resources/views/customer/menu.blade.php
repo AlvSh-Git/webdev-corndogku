@@ -866,7 +866,15 @@ $(function () {
         let productId = $clickedBtn.data('id');
 
         // Seleksi kedua tombol secara kolektif (tombol di katalog dan tombol di modal detail)
-        let $bothButtons = $('.btn-wishlist[data-id="' + productId + '"], #modal-btn-wishlist[data-id="' + productId + '"]');
+        let $bothButtons = $('.btn-wishlist[data-id="' + productId + '"]');
+        // Tombol love di dalam modal menyimpan product id lewat jQuery .data()
+        // (bukan atribut DOM), sehingga selector atribut di atas TIDAK pernah
+        // cocok dengannya. Tambahkan secara eksplisit saat modal sedang membuka
+        // produk yang sama — tanpa ini, hati di dalam popup tidak ikut berubah
+        // sampai popup ditutup/dibuka ulang.
+        if ($('#modal-btn-wishlist').data('id') == productId) {
+            $bothButtons = $bothButtons.add('#modal-btn-wishlist');
+        }
         let $bothSvgs = $bothButtons.find('svg');
 
         $bothButtons.prop('disabled', true);

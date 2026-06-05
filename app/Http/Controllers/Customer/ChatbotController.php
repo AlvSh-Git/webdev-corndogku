@@ -39,12 +39,22 @@ class ChatbotController extends Controller
                 ->timeout(15)
                 ->withHeaders(['Authorization' => 'Bearer ' . config('services.groq.key')])
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model'    => 'llama-3.1-8b-instant',
-                    'messages' => $messages,
+                    'model'       => 'llama-3.1-8b-instant',
+                    'messages'    => $messages,
+                    // Cap the reply: keeps answers short (per the persona) AND keeps us
+                    // under Groq's free-tier tokens-per-minute ceiling so a customer can
+                    // actually hold a multi-turn conversation without hitting a 429.
+                    'max_tokens'  => 300,
+                    'temperature' => 0.4,
                 ]);
 
             if ($response->successful()) {
                 $botReply = $response->json('choices.0.message.content') ?? $botReply;
+            } elseif ($response->status() === 429) {
+                // Rate limited (free-tier TPM). Give the customer a friendly nudge
+                // instead of the generic "assistant unavailable" wording.
+                $botReply = 'Waduh, lagi rame banget nih Kak 😅 Tunggu beberapa detik terus tanya lagi ya!';
+                Log::warning('Groq API rate limited', ['body' => $response->body()]);
             } else {
                 Log::error('Groq API error', [
                     'status' => $response->status(),
@@ -90,25 +100,69 @@ class ChatbotController extends Controller
 
         $lines = [];
         foreach ($products->groupBy(fn ($p) => $p->category?->name ?? 'Lainnya') as $category => $items) {
+            // The Custom category is a bag of build-your-own components, not real
+            // menu items. Listing all 10 with a generic description wastes tokens and
+            // confuses the model — collapse it into one compact line instead.
+            if (mb_strtolower($category) === 'custom') {
+                $lines[] = 'Kategori Custom Corndog (rakit sendiri, mulai Rp16.000) — pilih komponen: '
+                    . $this->customComponentList($items) . '.';
+                continue;
+            }
+
             $lines[] = "Kategori {$category}:";
             foreach ($items as $p) {
                 $price = (int) $p->price;
                 $priceLabel = $price > 0
                     ? 'Rp' . number_format($price, 0, ',', '.')
-                    : 'komponen custom (gratis)';
+                    : 'gratis';
 
-                // Inject the real composition/ingredients so the model is grounded
-                // and cannot invent what's inside an item.
+                // Inject the real composition/ingredients so the model is grounded and
+                // cannot invent what's inside an item. Condensed to the essentials so
+                // the whole menu stays well under the API's token budget.
                 $desc = trim((string) $p->description) ?: $this->fallbackDescription($p->name);
 
-                $lines[] = "- {$p->name} ({$priceLabel}): {$desc}";
+                $lines[] = "- {$p->name} ({$priceLabel}): {$this->condense($desc)}";
             }
         }
 
-        // The Custom Corndog builder starts from a fixed base price.
-        $lines[] = 'Custom Corndog: rakit sendiri, harga mulai Rp16.000.';
-
         return implode("\n", $lines);
+    }
+
+    /**
+     * Renders the build-your-own components as one compact, comma-separated line,
+     * each with its surcharge (free components show no price). Keeps the Custom
+     * category from bloating the prompt with ten near-identical bullet lines.
+     */
+    private function customComponentList($items): string
+    {
+        return $items
+            ->map(function ($p) {
+                $price = (int) $p->price;
+                return $price > 0
+                    ? "{$p->name} (+Rp" . number_format($price, 0, ',', '.') . ')'
+                    : $p->name;
+            })
+            ->implode(', ');
+    }
+
+    /**
+     * Trims a marketing description down to its grounding essentials — the leading
+     * ingredient phrase — dropping the flavour-text tail. Halves the menu's token
+     * footprint so multi-turn chats stay under the free-tier rate limit, while the
+     * ingredients needed for allergy filtering (which always lead) are preserved.
+     */
+    private function condense(string $text, int $max = 80): string
+    {
+        $text = trim(preg_replace('/\s+/', ' ', $text));
+
+        if (mb_strlen($text) <= $max) {
+            return $text;
+        }
+
+        $cut = mb_substr($text, 0, $max);
+        $lastSpace = mb_strrpos($cut, ' ');
+
+        return rtrim($lastSpace ? mb_substr($cut, 0, $lastSpace) : $cut, " ,.;");
     }
 
     /**
@@ -174,6 +228,9 @@ class ChatbotController extends Controller
             'hours'   => $this->scheduleHours($schedule),
             'status'  => $statusLine,
             'phone'   => (string) config('store.phone'),
+            // Grounds "cara pesan?" so the model stops inventing channels (it was
+            // hallucinating social-media ordering). This is the real app flow.
+            'order'   => 'Pesan lewat website Corndog-Ku: pilih menu atau rakit Custom Corndog, masukkan ke keranjang, lalu checkout & bayar online. Bisa juga datang langsung ke toko.',
         ];
     }
 
@@ -188,23 +245,26 @@ class ChatbotController extends Controller
         $jamBuka = $storeInfo['hours'];
         $status  = $storeInfo['status'];
         $phone   = $storeInfo['phone'];
+        $caraPesan = $storeInfo['order'];
 
         return "Kamu adalah asisten virtual Corndog-Ku. Panggil pelanggan dengan sebutan 'Kak'. Gunakan bahasa Indonesia santai, ramah, dan luwes (seperti admin sosmed kekinian). Jangan menggunakan bahasa baku atau kaku.\n\n"
-             . "PERANMU: HANYA menjawab tentang menu Corndog-Ku, harga, cara pemesanan, lokasi, jam buka, dan nomor telepon/kontak.\n\n"
+             . "PERANMU: menjawab SEMUA hal seputar Corndog-Ku — menu, harga, komposisi/bahan, rekomendasi, alergi, cara pesan, lokasi, jam buka, dan kontak. Semua ini DALAM KONTEKS, jawab dengan ramah.\n\n"
              . "INFO LOKASI, JAM BUKA & KONTAK (Gunakan bahasa santai saat menjawab):\n"
              . "- Lokasi: {$alamat}\n"
              . "- Jam Buka: {$jamBuka}\n"
              . "- Status Saat Ini: {$status}\n"
-             . "- Nomor Telepon/WA: {$phone}\n\n"
+             . "- Nomor Telepon/WA: {$phone}\n"
+             . "- Cara Pesan: {$caraPesan}\n\n"
              . "INFO MENU SAAT INI:\n"
              . $businessContext . "\n\n"
              . "ATURAN MUTLAK (SANKSI TEGAS):\n"
-             . "1. DILARANG KERAS membahas coding, IT, pelajaran, atau topik di luar Corndog-Ku.\n"
-             . "2. Jika ditanya hal di luar konteks, tolak dengan kalimat template ini: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'\n"
+             . "1. DILARANG KERAS membahas coding, IT, pelajaran, politik, atau topik yang benar-benar TIDAK ada hubungannya dengan Corndog-Ku.\n"
+             . "2. Kalimat penolakan template ini: 'Duh maaf banget Kak, aku cuma bisa bantu jawab seputar menu dan pesanan Corndog-Ku aja nih! 🌭'. HANYA pakai kalimat ini kalau topiknya benar-benar di luar Corndog-Ku. JANGAN PERNAH memakai kalimat penolakan ini untuk pertanyaan soal menu, bahan, alergi, rekomendasi, harga, atau cara pesan — itu semua WAJIB kamu jawab.\n"
              . "3. Jawab sesingkat dan seasik mungkin. Jangan bertele-tele.\n"
              . "4. Kalau ditanya soal buka/tutup sekarang, jawab sesuai 'Status Saat Ini' di atas.\n"
              . "5. ANTI-HALUSINASI: Kamu DILARANG KERAS mengarang, menebak, atau menambahkan menu, harga, atau komposisi bahan sendiri. HANYA gunakan informasi yang ada di [INFO MENU SAAT INI]. Jika bahan tidak disebutkan di sana, jangan dikarang!\n"
-             . "6. FILTERING: Jika pelanggan meminta menu TANPA bahan tertentu (misal: 'tanpa keju' atau 'alergi sosis'), kamu WAJIB mengecek deskripsi menu dan DILARANG merekomendasikan menu yang mengandung bahan tersebut.\n\n"
+             . "6. FILTERING: Jika pelanggan meminta menu TANPA bahan tertentu (misal: 'tanpa keju' atau 'alergi sosis'), kamu WAJIB mengecek deskripsi menu dan DILARANG merekomendasikan menu yang mengandung bahan tersebut.\n"
+             . "7. JANGAN DUMP SEMUA MENU. Kalau ditanya 'menu apa aja' atau 'jual apa', JANGAN tulis ulang seluruh daftar. Sebutkan saja kategori yang ada (Corndog Asin, Corndog Manis, Toppoki, Combo, Es Teler, Bingsoo, Custom) plus 1-2 contoh laris, lalu tanya pelanggan mau kategori yang mana. Sebut harga/detail item HANYA kalau diminta spesifik.\n\n"
              . "CONTOH PERCAKAPAN:\n"
              . "User: 'Lokasinya dimana min?'\n"
              . "Kamu: 'Lokasi Corndog-Ku ada di {$alamat}, Kak! Mampir yuk! 🌭'\n"
@@ -214,6 +274,8 @@ class ChatbotController extends Controller
              . "Kamu: '{$status}, Kak! 🌭'\n"
              . "User: 'nomor wa atau teleponnya berapa min?'\n"
              . "Kamu: 'Kakak bisa hubungi Corndog-Ku di nomor {$phone} ya! Ditunggu orderannya! 🌭'\n"
+             . "User: 'menu apa aja yang ada?'\n"
+             . "Kamu: 'Banyak Kak! Kita ada Corndog Asin, Corndog Manis, Toppoki, Combo, Es Teler, Bingsoo, sampai Custom rakit sendiri 🌭 Yang paling laris Corndog Original sama Toppoki Korean. Kakak mau lihat kategori yang mana dulu nih?'\n"
              . "User: 'Ada corndog yang gak pake keju?'\n"
              . "Kamu: 'Ada dong Kak! Kakak bisa pesen Corndog Full Sausage, isinya full sosis tanpa keju ya! 🌭'\n"
              . "User: 'Tolong buatkan kode Java.'\n"
@@ -239,9 +301,12 @@ class ChatbotController extends Controller
             ->reverse();
 
         foreach ($recent as $log) {
-            $history[] = ['role' => 'user', 'content' => $log->message];
+            // Truncate each turn: history is only for light context, and an old
+            // long reply (e.g. a menu rundown) would otherwise eat the per-minute
+            // token budget and trigger rate limits on later messages.
+            $history[] = ['role' => 'user', 'content' => mb_substr($log->message, 0, 300)];
             if (!empty($log->response)) {
-                $history[] = ['role' => 'assistant', 'content' => $log->response];
+                $history[] = ['role' => 'assistant', 'content' => mb_substr($log->response, 0, 300)];
             }
         }
 

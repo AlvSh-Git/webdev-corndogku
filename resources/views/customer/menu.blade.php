@@ -45,20 +45,24 @@
             {{-- Layer 1: Figma-exported composite banner image (natural intrinsic size) --}}
             <img src="{{ asset('assets/img/custom_corndog_banner_bg.png') }}"
                  alt="Custom Corndog – Buat corndog favoritmu sesuai seleramu!"
-                 class="w-full h-auto block rounded-[2rem] select-none"
+                 class="w-full h-auto block select-none"
                  draggable="false"
-                 style="box-shadow:0 8px 40px rgba(0,0,0,0.13);">
+                 style="border-radius: 2rem; box-shadow:0 8px 40px rgba(0,0,0,0.13);">
 
             {{-- Layer 2: Native interactive CTA button --}}
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
                class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
-                      inline-flex items-center gap-1 bg-[#ba0d0d] text-white text-[10px] sm:text-xs font-bold
-                      px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
-                      hover:bg-red-800 transition-colors w-auto max-w-fit">
+                      inline-flex items-center bg-[#ba0d0d] text-white font-bold
+                      rounded-full whitespace-nowrap shadow-md
+                      hover:bg-red-800 transition-colors w-auto max-w-fit"
+               style="font-size: clamp(7px, 1.7vw, 14px);
+                      gap: clamp(2px, 0.5vw, 4px);
+                      padding: clamp(3px, 0.85vw, 9px) clamp(7px, 2vw, 18px);">
                 Yuk, Buat Corndog Kamu!
-                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor"
-                     stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="flex-shrink-0" fill="none" stroke="currentColor"
+                     stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"
+                     style="width: clamp(7px, 1.7vw, 14px); height: clamp(7px, 1.7vw, 14px);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </a>
@@ -524,7 +528,7 @@ $(function () {
         var prevClass    = (cur === 1) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
         html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + prevClass + '"' +
                  ' data-page="' + (cur - 1) + '" ' + prevDisabled +
-                 ' style="border-color:var(--color-border);">&#8592; Prev</button>';
+                 ' style="border-color:var(--color-border);" aria-label="Sebelumnya">&#8592;</button>';
 
         // Page number window
         var pages = [];
@@ -553,7 +557,7 @@ $(function () {
         var nextClass    = (cur === last) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50';
         html += '<button class="pg-btn px-3 py-1.5 rounded-lg text-sm font-semibold border transition-colors ' + nextClass + '"' +
                  ' data-page="' + (cur + 1) + '" ' + nextDisabled +
-                 ' style="border-color:var(--color-border);">Next &#8594;</button>';
+                 ' style="border-color:var(--color-border);" aria-label="Selanjutnya">&#8594;</button>';
 
         html += '</div>';
         $nav.html(html);

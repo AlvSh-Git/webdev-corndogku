@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* ── Global guard ──────────────────────────────────────────────
+   Never allow horizontal overflow / blank right strip at any
+   resolution. Off-screen decorations, wide marquees, or stray
+   full-bleed elements can otherwise widen the document and leave
+   blank background on the right of every full-width section. */
+html, body { overflow-x: hidden; max-width: 100%; }
+
 :root {
     /* Core Brand Palette — from "Color Pallete" frame in Figma */
     --color-primary:         #A6171C; /* Red Blood — header, active states */

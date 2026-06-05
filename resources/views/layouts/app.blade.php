@@ -147,14 +147,15 @@
                     <span class="block w-5 h-0.5 rounded-full bg-gray-700"></span>
                 </button>
 
-                <div class="flex items-center gap-2">
+                <a href="{{ route($role === 'cashier' ? 'cashier.dashboard' : 'owner.dashboard') }}"
+                   class="flex items-center gap-2 flex-none"
+                   aria-label="Kembali ke Dashboard">
                     <img src="{{ asset('assets/img/logo.png') }}"
-                         alt=""
-                         class="w-9 h-9 object-contain rounded-full"
-                         style="background-color: var(--color-primary);">
-                    <span class="font-bold text-base tracking-widest hidden sm:inline"
-                          style="color: var(--color-primary);">CORNDOG-KU</span>
-                </div>
+                         alt="Corndog-Ku"
+                         class="w-10 h-10 rounded-full object-cover">
+                    <span class="font-bold text-base tracking-tight hidden sm:inline"
+                          style="color: var(--color-black);">Corndog-Ku</span>
+                </a>
             </div>
 
             {{-- Right: page title + role chip --}}

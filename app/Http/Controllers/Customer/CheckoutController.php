@@ -92,15 +92,17 @@ class CheckoutController extends Controller
         }
 
         $cart = session()->get('cart', []);
-        if (empty($cart)) {
-            return response()->json(['redirect' => route('history')]);
-        }
 
         $orderNumber = (string) $request->input('order_number', 'CKKU-' . strtoupper(substr(uniqid(), -6)) . '-' . now()->format('ymd'));
 
-        // Idempotency guard — same order_number should not be inserted twice
+        // Idempotency guard — if this checkout's order already exists (double-click,
+        // or a retry after returning from the payment app) just let the client
+        // re-open Snap for the same order instead of creating a duplicate.
         if (Order::where('order_number', $orderNumber)->exists()) {
-            session()->forget('cart');
+            return response()->json(['success' => true, 'order_number' => $orderNumber]);
+        }
+
+        if (empty($cart)) {
             return response()->json(['redirect' => route('history')]);
         }
 
@@ -189,19 +191,55 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Record online payment (Midtrans / QRIS) so the Sales Report can attribute it correctly
+            // Payment starts Unpaid; it is confirmed by the Midtrans webhook
+            // (and the client confirm() fallback) once the customer actually pays.
             Payment::create([
                 'order_id'       => $order->id,
                 'payment_method' => 'QRIS',
                 'amount'         => $total,
-                'status'         => 'Paid',
+                'status'         => 'Unpaid',
             ]);
 
             $createdOrderId = $order->id;
         });
 
+        // Cart is cleared now that the order exists — the order is the source of
+        // truth from here on, so a dropped payment callback can't lose it.
         session()->forget('cart');
-        session()->flash('show_receipt_for_order', $createdOrderId);
+
+        return response()->json(['success' => true, 'order_number' => $orderNumber]);
+    }
+
+    /**
+     * Mark a just-paid order as paid from the Snap onSuccess callback. This is a
+     * fast-path for UX; the Midtrans server-to-server webhook is the authoritative
+     * confirmation and works even when the mobile callback never fires. Idempotent.
+     */
+    public function confirm(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $orderNumber = (string) $request->input('order_number', '');
+
+        $order = Order::where('order_number', $orderNumber)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($order) {
+            $order->payment()->updateOrCreate([], [
+                'payment_method' => 'QRIS',
+                'amount'         => $order->total_price,
+                'status'         => 'Paid',
+            ]);
+
+            if ($order->status === 'Pending') {
+                $order->update(['status' => 'Preparing']);
+            }
+
+            session()->flash('show_receipt_for_order', $order->id);
+        }
 
         return response()->json(['redirect' => route('history')]);
     }

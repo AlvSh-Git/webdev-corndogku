@@ -367,15 +367,6 @@
 
         <div class="relative flex flex-wrap items-center gap-2 px-4 py-3 overflow-hidden"
              style="background-color:var(--color-primary);min-height:56px;">
-            <div class="absolute right-4 top-0 flex items-end gap-2 pointer-events-none select-none"
-                 aria-hidden="true">
-                <img src="{{ asset('assets/img/CB_02.png') }}" alt=""
-                     class="h-14 w-auto object-contain opacity-90"
-                     style="transform:rotate(-8deg) translateY(4px);">
-                <img src="{{ asset('assets/img/CB_01.png') }}" alt=""
-                     class="h-14 w-auto object-contain opacity-90"
-                     style="transform:rotate(6deg) translateY(2px);">
-            </div>
             <span class="font-bold text-white text-sm mr-2 z-10">Active Orders</span>
             @foreach (['All','Pending','Preparing','Ready','Completed','Cancelled'] as $tab)
                 <button type="button"

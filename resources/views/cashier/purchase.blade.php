@@ -89,8 +89,10 @@
 
     {{-- ══════════════════════════════════════════
          RIGHT — Order Panel (h-full, stretches to screen bottom on lg+)
+         On mobile it's moved ABOVE the product list via #pos-order-panel order rule.
     ══════════════════════════════════════════ --}}
-    <div class="w-full lg:w-5/12 xl:w-4/12 lg:h-full flex flex-col bg-white rounded-2xl shadow overflow-hidden">
+    <div id="pos-order-panel"
+         class="w-full lg:w-5/12 xl:w-4/12 lg:h-full flex flex-col bg-white rounded-2xl shadow overflow-hidden">
 
         {{-- ── Panel header (flex-none) ──────────────────────────── --}}
         <div class="flex-none border-b border-gray-100 p-3">
@@ -485,6 +487,12 @@
 
 <style>
 @keyframes pospin { to { transform: rotate(360deg); } }
+
+/* Mobile/tablet (below lg = 1024px): show the order/cashier panel ABOVE the
+   product list. On lg+ the columns sit side-by-side so default order applies. */
+@media (max-width: 1023.98px) {
+    #pos-order-panel { order: -1; }
+}
 </style>
 
 @endsection

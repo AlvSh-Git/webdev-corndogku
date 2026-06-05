@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     // Checkout
     Route::get('/checkout',        [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('checkout.confirm');
 
     // Order history
     Route::get('/history', [HistoryController::class, 'index'])->name('history');

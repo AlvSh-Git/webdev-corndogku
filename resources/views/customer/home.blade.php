@@ -155,6 +155,12 @@
             opacity: 1;
             transform: translateY(-50%) translateX(36%) scaleX(-1);    /* ← ~64 % visible from right */
         }
+
+        /* ━━━ Prevent horizontal overflow / blank right strip at any resolution ━━━
+           The floating-food decorations are anchored off-screen via translateX,
+           which otherwise extends the document and creates a page-wide horizontal
+           scroll (blank background on the right at wide viewports). Clip it here. */
+        html, body { overflow-x: hidden; max-width: 100%; }
     </style>
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
@@ -443,8 +449,10 @@
         </div>
     </div>
 
-    {{-- Cards grid — wrapper is relative so food images are absolute inside it --}}
-    <div id="promo-cards-wrapper" class="relative w-full mt-12">
+    {{-- Cards grid — wrapper is relative so food images are absolute inside it.
+         overflow-x:clip keeps the off-screen floating-food decorations from
+         widening the document (no horizontal scroll / blank right strip). --}}
+    <div id="promo-cards-wrapper" class="relative w-full mt-12" style="overflow-x: clip;">
 
         {{-- Decorative food images — absolute, edge-peeking, scroll-triggered --}}
         <img id="floating-food-left"
@@ -486,7 +494,7 @@
                        class="group block relative rounded-[2rem] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <img src="{{ asset('assets/img/home_card_01.png') }}"
                              alt="{{ $promoFullMozza->name ?? 'Promo 1' }}" class="w-full block">
-                        <div class="absolute bottom-6 left-8 sm:bottom-8 sm:left-10">
+                        <div class="absolute" style="bottom: clamp(2.25rem, 5vw, 3rem); left: clamp(2rem, 4vw, 2.5rem);">
                             <span class="inline-flex items-center gap-1 bg-white text-black font-bold text-xs sm:text-sm py-1.5 px-4 rounded-full shadow-lg group-hover:bg-gray-100 transition-colors">Order Now 🔥</span>
                         </div>
                     </a>
@@ -809,20 +817,26 @@
             {{-- Layer 1: Figma-exported composite banner image (natural intrinsic size) --}}
             <img src="{{ asset('assets/img/custom_corndog_banner_bg.png') }}"
                  alt="Custom Corndog – Buat corndog favoritmu sesuai seleramu!"
-                 class="w-full h-auto block rounded-[2rem] select-none"
+                 class="w-full h-auto block select-none"
                  draggable="false"
-                 style="box-shadow:0 8px 40px rgba(0,0,0,0.13);">
+                 style="border-radius: 2rem; box-shadow:0 8px 40px rgba(0,0,0,0.13);">
 
-            {{-- Layer 2: Native interactive CTA button --}}
+            {{-- Layer 2: Native interactive CTA button —
+                 fluid clamp() sizing so it scales down with the banner on mobile
+                 (matches the hero section approach) instead of staying a fixed 36px. --}}
             <a href="{{ route('customize') }}"
                id="btn-custom-cta"
                class="absolute bottom-[8%] left-[5%] md:bottom-[15%] md:left-[8%] z-10
-                      inline-flex items-center gap-1 bg-[#7A0000] text-white text-xs sm:text-sm font-bold
-                      px-4 min-h-[36px] sm:px-4 sm:py-2 rounded-full whitespace-nowrap shadow-md
-                      hover:bg-red-800 transition-colors w-auto max-w-fit">
+                      inline-flex items-center bg-[#7A0000] text-white font-bold
+                      rounded-full whitespace-nowrap shadow-md
+                      hover:bg-red-800 transition-colors w-auto max-w-fit"
+               style="font-size: clamp(7px, 1.7vw, 14px);
+                      gap: clamp(2px, 0.5vw, 4px);
+                      padding: clamp(3px, 0.85vw, 9px) clamp(7px, 2vw, 18px);">
                 Yuk, Buat Corndog Kamu!
-                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" fill="none" stroke="currentColor"
-                     stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="flex-shrink-0" fill="none" stroke="currentColor"
+                     stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"
+                     style="width: clamp(7px, 1.7vw, 14px); height: clamp(7px, 1.7vw, 14px);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
             </a>
@@ -953,13 +967,14 @@
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
-            {{-- Map embed --}}
-            <div class="rounded-2xl overflow-hidden min-h-[300px]"
-                 style="box-shadow: var(--shadow-card);">
+            {{-- Map embed — query-based embed from the store address (no API key needed) --}}
+            <div class="rounded-2xl overflow-hidden"
+                 style="min-height: 300px; box-shadow: var(--shadow-card);">
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.9!2d112.76!3d-7.32!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMTknMTIuMCJTIDExMsKwNDUnMzYuMCJF!5e0!3m2!1sen!2sid!4v1"
-                    class="w-full h-full min-h-[300px]"
-                    style="border: 0;"
+                    src="https://www.google.com/maps?q={{ urlencode(config('store.address')) }}&z=16&output=embed"
+                    class="w-full h-full"
+                    style="border: 0; min-height: 300px;"
+                    title="Lokasi {{ config('store.address') }}"
                     allowfullscreen=""
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade">

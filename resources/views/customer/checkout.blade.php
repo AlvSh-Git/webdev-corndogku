@@ -402,64 +402,72 @@
 @if($snapToken)
 <script>
 $(function () {
-    $('#btn-pay-qris').on('click', function () {
-        var $btn = $(this);
-        $btn.prop('disabled', true).html(
-            '<svg class="w-5 h-5 animate-spin flex-none" fill="none" viewBox="0 0 24 24">' +
+    var CSRF      = $('meta[name="csrf-token"]').attr('content');
+    var ORDER_NO  = '{{ $orderId }}';
+    var HISTORY   = '{{ route("history") }}';
+
+    var payBtnHtml =
+        '<svg class="w-6 h-6 flex-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
+        '<path stroke-linecap="round" stroke-linejoin="round" ' +
+        'd="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5V16M4 6h16M4 6a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2"/>' +
+        '</svg> Bayar via QRIS';
+
+    function spinner(label) {
+        return '<svg class="w-5 h-5 animate-spin flex-none" fill="none" viewBox="0 0 24 24">' +
             '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
             '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>' +
-            '</svg> Membuka QRIS...'
-        );
+            '</svg> ' + label;
+    }
 
+    function openSnap($btn) {
         snap.pay('{{ $snapToken }}', {
             enabledPayments: ['qris', 'gopay', 'shopeepay'],
-            onSuccess: function (result) {
-                $btn.prop('disabled', true).html(
-                    '<svg class="w-5 h-5 animate-spin flex-none" fill="none" viewBox="0 0 24 24">' +
-                    '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
-                    '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>' +
-                    '</svg> Menyimpan pesanan...'
-                );
+            // The order already exists (created above), so payment confirmation is
+            // handled by the Midtrans webhook server-side — reliable even when this
+            // callback never fires (e.g. mobile e-wallet app-switch). These handlers
+            // are just for fast UX feedback.
+            onSuccess: function () {
+                $btn.prop('disabled', true).html(spinner('Menyimpan pesanan...'));
                 $.ajax({
-                    url: '{{ route("checkout.store") }}',
+                    url: '{{ route("checkout.confirm") }}',
                     type: 'POST',
-                    data: { _token: $('meta[name="csrf-token"]').attr('content'), order_number: '{{ $orderId }}' },
-                    success: function (res) { window.location.href = res.redirect; },
-                    error:   function ()    { window.location.href = '{{ route("history") }}'; }
+                    data: { _token: CSRF, order_number: ORDER_NO },
+                    complete: function () { window.location.href = HISTORY; }
                 });
             },
-            onPending: function (result) {
-                $.ajax({
-                    url: '{{ route("checkout.store") }}',
-                    type: 'POST',
-                    data: { _token: $('meta[name="csrf-token"]').attr('content'), order_number: '{{ $orderId }}' },
-                    success: function (res) { window.location.href = res.redirect; },
-                    error:   function ()    {
-                        $btn.prop('disabled', false).html(
-                            '<svg class="w-6 h-6 flex-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" ' +
-                            'd="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5V16M4 6h16M4 6a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2"/>' +
-                            '</svg> Bayar via QRIS'
-                        );
-                    }
-                });
-            },
-            onError: function (result) {
-                alert('Pembayaran gagal. Silakan coba lagi.');
-                $btn.prop('disabled', false).html(
-                    '<svg class="w-6 h-6 flex-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" ' +
-                    'd="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5V16M4 6h16M4 6a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2"/>' +
-                    '</svg> Bayar via QRIS'
-                );
+            // Pending (e.g. QRIS displayed, awaiting scan) — order is saved; the
+            // webhook flips it to paid. Send the customer to their order history.
+            onPending: function () { window.location.href = HISTORY; },
+            onError: function () {
+                alert('Pembayaran gagal. Pesanan Anda tersimpan sebagai "Pending" — Anda dapat mencoba membayar lagi dari Riwayat Pesanan.');
+                window.location.href = HISTORY;
             },
             onClose: function () {
-                $btn.prop('disabled', false).html(
-                    '<svg class="w-6 h-6 flex-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" ' +
-                    'd="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5V16M4 6h16M4 6a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2"/>' +
-                    '</svg> Bayar via QRIS'
-                );
+                // Order is already saved as Pending/Unpaid; let them review it.
+                window.location.href = HISTORY;
+            }
+        });
+    }
+
+    $('#btn-pay-qris').on('click', function () {
+        var $btn = $(this);
+        $btn.prop('disabled', true).html(spinner('Menyiapkan pesanan...'));
+
+        // 1) Persist the order BEFORE opening the payment UI, so a dropped mobile
+        //    callback can never result in "paid but no order".
+        $.ajax({
+            url: '{{ route("checkout.store") }}',
+            type: 'POST',
+            data: { _token: CSRF, order_number: ORDER_NO },
+            success: function (res) {
+                if (res && res.redirect) { window.location.href = res.redirect; return; }
+                $btn.html(spinner('Membuka pembayaran...'));
+                openSnap($btn);
+            },
+            error: function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Gagal menyiapkan pesanan. Coba lagi.';
+                alert(msg);
+                $btn.prop('disabled', false).html(payBtnHtml);
             }
         });
     });

@@ -14,6 +14,8 @@ npm run build           # Build frontend assets (Vite + Tailwind)
 ## 1. TECH STACK & ARCHITECTURE
 - **Backend:** Laravel 13 (PHP 8.3+)
 - **Frontend:** Tailwind CSS, Blade Templating, native HTML/CSS for simple interactivity (jQuery loaded via CDN only if strictly necessary). Do NOT use Alpine.js or Vue/React to prevent Vite compilation issues.
+- **Tailwind v4 (CSS-first):** Configured via `@tailwindcss/vite` + `@import "tailwindcss"` in `resources/css/app.css` — there is **no `tailwind.config.js`**. Brand design tokens are CSS variables in `app.css` (`--color-primary`, `--color-accent`, `--color-light`, `--color-border`, …); views apply them inline, e.g. `style="color:var(--color-primary)"`. Reuse these tokens, don't hardcode hex.
+- **⚠️ BUILD GOTCHA — the live server has no Node.** The compiled Vite output in `public/build/assets/` is **committed to git** and served as-is; Tailwind is NOT compiled on the fly in prod. Any *new* or *arbitrary-value* utility class (`bottom-8`, `rounded-[2rem]`, `sm:bottom-10`, `lg:order-*`) that isn't already in the built CSS will **silently do nothing** (element looks broken/"gone"). For layout-critical styling either (a) reuse a class already present in `public/build/assets/app-*.css`, or (b) use an **inline `style="…"`** (supports `clamp()`, media-independent). If you must add new classes, run `npm run build` AND commit the regenerated `public/build/` assets.
 - **Database:** MySQL (`DB_CONNECTION=mysql` — override the sqlite default in `.env.example`)
 - **Test Runner:** Pest (`composer test`)
 - **Strict Separation of Concerns:**
@@ -99,9 +101,12 @@ Copy `.env.example` → `.env` and fill in these keys:
 ## 7. CONTROLLER DIRECTORY STRUCTURE
 ```
 app/Http/Controllers/
-  Auth/          → SocialiteController (Google SSO)
-  Owner/         → DashboardController, ProductController, ReportController, UserController, CategoryController, JadwalController
+  Auth/          → SocialiteController (Google SSO), WhatsAppResetController (WA password reset)
+  Owner/         → DashboardController, ProductController, ReportController, UserMaintenanceController, CategoryController, JadwalController
   Customer/      → MenuController, CartController, CheckoutController, HistoryController, ProfileController, WelcomeController
+                   ChatbotController (Groq), WishlistController
   Cashier/       → DashboardController, PurchaseController
+  Concerns/      → Shared controller traits: ManagesOrderStatus, NormalizesPhone, RestoresOrderStock
+  Controller.php → Base controller — store-status/schedule helpers (see §5G)
   AuthController.php   → Login / Register / Logout
 ```

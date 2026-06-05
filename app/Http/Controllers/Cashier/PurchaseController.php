@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Concerns\NormalizesPhone;
+use App\Http\Controllers\Concerns\RestoresOrderStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,7 @@ use App\Models\User;
 class PurchaseController extends Controller
 {
     use NormalizesPhone;
+    use RestoresOrderStock;
 
     public function index()
     {
@@ -356,7 +358,7 @@ class PurchaseController extends Controller
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        $order = Order::where('order_number', $orderId)->first();
+        $order = Order::with('items')->where('order_number', $orderId)->first();
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
@@ -379,9 +381,12 @@ class PurchaseController extends Controller
         ]);
 
         // Advance the order out of Pending once paid; cancel it if the charge failed.
+        // The `status === 'Pending'` guard makes this idempotent against duplicate
+        // notifications, so stock is restored at most once on cancel/expire.
         if ($paymentStatus === 'Paid' && $order->status === 'Pending') {
             $order->update(['status' => 'Preparing']);
         } elseif ($paymentStatus === 'Failed' && $order->status === 'Pending') {
+            $this->restoreStockForOrder($order);
             $order->update(['status' => 'Cancelled']);
         }
 

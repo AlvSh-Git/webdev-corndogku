@@ -9,6 +9,7 @@
 </head>
 <body class="font-sans antialiased">
 
+{{-- Complete-profile page for new Google sign-ins. --}}
 <div class="min-h-screen relative text-gray-900 font-sans overflow-hidden bg-[#FEFDF2]">
 
     {{-- Background texture --}}
@@ -45,6 +46,7 @@
                 </div>
             @endif
 
+            {{-- Onboarding form. --}}
             <form action="{{ route('register.complete.post') }}" method="POST">
                 @csrf
                 <div class="space-y-3.5">

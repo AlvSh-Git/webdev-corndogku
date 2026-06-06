@@ -15,7 +15,7 @@
 <script>setTimeout(function(){ $('#flash-success').fadeOut(400); }, 3000);</script>
 @endif
 
-{{-- ── Page Header ─────────────────────────────────────────────── --}}
+{{-- Page Header --}}
 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
     <h1 class="text-4xl font-black tracking-tight" style="color: var(--color-black);">PRODUCT</h1>
 
@@ -41,7 +41,7 @@
     </div>
 </div>
 
-{{-- ── Product Grid ─────────────────────────────────────────────── --}}
+{{-- Product Grid --}}
 <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-5">
 
     {{-- Add Menu card - Background Merah --}}
@@ -160,7 +160,7 @@
 </div>
 
 
-{{-- ── Modal CSS (plain CSS — no Vite compilation needed) ──────── --}}
+{{-- Modal CSS (plain CSS — no Vite compilation needed) --}}
 <style>
 /* Force SweetAlert2 above all modals */
 .swal2-container { z-index: 99999 !important; }
@@ -247,9 +247,7 @@
 .pm-locked-msg{ font-size:11px;color:#ef4444;margin:4px 0 0;display:none; }
 </style>
 
-{{-- ══════════════════════════════════════════════════════════════
-     ADD PRODUCT MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- ADD PRODUCT MODAL --}}
 <div id="modal-add" class="pm-overlay">
     <div class="pm-panel">
         <form id="form-add-product"
@@ -409,9 +407,7 @@
 </div>
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     EDIT PRODUCT MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- EDIT PRODUCT MODAL --}}
 <div id="modal-edit" class="pm-overlay">
     <div class="pm-panel">
         <form id="form-edit-product" method="POST" enctype="multipart/form-data">
@@ -582,9 +578,9 @@ $(function () {
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        SHARED HELPERS
-    ══════════════════════════════════════════════════════════════ */
+     */
 
     /* Status switcher: sets active/inactive styles + hidden input + auto-lock on zero stock */
     function setStatus(prefix, available, locked) {
@@ -617,9 +613,9 @@ $(function () {
         }
     }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        ADD MODAL
-    ══════════════════════════════════════════════════════════════ */
+     */
     function openAddModal() {
         $('#form-add-product')[0].reset();
         $('#add-img-preview').css('display','none');
@@ -680,7 +676,7 @@ $(function () {
         }
     });
 
-    /* ── On-the-fly category creation ──────────────────────── */
+    /*  On-the-fly category creation  */
     $(document).on('click', '#btn-add-category, .btn-add-category', function (e) {
         e.preventDefault();
 
@@ -733,9 +729,9 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        EDIT MODAL
-    ══════════════════════════════════════════════════════════════ */
+     */
     function closeEditModal() {
         $('#modal-edit').removeClass('pm-open');
         $('body').css('overflow','');
@@ -820,9 +816,9 @@ $(function () {
         $('body').css('overflow','hidden');
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        DELETE
-    ══════════════════════════════════════════════════════════════ */
+     */
     $(document).on('click', '.btn-delete', function () {
         const id   = $(this).data('id');
         const name = $(this).data('name');
@@ -843,16 +839,16 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        ESC key closes any open modal
-    ══════════════════════════════════════════════════════════════ */
+     */
     $(document).on('keydown', function (e) {
         if (e.key === 'Escape') { closeAddModal(); closeEditModal(); }
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        SEARCH + CATEGORY FILTER
-    ══════════════════════════════════════════════════════════════ */
+     */
     function applyFilter() {
         const q   = $('#search-products').val().toLowerCase().trim();
         const cat = $('#filter-category').val();

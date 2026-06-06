@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ChatbotLog;
 
+// User account for all roles (owner, cashier, customer).
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;

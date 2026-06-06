@@ -10,13 +10,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
+// Google SSO via Laravel Socialite.
 class SocialiteController extends Controller
 {
+    // Start the Google OAuth redirect.
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
+    // Log in existing users, or start onboarding for new ones.
     public function handleGoogleCallback()
     {
         try {

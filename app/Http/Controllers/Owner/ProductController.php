@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 
+// Owner product catalog management (CRUD).
 class ProductController extends Controller
 {
+    // List all products.
     public function index()
     {
         $role       = $this->currentRole();
@@ -19,6 +21,7 @@ class ProductController extends Controller
         return view('owner.products', compact('role', 'products', 'categories'));
     }
 
+    // Create a product.
     public function store(Request $request)
     {
         $request->validate([
@@ -56,6 +59,7 @@ class ProductController extends Controller
         return redirect()->route('owner.products')->with('success', 'Product added successfully.');
     }
 
+    // Update a product.
     public function update(Request $request, Product $product)
     {
         $request->validate([
@@ -87,6 +91,7 @@ class ProductController extends Controller
         return redirect()->route('owner.products')->with('success', 'Product updated.');
     }
 
+    // Delete a product.
     public function destroy(Product $product)
     {
         $product->delete();

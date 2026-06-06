@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
+// Base controller with shared helpers (roles, order lists, store status).
 abstract class Controller
 {
+    // Get the active role from the URL's first segment.
     protected function currentRole(): string
     {
         $segment = request()->segment(1);
@@ -270,6 +272,7 @@ abstract class Controller
         ];
     }
 
+    // Find the next open day after today.
     private function nextOpenSlot(array $schedule, string $todayKey): array
     {
         $dayOrder = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];

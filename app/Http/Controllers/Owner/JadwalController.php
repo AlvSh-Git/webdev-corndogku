@@ -7,13 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
+// Owner operating-schedule manager (stored in cache, not the database).
 class JadwalController extends Controller
 {
+    // Return the current store status.
     public function statusInfo(): array
     {
         return $this->calcStoreStatus();
     }
 
+    // Show the schedule editor.
     public function index()
     {
         $schedule  = $this->operationalSchedule();
@@ -29,6 +32,7 @@ class JadwalController extends Controller
         return view('owner.jadwal', compact('schedule', 'storeInfo', 'override', 'role', 'todayLabel', 'todayBuka'));
     }
 
+    // Save the weekly schedule.
     public function save(Request $request)
     {
         $days   = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
@@ -54,6 +58,7 @@ class JadwalController extends Controller
         return back()->with('saved', true);
     }
 
+    // Manually open or close the store.
     public function toggleStatus(Request $request)
     {
         $request->validate(['status' => ['required', 'in:available,unavailable']]);
@@ -76,6 +81,7 @@ class JadwalController extends Controller
         return response()->json(['success' => true, 'store_info' => $this->calcStoreStatus()]);
     }
 
+    // Return the store status as JSON.
     public function getStatus(): \Illuminate\Http\JsonResponse
     {
         return response()->json($this->calcStoreStatus());

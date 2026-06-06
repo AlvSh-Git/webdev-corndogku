@@ -6,9 +6,10 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+// Owner financial report (figures from Completed orders only).
 class ReportController extends Controller
 {
-    // ── Shared date-range parser ─────────────────────────────
+    // Shared date-range parser.
     private function parseDateRange(): array
     {
         // HTML <input type="date"> always submits Y-m-d; str_replace handles
@@ -22,7 +23,7 @@ class ReportController extends Controller
         ];
     }
 
-    // ── Shared base query: Completed orders + optional payment join ──
+    // Shared base query: Completed orders with an optional payment join.
     private function completedOrders(Carbon $start, Carbon $end)
     {
         return DB::table('orders')
@@ -31,7 +32,7 @@ class ReportController extends Controller
             ->whereBetween('orders.created_at', [$start, $end]);
     }
 
-    // ── Dashboard view ───────────────────────────────────────
+    // Show the report page.
     public function index()
     {
         $role = $this->currentRole();
@@ -120,7 +121,7 @@ class ReportController extends Controller
         ));
     }
 
-    // ── Chart data AJAX endpoint ─────────────────────────────
+    // Return the revenue chart data as JSON.
     public function getChartData()
     {
         [$startDate, $endDate] = $this->parseDateRange();
@@ -144,7 +145,7 @@ class ReportController extends Controller
         return response()->json(['labels' => $labels, 'values' => $values]);
     }
 
-    // ── CSV Export ───────────────────────────────────────────
+    // Export the report as a CSV file.
     public function export()
     {
         [$startDate, $endDate] = $this->parseDateRange();
@@ -235,7 +236,7 @@ class ReportController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    // ── Order Detail (AJAX modal) ────────────────────────────
+    // Return a single order's details as JSON.
     public function orderDetail($id)
     {
         $order = DB::table('orders')

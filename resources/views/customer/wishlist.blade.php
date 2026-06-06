@@ -80,9 +80,7 @@
     @endif
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PRODUCT DETAIL MODAL (mirrors the menu view popup)
-══════════════════════════════════════════════════════════════ --}}
+{{-- PRODUCT DETAIL MODAL (mirrors the menu view popup) --}}
 <div id="product-modal"
      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden"
      style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
@@ -189,18 +187,18 @@
 <script>
 $(function () {
 
-    /* ── CSRF header for all AJAX requests ───────────────── */
+    /*  CSRF header for all AJAX requests  */
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
-    /* ── Current modal product data ─────────────────────── */
+    /*  Current modal product data  */
     var currentProductId    = null;
     var currentProductPrice = 0;
     var currentProductImage = '';
     var currentProductDesc  = '';
 
-    /* ── Helpers ──────────────────────────────────────────── */
+    /*  Helpers  */
     function fmtRp(n) {
         return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
@@ -224,9 +222,9 @@ $(function () {
         setTimeout(function () { $t.fadeOut(300, function () { $(this).remove(); }); }, 2500);
     }
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        OPEN PRODUCT DETAIL MODAL (clicking a wishlist card)
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.product-card', function (e) {
         // Jangan buka modal kalau yang diklik adalah tombol love atau tombol Pesan
         if ($(e.target).closest('.btn-wishlist, .btn-wishlist-order').length) return;
@@ -253,7 +251,7 @@ $(function () {
         $('body').css('overflow', 'hidden');
     });
 
-    /* ── Close modal helpers ───────────────────────────────── */
+    /*  Close modal helpers  */
     $('#modal-close').on('click', closeModal);
     $('#product-modal').on('click', function (e) {
         if (!$(e.target).closest('#product-modal-box').length) closeModal();
@@ -262,7 +260,7 @@ $(function () {
         if (e.key === 'Escape') closeModal();
     });
 
-    /* ── Modal Qty Plus & Minus ────────────────────────────── */
+    /*  Modal Qty Plus & Minus  */
     $('#modal-qty-plus').on('click', function () {
         var q = parseInt($('#modal-qty').text(), 10);
         $('#modal-qty').text(q + 1);
@@ -272,9 +270,9 @@ $(function () {
         if (q > 1) $('#modal-qty').text(q - 1);
     });
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        WISHLIST LOVE TOGGLE (card heart + modal heart)
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.btn-wishlist, #modal-btn-wishlist', function (e) {
         e.stopPropagation();
 
@@ -321,9 +319,9 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        ADD TO CART — outline button (stay on page)
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.btn-add-only', function () {
         var $btn     = $(this);
         var origHtml = $btn.html();
@@ -358,9 +356,9 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        ORDER NOW — solid button (add then go to cart)
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.btn-order-now', function () {
         var $btn = $(this);
         var qty  = parseInt($('#modal-qty').text(), 10) || 1;
@@ -390,9 +388,9 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        WISHLIST "Pesan" button — add to cart then go to cart
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.btn-wishlist-order', function () {
         var $btn = $(this);
 

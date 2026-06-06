@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+// Password reset over WhatsApp OTP (Fonnte).
 class WhatsAppResetController extends Controller
 {
     use NormalizesPhone;

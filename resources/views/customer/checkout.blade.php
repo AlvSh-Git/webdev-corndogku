@@ -33,9 +33,7 @@
 </head>
 <body class="font-sans antialiased" style="color: var(--color-black);">
 
-{{-- ══════════════════════════════════════════════════════════════
-     NAVBAR
-══════════════════════════════════════════════════════════════ --}}
+{{-- NAVBAR --}}
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
@@ -100,9 +98,7 @@
 </header>
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAGE CONTENT
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAGE CONTENT --}}
 <main>
 
 {{-- Page header --}}
@@ -129,9 +125,7 @@
 <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-8
             flex flex-col lg:flex-row gap-8 items-start">
 
-    {{-- ════════════════════
-         LEFT — Order Summary
-    ════════════════════ --}}
+    {{-- LEFT — Order Summary --}}
     <div class="w-full lg:flex-1 flex flex-col gap-5">
 
         {{-- Order items card --}}
@@ -249,9 +243,7 @@
     </div>{{-- /.left --}}
 
 
-    {{-- ════════════════════
-         RIGHT — Payment
-    ════════════════════ --}}
+    {{-- RIGHT — Payment --}}
     <div class="w-full lg:w-[380px] flex flex-col gap-5">
 
         {{-- Payment method selector --}}
@@ -389,9 +381,7 @@
 </main>
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     FOOTER (minimal)
-══════════════════════════════════════════════════════════════ --}}
+{{-- FOOTER (minimal) --}}
 <footer class="mt-8 py-6 border-t text-center text-xs"
         style="border-color: var(--color-border); color: #9c9c9c;">
     &copy; {{ date('Y') }} Corndog-Ku. Pembayaran diproses aman oleh

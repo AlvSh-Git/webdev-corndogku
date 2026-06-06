@@ -591,7 +591,7 @@
 }
 
 @media (max-width: 900px) {
-    /* ════════════════════════════════════════════════════════════
+    /* 
        NO-SCROLL MOBILE LAYOUT
        Goal: everything fits in one screen height without scrolling.
        Strategy:
@@ -599,9 +599,9 @@
          custom-page→ flex:1, overflow:hidden  (fills space below 64px header)
          custom-layout → flex:1, min-height:0  (fills remaining space)
          button-area → relative + margin-top:auto (natural bottom anchor)
-       ════════════════════════════════════════════════════════════ */
+        */
 
-    /* ── 1. Allow natural vertical scroll on mobile ───────────────
+    /*  1. Allow natural vertical scroll on mobile 
        Previously the page was locked to one screen (100dvh + overflow
        hidden). On short phones — and on step 3 where the "Add Sauce"
        block adds height — that clipped the bottom CTA button.
@@ -621,14 +621,14 @@
         flex-direction: column;
     }
 
-    /* ── 2. Hide decorative circles & accent lines ─────────────── */
+    /*  2. Hide decorative circles & accent lines  */
     .deco-circle-left,
     .deco-circle-right,
     .title-accent-lines {
         display: none;
     }
 
-    /* ── 3. Title: compact, centered, in document flow ──────────── */
+    /*  3. Title: compact, centered, in document flow  */
     .custom-title-wrap {
         position: relative !important;
         top: auto !important;
@@ -685,7 +685,7 @@
         line-height: 1.1;
     }
 
-    /* ── 4. Stepper: compact, in flow ──────────────────────────── */
+    /*  4. Stepper: compact, in flow  */
     .step-line {
         min-width: 20px !important;
     }
@@ -705,7 +705,7 @@
         justify-content: center;
     }
 
-    /* ── 5. Layout: flex column, fills all remaining height ──────── */
+    /*  5. Layout: flex column, fills all remaining height  */
     .custom-layout {
         display: flex !important;
         flex-direction: column !important;
@@ -717,7 +717,7 @@
         padding-bottom: 12px;
     }
 
-    /* ── 6. Preview wrapper: sized to leave room for card + button ─ */
+    /*  6. Preview wrapper: sized to leave room for card + button  */
     .preview-with-arrows {
         position: relative;
         width: 100%;
@@ -730,7 +730,7 @@
         flex-shrink: 0;
     }
 
-    /* ── 7. Corndog preview: centred inside the wrapper ─────────── */
+    /*  7. Corndog preview: centred inside the wrapper  */
     .custom-preview-area {
         position: absolute !important;
         left: 50% !important;
@@ -762,7 +762,7 @@
         max-height: none !important;
     }
 
-    /* ── 8. Arrow buttons: sides of the wrapper ─────────────────── */
+    /*  8. Arrow buttons: sides of the wrapper  */
     #btn-prev {
         position: absolute !important;
         left: 8px !important;
@@ -783,7 +783,7 @@
         font-size: 30px !important;
     }
 
-    /* ── 9. Selection pill ──────────────────────────────────────── */
+    /*  9. Selection pill  */
     .selection-pill {
         position: relative !important;
         left: auto !important;
@@ -799,7 +799,7 @@
         font-size: 13px !important;
     }
 
-    /* ── 10. Instruction card ───────────────────────────────────── */
+    /*  10. Instruction card  */
     #step-card {
         position: relative !important;
         right: auto !important;
@@ -828,7 +828,7 @@
         margin-top: 4px !important;
     }
 
-    /* ── 11. Review panel (step 4) ──────────────────────────────── */
+    /*  11. Review panel (step 4)  */
     #review-panel {
         position: relative !important;
         left: auto !important;
@@ -844,7 +844,7 @@
         flex-shrink: 0;
     }
 
-    /* ── 12. CTA button: in flow, pushed to bottom by margin-top:auto */
+    /*  12. CTA button: in flow, pushed to bottom by margin-top:auto */
     .button-area-custom {
         position: relative !important;
         bottom: auto !important;
@@ -868,7 +868,7 @@
         border-radius: 12px !important;
     }
 
-    /* ── 13. Back button: small pill fixed at top-left ──────────── */
+    /*  13. Back button: small pill fixed at top-left  */
     /* position:fixed pulls it out of .button-area-custom flow.
        JS still controls the .hidden class — no logic change needed. */
     #btn-back {
@@ -889,15 +889,15 @@
         background: rgba(255, 253, 235, 0.95) !important;
     }
 
-    /* ── 14. Red decorative accent ──────────────────────────────── */
+    /*  14. Red decorative accent  */
     .corndog-red-accent {
         right: 6% !important;
         top: 18% !important;
     }
 }
 
-/* ── Extra-small phones: shrink the corndog preview so its edges
-      never get clipped on ~320 px wide screens ──────────────────── */
+/*  Extra-small phones: shrink the corndog preview so its edges
+      never get clipped on ~320 px wide screens  */
 @media (max-width: 360px) {
     .custom-preview-area {
         width: 240px !important;
@@ -922,9 +922,7 @@
 </head>
 <body class="font-sans antialiased h-screen overflow-hidden flex flex-col">
 
-{{-- ══════════════════════════════════════════════════════════════
-     NAVBAR
-══════════════════════════════════════════════════════════════ --}}
+{{-- NAVBAR --}}
 <header class="sticky top-0 z-30 bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 h-16 flex items-center justify-between gap-6">
@@ -1004,9 +1002,7 @@
     </div>
 </header>
 
-{{-- ══════════════════════════════════════════════════════════════
-     MAIN — CUSTOM CORNDOG WIZARD
-══════════════════════════════════════════════════════════════ --}}
+{{-- MAIN — CUSTOM CORNDOG WIZARD --}}
 <section class="custom-page flex-1">
 
     {{-- Decorative background --}}
@@ -1219,9 +1215,7 @@
 
     </div>
 </section>
-{{-- ══════════════════════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════════════════════ --}}
+{{-- FOOTER --}}
 <footer class="hidden" style="background-color: var(--color-primary);">
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-16 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -1335,7 +1329,7 @@ var SAUCE_DATA  = @json($jsSauce);
 
 <script>
 $(function () {
-    /* ─── Data ───────────────────────────────────────────────── */
+    /*  Data  */
     var BASE_PRICE = 16000;
 
     var STEPS = [
@@ -1372,14 +1366,14 @@ $(function () {
         }
     ];
 
-    /* ─── State ─────────────────────────────────────────────── */
+    /*  State  */
     var state = {
         step: 0,          // 0-indexed (0=step1, 1=step2, 2=step3, 3=step4)
         idx: [0, 0, 0],   // selected index per step 1-3
         sauces: []         // for step 3 multi-select
     };
 
-    /* ─── Helpers ───────────────────────────────────────────── */
+    /*  Helpers  */
     function rupiah(n) {
         return 'Rp ' + Math.round(n).toLocaleString('id-ID');
     }
@@ -1392,7 +1386,7 @@ $(function () {
         return state.idx[state.step] || 0;
     }
 
-    /* ─── Render stepper ────────────────────────────────────── */
+    /*  Render stepper  */
     function renderStepper() {
         var el = document.getElementById('stepper');
         var html = '';
@@ -1489,7 +1483,7 @@ function getSauceTransform(sauceDisplay, variantDisplay) {
     return defaultMap[sauceDisplay] || (isMobile ? 'scale(1.10) translate(0px, -9px)' : 'scale(1.15) translate(0px, -16px)');
 }
 
-    /* ─── Render carousel ───────────────────────────────────── */
+    /*  Render carousel  */
     function renderCarousel(animate) {
         var step = STEPS[state.step];
         if (state.step >= 3) return; // review step has no carousel
@@ -1632,7 +1626,7 @@ if (animate) {
         }
     }
 
-    /* ─── Render instruction card ──────────────────────────── */
+    /*  Render instruction card  */
     function renderStepCard() {
         var step = STEPS[state.step];
         if (state.step >= 3) {
@@ -1645,7 +1639,7 @@ if (animate) {
         document.getElementById('step-card-desc').textContent = step.description;
     }
 
-    /* ─── Render ingredient selection cards (steps 1 & 2) ──── */
+    /*  Render ingredient selection cards (steps 1 & 2)  */
     function renderIngredientCards() {
         var grid = document.getElementById('ingredient-grid');
         if (!grid) return;
@@ -1693,7 +1687,7 @@ if (animate) {
         });
     }
 
-    /* ─── Render Next button ────────────────────────────────── */
+    /*  Render Next button  */
     function renderNextBtn() {
         var step = STEPS[state.step];
         document.getElementById('btn-next-step').innerHTML = step.nextLabel || 'Next';
@@ -1705,7 +1699,7 @@ if (animate) {
         }
     }
 
-    /* ─── Render review panel ──────────────────────────────── */
+    /*  Render review panel  */
     function renderReview() {
         var panel = document.getElementById('review-panel');
         if (state.step !== 3) {
@@ -1755,7 +1749,7 @@ if (animate) {
              + '</div>';
     }
 
-    /* ─── Full re-render ────────────────────────────────────── */
+    /*  Full re-render  */
     function renderAll(animate) {
         renderStepper();
         if (state.step < 3) renderCarousel(animate);
@@ -1813,7 +1807,7 @@ if (animate) {
         }
     }
 
-    /* ─── Navigation ────────────────────────────────────────── */
+    /*  Navigation  */
     function prevItem() {
         var items = currentItems();
         if (!items.length) return;
@@ -1877,7 +1871,7 @@ if (animate) {
             return;
         }
 
-        // ── Step 4: Add custom corndog to cart ──────────────────
+        //  Step 4: Add custom corndog to cart 
         if (!isLoggedIn) {
             Swal.fire({
                 icon: 'warning',
@@ -1962,7 +1956,7 @@ if (animate) {
         renderAll(false);
     };
 
-    /* ─── jQuery event bindings ─────────────────────────────── */
+    /*  jQuery event bindings  */
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
     var isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
@@ -1973,7 +1967,7 @@ if (animate) {
     $('#btn-next-step').on('click', nextStep);
     $('#add-sauce-btn').on('click', toggleSauce);
 
-    /* ─── Touch/swipe support ───────────────────────────────── */
+    /*  Touch/swipe support  */
     var touchStartX = 0;
     $('#carousel-center').on('touchstart', function (e) {
         touchStartX = e.originalEvent.touches[0].clientX;
@@ -1984,7 +1978,7 @@ if (animate) {
         }
     });
 
-    /* ─── Init ──────────────────────────────────────────────── */
+    /*  Init  */
     renderAll(false);
 
 });

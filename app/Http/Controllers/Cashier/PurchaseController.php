@@ -16,11 +16,13 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\User;
 
+// Cashier POS for building and ringing up walk-in orders.
 class PurchaseController extends Controller
 {
     use NormalizesPhone;
     use RestoresOrderStock;
 
+    // Show the POS screen.
     public function index()
     {
         $role      = $this->currentRole();
@@ -35,6 +37,7 @@ class PurchaseController extends Controller
         return view('cashier.purchase', compact('role', 'categories', 'storeInfo'));
     }
 
+    // Search customers for the typeahead.
     public function searchCustomer(Request $request)
     {
         $q     = trim($request->query('q', ''));
@@ -62,6 +65,7 @@ class PurchaseController extends Controller
         }
     }
 
+    // Return the product grid as JSON.
     public function getProducts(Request $request)
     {
         $category = $request->query('category', 'all');
@@ -117,6 +121,7 @@ class PurchaseController extends Controller
         }
     }
 
+    // Create an order and its payment.
     public function store(Request $request)
     {
         $request->validate([
@@ -301,6 +306,7 @@ class PurchaseController extends Controller
         }
     }
 
+    // Manually confirm a QRIS payment.
     public function markQrisPaid($id)
     {
         $order = Order::with(['items', 'payment', 'user'])->find((int) $id);
@@ -333,7 +339,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    // ── Midtrans server-to-server notification (webhook) ─────────────
+    // Midtrans server-to-server payment notification (webhook).
     //
     // Midtrans POSTs here whenever a transaction changes state. Because it is a
     // server call (no session/cookie) the route is public and CSRF-exempt; we
@@ -401,7 +407,7 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'OK']);
     }
 
-    // ── Send WhatsApp receipt via Fonnte API ─────────────────
+    // Send the order receipt over WhatsApp.
     public function sendWhatsAppReceipt($id)
     {
         $order = Order::with(['items', 'user'])->find($id);

@@ -41,7 +41,7 @@
             {{-- Alert (success / error) --}}
             <div id="alert-box" class="hidden mb-5 text-sm rounded-lg px-4 py-3"></div>
 
-            {{-- ───── STEP 1: Request OTP ───── --}}
+            {{-- STEP 1: Request OTP --}}
             <form id="step-1" onsubmit="return false;">
                 <div class="space-y-4">
                     <div>
@@ -60,7 +60,7 @@
                 </button>
             </form>
 
-            {{-- ───── STEP 2: Verify OTP ───── --}}
+            {{-- STEP 2: Verify OTP --}}
             <form id="step-2" class="hidden" onsubmit="return false;">
                 <div class="space-y-4">
                     <div>
@@ -92,7 +92,7 @@
                 </div>
             </form>
 
-            {{-- ───── STEP 3: New Password ───── --}}
+            {{-- STEP 3: New Password --}}
             <form id="step-3" class="hidden" onsubmit="return false;">
                 <div class="space-y-4">
                     <div>
@@ -233,12 +233,12 @@
         }
     }
 
-    // ── Step 1: send OTP ──
+    //  Step 1: send OTP 
     step1.addEventListener('submit', function () {
         sendOtp(btnSend, 'MENGIRIM…', 'KIRIM OTP VIA WA', true);
     });
 
-    // ── Step 2: verify OTP only ──
+    //  Step 2: verify OTP only 
     step2.addEventListener('submit', async function () {
         clearAlert();
         const otp = document.getElementById('otp').value.trim();
@@ -262,7 +262,7 @@
         }
     });
 
-    // ── Step 3: set new password ──
+    //  Step 3: set new password 
     step3.addEventListener('submit', async function () {
         clearAlert();
         const password = document.getElementById('password').value;
@@ -289,14 +289,14 @@
         }
     });
 
-    // ── "Ganti Nomor" — return to Step 1 to enter a different number ──
+    //  "Ganti Nomor" — return to Step 1 to enter a different number 
     btnChange.addEventListener('click', function () {
         clearAlert();
         document.getElementById('otp').value = '';
         goToStep1();
     });
 
-    // ── "Kirim Ulang OTP" — resend to the same number, staying on Step 2 ──
+    //  "Kirim Ulang OTP" — resend to the same number, staying on Step 2 
     btnResend.addEventListener('click', function () {
         sendOtp(btnResend, 'Mengirim…', 'Kirim Ulang OTP', false);
     });

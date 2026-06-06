@@ -4,12 +4,12 @@
 
 @section('content')
 
-    {{-- ── Page Header ──────────────────────────────────────────── --}}
+    {{-- Page Header --}}
     <h1 class="text-3xl md:text-5xl font-bold mb-7" style="color: var(--color-black);">
         User Maintenance
     </h1>
 
-    {{-- ── Success Alert ───────────────────────────────────────── --}}
+    {{-- Success Alert --}}
     @if (session('success'))
         <div id="pageAlert"
              class="mb-5 px-4 py-3 rounded-xl text-sm font-medium transition-opacity duration-500"
@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    {{-- ── Error Alert ─────────────────────────────────────────── --}}
+    {{-- Error Alert --}}
     @if ($errors->any())
         <div id="pageAlert"
              class="mb-5 px-4 py-3 rounded-xl text-sm font-medium transition-opacity duration-500"
@@ -27,10 +27,10 @@
         </div>
     @endif
 
-    {{-- ── User Card Grid ───────────────────────────────────────── --}}
+    {{-- User Card Grid --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        {{-- ── User Cards from Database ─────────────────────────── --}}
+        {{-- User Cards from Database --}}
         @forelse ($users as $user)
             <article class="relative rounded-3xl p-5"
                      style="background-color: var(--color-white); box-shadow: var(--shadow-card); min-height: 170px;">
@@ -141,7 +141,7 @@
             </article>
         @endforelse
 
-        {{-- ── Add User Card ────────────────────────────────────── --}}
+        {{-- Add User Card --}}
         <button type="button"
                 onclick="openAddUserModal()"
                 class="flex flex-col items-center justify-center gap-3 rounded-3xl p-5 border-2 border-dashed transition-colors hover:opacity-80"
@@ -164,7 +164,7 @@
     </div>
 
 
-    {{-- ── Add User Model ───────────────────────────────────────── --}}
+    {{-- Add User Model --}}
     <div id="addUserModal"
          class="fixed inset-0 z-50 hidden items-center justify-center"
          style="background-color: rgba(0, 0, 0, 0.55);">
@@ -299,7 +299,7 @@
     </div>
 
 
-    {{-- ── Edit User Modal ──────────────────────────────────────── --}}
+    {{-- Edit User Modal --}}
     <div id="editUserModal"
          class="fixed inset-0 z-50 hidden items-center justify-center"
          style="background-color: rgba(0, 0, 0, 0.55);">
@@ -433,7 +433,7 @@
     </div>
 
 
-    {{-- ── Delete User Modal ────────────────────────────────────── --}}
+    {{-- Delete User Modal --}}
     <div id="deleteUserModal"
          class="fixed inset-0 z-50 hidden items-center justify-center"
          style="background-color: rgba(0, 0, 0, 0.55);">
@@ -482,7 +482,7 @@
     </div>
 
 
-    {{-- ── Modal Script ─────────────────────────────────────────── --}}
+    {{-- Modal Script --}}
     <script>
         function openAddUserModal() {
             const modal = document.getElementById('addUserModal');

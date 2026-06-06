@@ -12,6 +12,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use Carbon\Carbon;
 
+// Cashier dashboard; cashiers can change order status (which sends WhatsApp).
 class DashboardController extends Controller
 {
     use ManagesOrderStatus;
@@ -29,6 +30,7 @@ class DashboardController extends Controller
         }
     }
 
+    // Show the dashboard with today's stats and orders.
     public function index(Request $request)
     {
         $role        = 'cashier';
@@ -134,6 +136,7 @@ class DashboardController extends Controller
         ));
     }
 
+    // Return the filtered order list as JSON.
     public function getOrders(Request $request)
     {
         $status  = $request->query('status', 'all');
@@ -204,6 +207,7 @@ class DashboardController extends Controller
         }
     }
 
+    // Toggle the store available/unavailable.
     public function updateStatus(Request $request)
     {
         $request->validate(['status' => ['required', 'in:available,unavailable']]);
@@ -211,6 +215,7 @@ class DashboardController extends Controller
         return response()->json(['success' => true, 'status' => $request->status]);
     }
 
+    // Return the day's headline stats as JSON.
     public function getStats(Request $request)
     {
         $rawDate = $request->query('date', today()->toDateString());
@@ -260,6 +265,7 @@ class DashboardController extends Controller
         }
     }
 
+    // Return this week's daily revenue as JSON.
     public function getChartData(Request $request)
     {
         $rawDate = $request->query('date', today()->toDateString());

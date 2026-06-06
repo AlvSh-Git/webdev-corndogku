@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+// Sellable menu item; is_custom flags the build-your-own template.
 class Product extends Model
 {
     use HasFactory;
@@ -24,6 +25,7 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
     public function favoritedBy()
     {
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();

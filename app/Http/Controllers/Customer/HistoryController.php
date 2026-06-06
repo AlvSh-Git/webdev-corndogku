@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+// Customer order history (list, detail, WhatsApp receipt).
 class HistoryController extends Controller
 {
     use NormalizesPhone;
 
+    // Show the user's orders.
     public function index(Request $request)
     {
         if (!auth()->check()) {
@@ -44,6 +46,7 @@ class HistoryController extends Controller
         return view('customer.history', compact('orders', 'statusFilter'));
     }
 
+    // Return one of the user's orders as JSON.
     public function show($id)
     {
         if (!auth()->check()) {
@@ -86,6 +89,7 @@ class HistoryController extends Controller
         ]);
     }
 
+    // Send the order receipt over WhatsApp.
     public function sendReceipt($id)
     {
         try {

@@ -34,7 +34,7 @@
     .tutup-input::-moz-clear { display: none; }
 </style>
 
-{{-- Full-page wrapper: cream background + decorative blobs ──────────── --}}
+{{-- Full-page wrapper: cream background + decorative blobs --}}
 <div class="relative overflow-hidden -m-4 sm:-m-6 lg:-m-8 p-4 sm:p-6 lg:p-8" style="background-color:#fffef0;min-height:calc(100vh - 4rem);">
 
     {{-- Decorative background blobs --}}
@@ -56,7 +56,7 @@
         <div class="absolute rounded-full" style="width:15px;height:15px;right:12px;top:530px;background-color:#f59e0b;"></div>
     </div>
 
-    {{-- Page header: title + 3D storefront illustration ─────────────── --}}
+    {{-- Page header: title + 3D storefront illustration --}}
     <div class="relative z-10 flex items-start justify-between mb-6">
         <div>
             <h1 class="font-bold text-gray-900 leading-tight"
@@ -65,12 +65,10 @@
         </div>
     </div>
 
-    {{-- Two-panel layout ─────────────────────────────────────────────── --}}
+    {{-- Two-panel layout --}}
     <div class="relative z-10 flex flex-col lg:flex-row gap-6 items-start">
 
-        {{-- ═══════════════════════════════════════════════════════════
-             LEFT — Schedule Table Card
-        ═══════════════════════════════════════════════════════════ --}}
+        {{-- LEFT — Schedule Table Card --}}
         <div class="flex-1 min-w-0 bg-white rounded-3xl shadow-md">
             <form method="POST" action="{{ route('owner.jadwal.save') }}">
                 @csrf
@@ -164,7 +162,7 @@
                     <span style="color:#9a7d3f;font-size:12px;">Jadwal ini akan diterapkan setiap hari sesuai pengaturan di atas.</span>
                 </div>
 
-                {{-- Save button — bottom-right ──────────────────────── --}}
+                {{-- Save button — bottom-right --}}
                 <div class="px-6 pb-6 flex justify-end">
                     <button type="submit"
                             class="inline-flex items-center gap-2 font-bold text-white text-sm rounded-xl px-6 py-3 hover:opacity-90 transition-opacity"
@@ -178,9 +176,7 @@
             </form>
         </div>
 
-        {{-- ═══════════════════════════════════════════════════════════
-             RIGHT — Manual Override Card
-        ═══════════════════════════════════════════════════════════ --}}
+        {{-- RIGHT — Manual Override Card --}}
         <div class="w-full lg:w-72 xl:w-80 flex-none">
             <div class="bg-white rounded-3xl p-6 flex flex-col gap-4"
                  style="box-shadow:3px 4px 20px rgba(0,0,0,0.07);">
@@ -191,7 +187,7 @@
                     <p style="color:#6b7280;font-size:10px;margin-top:2px;">Anda dapat menutup atau membuka toko kapan saja.</p>
                 </div>
 
-                {{-- Status box ──────────────────────────────────────── --}}
+                {{-- Status box --}}
                 <div id="status-box"
                      class="rounded-2xl border flex items-center justify-between gap-2 px-4 py-3"
                      style="background-color:{{ $isOpen ? '#f2fcf2' : '#fff6f6' }};border-color:{{ $isOpen ? '#dcfce7' : '#fecaca' }};">
@@ -230,7 +226,7 @@
                          style="width:64px;height:64px;flex-shrink:0;">
                 </div>
 
-                {{-- Buka Sekarang (outline green + unlock icon) ──────── --}}
+                {{-- Buka Sekarang (outline green + unlock icon) --}}
                 <button id="btn-buka"
                         class="w-full flex items-center justify-center gap-2 font-bold text-sm rounded-xl px-4 py-2.5 transition-opacity"
                         style="background-color:#effff5;border:2px solid #15803d;color:#15803d;{{ $isOpen ? 'opacity:.5;cursor:not-allowed;' : 'cursor:pointer;' }}"
@@ -242,7 +238,7 @@
                     Buka Sekarang
                 </button>
 
-                {{-- Tutup Sekarang (outline red + lock icon) ─────────── --}}
+                {{-- Tutup Sekarang (outline red + lock icon) --}}
                 <button id="btn-tutup"
                         class="w-full flex items-center justify-center gap-2 font-bold text-sm rounded-xl px-4 py-2.5 transition-opacity"
                         style="background-color:#fff6f6;border:2px solid #ef4444;color:#ef4444;{{ !$isOpen ? 'opacity:.5;cursor:not-allowed;' : 'cursor:pointer;' }}"
@@ -268,7 +264,7 @@
 
     </div>{{-- /two-panel --}}
 
-    {{-- Save success flash ───────────────────────────────────────────── --}}
+    {{-- Save success flash --}}
     @if (session('saved'))
     <div id="flash-saved"
          class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl text-white text-sm font-semibold shadow-xl"
@@ -293,14 +289,14 @@ $(function () {
     var todayLabel = @json($todayLabel);
     var todayBuka  = @json($todayBuka);
 
-    // ── Toggle pill click ─────────────────────────────────────────────
+    //  Toggle pill click 
     $(document).on('click', '.toggle-pill', function () {
         var $row = $(this).closest('.jadwal-row');
         var $cb  = $row.find('.day-toggle');
         $cb.prop('checked', !$cb.prop('checked')).trigger('change');
     });
 
-    // ── Toggle state change ───────────────────────────────────────────
+    //  Toggle state change 
     $(document).on('change', '.day-toggle', function () {
         var $row      = $(this).closest('.jadwal-row');
         var isChecked = $(this).is(':checked');
@@ -336,7 +332,7 @@ $(function () {
         }
     });
 
-    // ── Update right-panel status UI after AJAX ───────────────────────
+    //  Update right-panel status UI after AJAX 
     function updateStatusUI(info) {
         var isOpen   = info.is_open;
         var isManual = (info.reason === 'manual');
@@ -367,7 +363,7 @@ $(function () {
         }
     }
 
-    // ── Buka Sekarang ─────────────────────────────────────────────────
+    //  Buka Sekarang 
     $('#btn-buka').on('click', function () {
         if ($(this).prop('disabled')) return;
 
@@ -398,7 +394,7 @@ $(function () {
         });
     });
 
-    // ── Tutup Sekarang — Step 1: choose reopen day & time ────────────
+    //  Tutup Sekarang — Step 1: choose reopen day & time 
     $('#btn-tutup').on('click', function () {
         if ($(this).prop('disabled')) return;
 

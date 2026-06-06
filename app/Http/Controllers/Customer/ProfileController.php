@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+// Customer profile management (details, password, photo).
 class ProfileController extends Controller
 {
+    // Show the profile page.
     public function index()
     {
         if (!auth()->check()) {
@@ -18,6 +20,7 @@ class ProfileController extends Controller
         return view('customer.profile', ['user' => auth()->user()]);
     }
 
+    // Save profile fields (and the password if one was provided).
     public function update(Request $request)
     {
         if (!auth()->check()) {
@@ -75,6 +78,7 @@ class ProfileController extends Controller
         ]);
     }
 
+    // Upload a new profile photo, replacing the old one.
     public function uploadPhoto(Request $request)
     {
         if (!auth()->check()) {
@@ -104,6 +108,7 @@ class ProfileController extends Controller
         ]);
     }
 
+    // Remove the uploaded profile photo.
     public function deletePhoto(Request $request)
     {
         if (!auth()->check()) {

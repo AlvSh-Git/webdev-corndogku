@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// Payment record for an order (tracks the Midtrans status).
 class Payment extends Model
 {
     protected $fillable = ['order_id', 'payment_method', 'amount', 'status'];

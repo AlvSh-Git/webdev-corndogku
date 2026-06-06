@@ -9,6 +9,8 @@
 </head>
 <body class="font-sans antialiased relative overflow-x-hidden" style="background-color: #FFFBEE; min-height: 100vh;">
 
+{{-- Guest layout for public pages (with the floating chatbot widget). --}}
+
     {{-- Red blob — top-right decorative --}}
     <div class="absolute top-0 right-0 pointer-events-none select-none hidden lg:block" style="z-index:0; overflow:hidden; width:160px; height:160px;">
         <div style="position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:var(--color-primary); border-radius:50%;"></div>
@@ -43,9 +45,7 @@
     </div>
 
 
-    {{-- ════════════════════════════════════════════════════════════
-         CHATBOT WIDGET
-    ════════════════════════════════════════════════════════════ --}}
+    {{-- Chatbot widget. --}}
 
     {{-- Floating trigger button — #FFBE54 pill, 15px radius, same-color badge with white ring (Figma 347:4278) --}}
     <button id="chatbot-trigger"
@@ -129,6 +129,7 @@
         </div>
     </div>
 
+    {{-- Chatbot behaviour. --}}
     <script>
     (function () {
         const trigger   = document.getElementById('chatbot-trigger');

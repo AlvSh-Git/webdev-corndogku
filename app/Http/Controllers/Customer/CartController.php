@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+// Session-based shopping cart (stored in the session, not the database).
 class CartController extends Controller
 {
+    // Show the cart page.
     public function index()
     {
         $cartItems = session()->get('cart', []);
@@ -15,6 +17,7 @@ class CartController extends Controller
         return view('customer.cart', compact('cartItems', 'storeOpen'));
     }
 
+    // Add a normal product or a custom corndog to the cart.
     public function add(Request $request)
     {
         $status = $this->calcStoreStatus();
@@ -79,6 +82,7 @@ class CartController extends Controller
         ]);
     }
 
+    // Change a line's quantity (a quantity below 1 removes it).
     public function update(Request $request)
     {
         $productId = (string) $request->input('product_id');
@@ -104,6 +108,7 @@ class CartController extends Controller
         ]);
     }
 
+    // Remove a single line from the cart.
     public function remove(Request $request)
     {
         $productId = (string) $request->input('product_id');
@@ -119,6 +124,7 @@ class CartController extends Controller
         ]);
     }
 
+    // Empty the whole cart.
     public function clear()
     {
         session()->forget('cart');

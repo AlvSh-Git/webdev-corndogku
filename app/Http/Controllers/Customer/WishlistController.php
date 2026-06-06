@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// Customer wishlist (favorites).
 class WishlistController extends Controller
 {
     // Menampilkan semua produk yang disukai pelanggan

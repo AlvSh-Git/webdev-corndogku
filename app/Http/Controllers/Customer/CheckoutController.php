@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+// Online checkout flow (Midtrans Snap payment).
 class CheckoutController extends Controller
 {
+    // Show the checkout page and build the Midtrans Snap token.
     public function index()
     {
         if (!auth()->check()) {
@@ -78,6 +80,7 @@ class CheckoutController extends Controller
         return view('customer.checkout', compact('cart', 'subtotal', 'tax', 'total', 'snapToken', 'clientKey', 'orderId'));
     }
 
+    // Save the order and clear the cart.
     public function store(Request $request)
     {
         if (!auth()->check()) {
@@ -210,11 +213,7 @@ class CheckoutController extends Controller
         return response()->json(['success' => true, 'order_number' => $orderNumber]);
     }
 
-    /**
-     * Mark a just-paid order as paid from the Snap onSuccess callback. This is a
-     * fast-path for UX; the Midtrans server-to-server webhook is the authoritative
-     * confirmation and works even when the mobile callback never fires. Idempotent.
-     */
+    // Mark the order as paid from the Snap onSuccess callback.
     public function confirm(Request $request)
     {
         if (!auth()->check()) {

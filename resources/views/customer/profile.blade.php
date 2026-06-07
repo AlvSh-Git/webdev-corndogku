@@ -7,9 +7,7 @@
 
 <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
 
-    {{-- ═══════════════════════════════════════════════════════════
-         ALERT BANNER
-    ═══════════════════════════════════════════════════════════ --}}
+    {{-- ALERT BANNER --}}
     <div id="profile-alert"
          style="display:none;"
          class="mb-6 px-5 py-4 rounded-xl border">
@@ -25,7 +23,7 @@
         </div>
     </div>
 
-    {{-- ── HERO ── --}}
+    {{-- HERO --}}
     <div class="flex flex-col sm:flex-row sm:items-end gap-6 mb-8">
 
         {{-- Avatar --}}
@@ -132,9 +130,7 @@
     </div>{{-- /.hero --}}
 
 
-    {{-- ═══════════════════════════════════════════════════════════
-         TAB BAR
-    ═══════════════════════════════════════════════════════════ --}}
+    {{-- TAB BAR --}}
     <div class="flex mb-8 overflow-hidden"
          style="background-color: rgba(255,255,255,0.9);
                 box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);
@@ -172,7 +168,7 @@
     <div id="panel-profile">
 
 
-        {{-- ── ACCOUNT INFO CARD ── --}}
+        {{-- ACCOUNT INFO CARD --}}
         <div class="rounded-[10px] p-6 sm:p-8"
              style="background-color: var(--color-white);
                     box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
@@ -423,7 +419,7 @@
                 </div>{{-- /.space-y-4 --}}
 
 
-                {{-- ── Change-password inline panel (collapsed by default) ── --}}
+                {{-- Change-password inline panel (collapsed by default) --}}
                 <div id="change-pw-panel" style="display: none;" class="mt-4 space-y-4">
 
                     <div>
@@ -576,17 +572,17 @@
 <script>
 $(function () {
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        UBAH PASSWORD TOGGLE
-    ═══════════════════════════════════════════════════════════ */
+     */
     $('#open-change-pw').on('click', function () {
         var $panel = $('#change-pw-panel');
         $panel.is(':hidden') ? $panel.slideDown(200) : $panel.slideUp(200);
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        PASSWORD SHOW / HIDE
-    ═══════════════════════════════════════════════════════════ */
+     */
     $(document).on('click', '.toggle-eye', function () {
         var $input = $('#' + $(this).data('target'));
         var isPass = $input.attr('type') === 'password';
@@ -595,9 +591,9 @@ $(function () {
         $(this).find('.eye-off-icon').toggleClass('hidden', !isPass);
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        SAVE INFO — AJAX PUT
-    ═══════════════════════════════════════════════════════════ */
+     */
     $('#save-info-btn').on('click', function () {
         var $btn     = $(this);
         var name     = $.trim($('#name').val());
@@ -711,9 +707,9 @@ $(function () {
         });
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        PROFILE PHOTO UPLOAD
-    ═══════════════════════════════════════════════════════════ */
+     */
     $('#camera-btn').on('click', function () {
         $('#profile-photo-input').trigger('click');
     });
@@ -782,9 +778,9 @@ $(function () {
         });
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        PROFILE PHOTO DELETE
-    ═══════════════════════════════════════════════════════════ */
+     */
     $('#delete-photo-btn').on('click', function () {
         Swal.fire({
             title: 'Hapus Foto Profil?',
@@ -840,16 +836,16 @@ $(function () {
         });
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ALERT CLOSE
-    ═══════════════════════════════════════════════════════════ */
+     */
     $('#profile-alert-close').on('click', function () {
         $('#profile-alert').stop(true).fadeOut(300);
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ALERT HELPER
-    ═══════════════════════════════════════════════════════════ */
+     */
     function showAlert(msg, type) {
         var ok     = (type === 'success');
         var bg     = ok ? '#DCFCE7' : '#FCE8E6';

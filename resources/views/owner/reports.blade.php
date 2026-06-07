@@ -4,9 +4,7 @@
 
 @section('content')
 
-{{-- ════════════════════════════════════════════════════════
-     PAGE HEADER
-════════════════════════════════════════════════════════ --}}
+{{-- PAGE HEADER --}}
 <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
     <div>
         <h1 class="text-3xl md:text-4xl font-bold" style="color:var(--color-black);">Sales Report</h1>
@@ -28,9 +26,7 @@
     </a>
 </div>
 
-{{-- ════════════════════════════════════════════════════════
-     DATE FILTER
-════════════════════════════════════════════════════════ --}}
+{{-- DATE FILTER --}}
 <form method="GET" action="{{ route('owner.reports') }}">
     <div class="flex flex-col sm:flex-row sm:items-end gap-3 mb-6 p-4 rounded-xl"
          style="background:var(--color-white); box-shadow:var(--shadow-card);">
@@ -70,9 +66,7 @@
     </div>
 </form>
 
-{{-- ════════════════════════════════════════════════════════
-     SUMMARY CARDS
-════════════════════════════════════════════════════════ --}}
+{{-- SUMMARY CARDS --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
     {{-- Total Revenue --}}
@@ -161,9 +155,7 @@
 
 </div>
 
-{{-- ════════════════════════════════════════════════════════
-     SALES CHART
-════════════════════════════════════════════════════════ --}}
+{{-- SALES CHART --}}
 <div class="rounded-xl p-5 mb-6"
      style="background:var(--color-white); box-shadow:var(--shadow-card);">
 
@@ -180,9 +172,7 @@
     </div>
 </div>
 
-{{-- ════════════════════════════════════════════════════════
-     TRANSACTION TABLE
-════════════════════════════════════════════════════════ --}}
+{{-- TRANSACTION TABLE --}}
 <div class="rounded-xl overflow-hidden"
      style="background:var(--color-white); box-shadow:var(--shadow-card);">
 
@@ -300,9 +290,7 @@
 </div>
 
 
-{{-- ════════════════════════════════════════════════════════
-     ORDER DETAIL MODAL
-════════════════════════════════════════════════════════ --}}
+{{-- ORDER DETAIL MODAL --}}
 <div id="modal-order-detail"
      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
      style="background:rgba(0,0,0,0.45); backdrop-filter:blur(3px);">
@@ -385,15 +373,13 @@
 </div>
 
 
-{{-- ════════════════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════════════════ --}}
+{{-- JAVASCRIPT --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
 $(function () {
 
-    // ── Helpers ────────────────────────────────────────────
+    //  Helpers 
     function fmtRp(n) {
         return 'Rp ' + parseInt(n).toLocaleString('id-ID');
     }
@@ -402,7 +388,7 @@ $(function () {
         return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    // ── Daily Revenue Chart ─────────────────────────────────
+    //  Daily Revenue Chart 
     const dailyChart = new Chart(document.getElementById('daily-revenue-chart'), {
         type: 'line',
         data: {
@@ -466,7 +452,7 @@ $(function () {
 
     $('#date-start, #date-end').on('change', function () { fetchReportChart(); });
 
-    // ── Order Detail Modal ──────────────────────────────────
+    //  Order Detail Modal 
     var $modal = $('#modal-order-detail');
 
     $(document).on('click', '.btn-view-detail', function () {
@@ -535,7 +521,7 @@ $(function () {
         if (e.key === 'Escape') $modal.addClass('hidden');
     });
 
-    // ── AJAX Pagination ─────────────────────────────────────
+    //  AJAX Pagination 
     $(document).on('click', '#table-pagination-container a', function (e) {
         e.preventDefault();
         var url = $(this).attr('href');

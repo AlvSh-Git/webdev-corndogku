@@ -33,9 +33,7 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════════════════════════════
-     CUSTOMIZE CORNDOG BANNER
-══════════════════════════════════════════════════════════════ --}}
+{{-- CUSTOMIZE CORNDOG BANNER --}}
 <section class="pt-6 pb-4 sm:pt-8 sm:pb-6" style="background-color: var(--color-light);">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 2xl:px-12">
 
@@ -72,9 +70,7 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     CATEGORY FILTER + PRODUCT GRID
-══════════════════════════════════════════════════════════════ --}}
+{{-- CATEGORY FILTER + PRODUCT GRID --}}
 @php
     $categories = ['Semua', 'Corndog Asin', 'Corndog Manis', 'Toppoki', 'Combo', 'Es Teler Kwentel', 'Bingsoo'];
 @endphp
@@ -303,9 +299,7 @@
     </div>{{-- /.inner container --}}
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PRODUCT DETAIL MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- PRODUCT DETAIL MODAL --}}
 <div id="product-modal"
      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden"
      style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
@@ -411,14 +405,14 @@
 <script>
 $(function () {
 
-    /* ── CSRF header for all AJAX requests ───────────────── */
+    /*  CSRF header for all AJAX requests  */
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
     var isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
 
-    /* ── State ──────────────────────────────────────────── */
+    /*  State  */
     var activeCat      = 'Semua';
     var searchTerm     = '';
     var sortMode       = 'default';
@@ -431,13 +425,13 @@ $(function () {
 
     
 
-    /* ── Current modal product data ─────────────────────── */
+    /*  Current modal product data  */
     var currentProductId    = null;
     var currentProductPrice = 0;
     var currentProductImage = '';
     var currentProductDesc  = '';
 
-    /* ── Helpers ──────────────────────────────────────────── */
+    /*  Helpers  */
     function fmtRp(n) {
         return 'Rp ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
@@ -593,7 +587,7 @@ $(function () {
             });
     }
 
-    /* ── Custom Corndog CTA — require login ─────────────── */
+    /*  Custom Corndog CTA — require login  */
     $('#btn-custom-cta').on('click', function (e) {
         if (!isLoggedIn) {
             e.preventDefault();
@@ -613,7 +607,7 @@ $(function () {
         }
     });
 
-    /* ── Category tabs ────────────────────────────────────── */
+    /*  Category tabs  */
     $(document).on('click', '.cat-tab', function () {
         activeCat = $(this).data('cat');
 
@@ -627,7 +621,7 @@ $(function () {
         loadProducts(1);
     });
 
-    /* ── Navbar search ─────────────────────────────────────── */
+    /*  Navbar search  */
     var searchDebounce = null;
     $('#navbar-search').on('input', function () {
         searchTerm = $.trim($(this).val()).toLowerCase();
@@ -637,7 +631,7 @@ $(function () {
         }, 300);
     });
 
-    /* ── Dropdown helpers ──────────────────────────────────── */
+    /*  Dropdown helpers  */
     function closeAllDropdowns() {
         $('#dropdown-sort, #dropdown-filter').addClass('hidden');
     }
@@ -656,7 +650,7 @@ $(function () {
         });
     }
 
-    /* ── Sort dropdown toggle ──────────────────────────────── */
+    /*  Sort dropdown toggle  */
     $('#btn-sort-toggle').on('click', function (e) {
         e.stopPropagation();
         var wasHidden = $('#dropdown-sort').hasClass('hidden');
@@ -664,7 +658,7 @@ $(function () {
         if (wasHidden) $('#dropdown-sort').removeClass('hidden');
     });
 
-    /* ── Filter dropdown toggle ────────────────────────────── */
+    /*  Filter dropdown toggle  */
     $('#btn-filter-toggle').on('click', function (e) {
         e.stopPropagation();
         var wasHidden = $('#dropdown-filter').hasClass('hidden');
@@ -672,27 +666,27 @@ $(function () {
         if (wasHidden) $('#dropdown-filter').removeClass('hidden');
     });
 
-    /* ── Close both on outside click ──────────────────────── */
+    /*  Close both on outside click  */
     $(document).on('click', function (e) {
         if (!$(e.target).closest('#dropdown-sort, #btn-sort-toggle, #dropdown-filter, #btn-filter-toggle').length) {
             closeAllDropdowns();
         }
     });
 
-    /* ── Sort option card click (visual feedback) ──────────── */
+    /*  Sort option card click (visual feedback)  */
     $(document).on('click', '.sort-option-card', function () {
         $(this).find('input[type=radio]').prop('checked', true);
         updateSortUI();
     });
 
-    /* ── Sort apply ────────────────────────────────────────── */
+    /*  Sort apply  */
     $('#btn-sort-apply').on('click', function () {
         sortMode = $('input[name="sort-option"]:checked').val() || 'default';
         closeAllDropdowns();
         loadProducts(1);
     });
 
-    /* ── Sort reset ────────────────────────────────────────── */
+    /*  Sort reset  */
     $('#btn-sort-reset').on('click', function () {
         $('input[name="sort-option"]').prop('checked', false);
         sortMode = 'default';
@@ -701,7 +695,7 @@ $(function () {
         loadProducts(1);
     });
 
-    /* ── Filter apply ──────────────────────────────────────── */
+    /*  Filter apply  */
     $('#btn-filter-apply').on('click', function () {
         var minVal     = $('#filter-price-min').val();
         var maxVal     = $('#filter-price-max').val();
@@ -717,7 +711,7 @@ $(function () {
         loadProducts(1);
     });
 
-    /* ── Filter reset ──────────────────────────────────────── */
+    /*  Filter reset  */
     $('#btn-filter-reset').on('click', function () {
         filterMinPrice = 0;
         filterMaxPrice = null;
@@ -729,7 +723,7 @@ $(function () {
         loadProducts(1);
     });
 
-    /* ── Price quick-select pills ──────────────────────────── */
+    /*  Price quick-select pills  */
     $(document).on('click', '.price-pill', function () {
         $('.price-pill').css({ 'border-color': 'var(--color-border)', 'background-color': '', 'color': '#555' });
         $(this).css({ 'border-color': 'var(--color-primary)', 'background-color': '#fff5f5', 'color': 'var(--color-primary)' });
@@ -737,7 +731,7 @@ $(function () {
         $('#filter-price-max').val($(this).data('max') || '');
     });
 
-    /* ── Pagination click ─────────────────────────────────── */
+    /*  Pagination click  */
     $(document).on('click', '.pg-btn:not([disabled])', function () {
         var page = parseInt($(this).data('page'), 10);
         if (!page) { return; }
@@ -745,12 +739,12 @@ $(function () {
         $('html, body').animate({ scrollTop: $grid.offset().top - 80 }, 200);
     });
 
-    /* ── Init Awal Halaman ─────────────────────────────────── */
+    /*  Init Awal Halaman  */
     loadProducts(1);
 
-    /* ══════════════════════════════════════════════════════════
+    /* 
        PRODUCT DETAIL MODAL
-       ══════════════════════════════════════════════════════════ */
+        */
     $(document).on('click', '.product-card, .btn-pesan', function (e) {
         // Intersepsi: Jika yang dklik adalah tombol wishlist bunder, hentikan logic modalbox
         if ($(e.target).closest('.btn-wishlist').length) return;
@@ -791,9 +785,9 @@ $(function () {
         $('body').css('overflow', 'hidden');
     });
 
-    /* ── Auto-open a product popup when arriving from a home promo card
+    /*  Auto-open a product popup when arriving from a home promo card
           (e.g. /menu?product=12). Fetches that single product and opens the
-          detail modal directly, independent of the current grid/pagination. ── */
+          detail modal directly, independent of the current grid/pagination.  */
     function openProductModalById(productId) {
         $.get('/api/products', { id: productId }).done(function (res) {
             var p = (res.data || [])[0];
@@ -846,7 +840,7 @@ $(function () {
 
 
 
-    /* ── Core Logic Operasional Wishlist Love (Global Event Listener) ── */
+    /*  Core Logic Operasional Wishlist Love (Global Event Listener)  */
     $(document).on('click', '.btn-wishlist, #modal-btn-wishlist', function (e) {
         
         e.stopPropagation(); // Amankan agar modal luar tidak memicu bubbling click
@@ -908,7 +902,7 @@ $(function () {
 
     
 
-    /* ── Add to cart (outline button) — stay on page ────── */
+    /*  Add to cart (outline button) — stay on page  */
     $(document).on('click', '.btn-add-only', function () {
         if (!isLoggedIn) {
             closeModal();
@@ -961,7 +955,7 @@ $(function () {
         });
     });
 
-    /* ── Pesan Sekarang (solid button) — add then redirect ─ */
+    /*  Pesan Sekarang (solid button) — add then redirect  */
     $(document).on('click', '.btn-order-now', function () {
         if (!isLoggedIn) {
             closeModal();
@@ -1009,7 +1003,7 @@ $(function () {
         });
     });
 
-    /* ── Toast Notification ────────────────────────────────── */
+    /*  Toast Notification  */
     style="z-index: 999999;"
     function showCartToast(msg, isError) {
         var bg = isError ? '#c00f0c' : '#A6171C';
@@ -1025,7 +1019,7 @@ $(function () {
         setTimeout(function () { $t.fadeOut(300, function () { $(this).remove(); }); }, 2500);
     }
 
-    /* ── Modal Qty Plus & Minus ────────────────────────────── */
+    /*  Modal Qty Plus & Minus  */
     $('#modal-qty-plus').on('click', function () {
         var q = parseInt($('#modal-qty').text(), 10);
         $('#modal-qty').text(q + 1);
@@ -1036,7 +1030,7 @@ $(function () {
         if (q > 1) $('#modal-qty').text(q - 1);
     });
 
-    /* ── Close Modal Helpers ───────────────────────────────── */
+    /*  Close Modal Helpers  */
     function closeModal() {
         $('#product-modal').addClass('hidden').removeClass('flex');
         $('body').css('overflow', '');

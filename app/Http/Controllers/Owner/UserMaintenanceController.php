@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
+// Owner management of cashier accounts (CRUD).
 class UserMaintenanceController extends Controller
 {
+    // List all cashier accounts.
     public function index()
     {
         // User Maintenance manages cashier accounts. Match both the canonical
@@ -22,6 +24,7 @@ class UserMaintenanceController extends Controller
         return view('owner.users', compact('users'));
     }
 
+    // Create a cashier account.
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,6 +52,7 @@ class UserMaintenanceController extends Controller
             ->with('success', 'User berhasil ditambahkan.');
     }
 
+    // Update a cashier account.
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -87,6 +91,7 @@ class UserMaintenanceController extends Controller
             ->with('success', 'User berhasil diupdate.');
     }
 
+    // Delete a cashier account.
     public function destroy(User $user)
     {
         $user->delete();

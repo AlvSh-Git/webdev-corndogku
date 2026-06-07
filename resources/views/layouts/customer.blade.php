@@ -13,9 +13,7 @@
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
 
-{{-- ══════════════════════════════════════════════════════════════
-     CUSTOMER NAVBAR
-══════════════════════════════════════════════════════════════ --}}
+{{-- CUSTOMER NAVBAR --}}
 <header class="fixed top-0 left-0 right-0 z-[9999] w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
@@ -167,17 +165,13 @@
      64px = navbar only | 112px = navbar + store-closed banner --}}
 <div style="height: {{ !($storeInfo['is_open'] ?? true) ? '112px' : '64px' }};"></div>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAGE BODY
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAGE BODY --}}
 <main>
     @yield('content')
 </main>
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════════════════════ --}}
+{{-- FOOTER --}}
 <footer style="background-color: var(--color-primary);">
     <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
 

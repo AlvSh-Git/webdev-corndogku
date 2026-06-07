@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+// Email/username + password authentication (login, register, logout).
 class AuthController extends Controller
 {
+    // Show the login form.
     public function showLogin(Request $request)
     {
         if (Auth::check()) {
@@ -26,6 +28,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    // Log the user in (by email or username) and restore their saved cart.
     public function login(Request $request)
     {
         $request->validate([
@@ -71,6 +74,7 @@ class AuthController extends Controller
             ->withInput($request->only('login', 'remember'));
     }
 
+    // Save the cart onto the user and log them out.
     public function logout(Request $request)
     {
         $user = Auth::user();
@@ -88,6 +92,7 @@ class AuthController extends Controller
         return redirect('/');
     }
 
+    // Show the registration form.
     public function showRegister(Request $request)
     {
         if (Auth::check()) {
@@ -104,6 +109,7 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    // Register a new customer.
     public function register(Request $request)
     {
         $request->validate([
@@ -140,6 +146,7 @@ class AuthController extends Controller
         return redirect()->intended('/');
     }
 
+    // Send each role to its landing page after login.
     private function redirectByRole($user)
     {
         return match ($user->role) {
@@ -149,6 +156,7 @@ class AuthController extends Controller
         };
     }
 
+    // Allow redirects only to same-host URLs.
     private function safeRedirectUrl(?string $url): ?string
     {
         if (!$url) return null;

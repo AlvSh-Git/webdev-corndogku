@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+// Customer-service chatbot backed by the Groq LLM.
 class ChatbotController extends Controller
 {
+    // Handle one chat message and return the bot's reply.
     public function sendMessage(Request $request)
     {
         $request->validate(['message' => ['required', 'string', 'max:500']]);
@@ -19,7 +21,7 @@ class ChatbotController extends Controller
         $userMessage = $request->input('message');
         $botReply    = 'Maaf, asisten sedang tidak tersedia. Silakan coba lagi nanti.';
 
-        // ── Lightweight RAG: inject live menu/price data into the system prompt ──
+        // Lightweight RAG: inject live menu/price data into the system prompt.
         $businessContext = $this->buildBusinessContext();
         $storeInfo       = $this->buildStoreInfo();
         $systemPrompt    = $this->buildSystemPrompt($businessContext, $storeInfo);

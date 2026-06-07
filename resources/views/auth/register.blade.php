@@ -9,6 +9,7 @@
 </head>
 <body class="font-sans antialiased">
 
+{{-- Register page. --}}
 <div class="min-h-screen relative text-gray-900 font-sans overflow-hidden bg-[#FEFDF2]">
 
     {{-- Background texture --}}
@@ -42,6 +43,7 @@
                 </div>
             @endif
 
+            {{-- Registration form. --}}
             <form action="{{ route('register.post') }}" method="POST">
                 @csrf
                 <div class="space-y-3.5">
@@ -106,6 +108,7 @@
                 </button>
             </form>
 
+            {{-- Google sign-up. --}}
             <div class="text-center mt-5 text-xs font-semibold text-gray-400">ATAU</div>
 
             <div class="mt-4 flex justify-center">

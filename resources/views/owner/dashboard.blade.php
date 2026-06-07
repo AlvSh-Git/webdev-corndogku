@@ -5,7 +5,7 @@
 @section('content')
 
 @php
-    /* ── Fallback stubs — only used when DB is completely unavailable ── */
+    /*  Fallback stubs — only used when DB is completely unavailable  */
     $selectedDate  = $selectedDate  ?? today()->toDateString();
     $revenueToday  = $revenueToday  ?? 0;
     $revenueGrowth = $revenueGrowth ?? 0;
@@ -82,9 +82,7 @@
 }
 </style>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAGE HEADER
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAGE HEADER --}}
 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
 
     <div class="flex items-center gap-3">
@@ -115,15 +113,15 @@
     </a>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════
+{{--
      MAIN GRID — 12-col on desktop, 1-col on mobile
      Row 1: Stats(8) + Calendar(4)
      Row 2: Chart(8) + LowStock(4)
      Row 3: Orders(8) + Status(4)
-══════════════════════════════════════════════════════════════ --}}
+--}}
 <div id="dash-grid" class="flex flex-col gap-6 w-full">
 
-    {{-- ── CALENDAR ──────────────────────────────────────────────────── --}}
+    {{-- CALENDAR --}}
     <div id="dash-calendar" class="rounded-xl p-4"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
 
@@ -183,7 +181,7 @@
         </p>
     </div>
 
-    {{-- ── TOP STATS WRAPPER ─────────────────────────────────────────── --}}
+    {{-- TOP STATS WRAPPER --}}
     <div id="dash-stats">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -280,7 +278,7 @@
         </div>
     </div>{{-- /stats wrapper --}}
 
-    {{-- ── LOW STOCK ─────────────────────────────────────────────────── --}}
+    {{-- LOW STOCK --}}
     <div id="dash-lowstock" class="rounded-xl p-4 flex flex-col gap-3"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
         <div class="flex items-center justify-between">
@@ -316,7 +314,7 @@
         </a>
     </div>
 
-    {{-- ── ORDER STATUS SUMMARY ──────────────────────────────────────── --}}
+    {{-- ORDER STATUS SUMMARY --}}
     <div id="dash-status" class="rounded-xl p-4 flex flex-col gap-3"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
         <div class="flex items-center justify-between">
@@ -344,7 +342,7 @@
         </div>
     </div>
 
-    {{-- ── REVENUE CHART ─────────────────────────────────────────────── --}}
+    {{-- REVENUE CHART --}}
     <div id="dash-chart" class="rounded-xl p-5 flex flex-col"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
         <div class="flex items-center justify-between mb-4 flex-none">
@@ -361,7 +359,7 @@
         </div>
     </div>
 
-    {{-- ── ACTIVE ORDERS TABLE ───────────────────────────────────────── --}}
+    {{-- ACTIVE ORDERS TABLE --}}
     <div id="dash-orders" class="rounded-xl overflow-hidden"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
 
@@ -514,9 +512,9 @@
 $(function () {
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        SHARED STATE
-    ═══════════════════════════════════════════════════════════ */
+     */
     let SELECTED_DATE = '{{ $displaySel }}';
     let currentStatus = 'all';
     let currentPage   = 1;
@@ -525,9 +523,9 @@ $(function () {
     let winStart = '{{ $winStartPHP }}';   /* today - 6 */
     let winEnd   = '{{ $winEndPHP }}';     /* today     */
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        DATE UTILITIES
-    ═══════════════════════════════════════════════════════════ */
+     */
     function toISO(d) {
         return d.getFullYear()
             + '-' + String(d.getMonth() + 1).padStart(2, '0')
@@ -540,10 +538,10 @@ $(function () {
     }
     function todayISO() { return toISO(new Date()); }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        CALENDAR — highlight-only navigation (no DOM rebuild
        unless navigating past the visible window edge)
-    ═══════════════════════════════════════════════════════════ */
+     */
 
     /**
      * Moves the red circle to dateStr without touching the DOM structure.
@@ -715,9 +713,9 @@ $(function () {
         fetchChartData(d);
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        STATS — AJAX update Revenue / Orders / Profit
-    ═══════════════════════════════════════════════════════════ */
+     */
     const UP_ARROW   = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>';
     const DOWN_ARROW = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
 
@@ -747,9 +745,9 @@ $(function () {
             });
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        REVENUE CHART
-    ═══════════════════════════════════════════════════════════ */
+     */
     const revenueChart = new Chart(document.getElementById('revenue-chart'), {
         type: 'line',
         data: {
@@ -807,9 +805,9 @@ $(function () {
             });
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ORDER TABLE — AJAX pagination
-    ═══════════════════════════════════════════════════════════ */
+     */
     const tabStyles = {
         All:{bg:'#fff',text:'var(--color-primary)'},Pending:{bg:'#F59E0B',text:'#fff'},
         Preparing:{bg:'#F97316',text:'#fff'},Ready:{bg:'#22C55E',text:'#fff'},
@@ -935,9 +933,9 @@ $(function () {
 
     fetchOrders('all',1);
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ORDER DETAIL DRAWER
-    ═══════════════════════════════════════════════════════════ */
+     */
     const stepOrder=['Pending','Preparing','Ready','Completed'];
     const typeMap={takeaway:'Take Away','dine-in':'Dine In',online:'Online Order'};
     const payMap={QRIS:'QRIS',Cash:'Cash',Debit:'Debit Card'};
@@ -1063,7 +1061,7 @@ $(function () {
     $(document).on('click','#order-detail-drawer',function(e){e.stopPropagation();});
     $(document).on('keydown',function(e){if(e.key==='Escape')closeDrawer();});
 
-    /* ── Order status is cashier-only ─────────────────────────────
+    /*  Order status is cashier-only 
        The owner board is view-only for order status: the stepper-advance
        and Batalkan-Order handlers were removed so the owner can read an
        order's progress but never mutate it. The server also blocks

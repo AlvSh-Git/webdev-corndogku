@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+// Public home page.
 class WelcomeController extends Controller
 {
+    // Show the home page.
     public function index()
     {
+        // Catalog + categories (exclude the hidden "custom" components).
         $products   = Product::with('category')
             ->where('is_custom', false)
             ->whereHas('category', fn($q) => $q->whereRaw('LOWER(name) != ?', ['custom']))
@@ -22,6 +25,7 @@ class WelcomeController extends Controller
         $categories = Category::whereRaw('LOWER(name) != ?', ['custom'])->orderBy('id')->get();
         $storeInfo  = $this->calcStoreStatus();
 
+        // Google reviews, cached for 24h to stay within the API quota.
         $googleReviews = Cache::remember('google_reviews_corndogku', 86400, function () {
             $apiKey  = config('services.google_places.key');
             $placeId = config('services.google_places.place_id');

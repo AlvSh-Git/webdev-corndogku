@@ -4,9 +4,7 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════════════════════════════
-     HERO HEADER
-══════════════════════════════════════════════════════════════ --}}
+{{-- HERO HEADER --}}
 <section class="relative overflow-hidden" style="background-color: var(--color-light);">
     <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 flex items-center justify-between">
         <div>
@@ -25,17 +23,13 @@
 </section>
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     MAIN CONTENT  (two-column on desktop)
-══════════════════════════════════════════════════════════════ --}}
+{{-- MAIN CONTENT  (two-column on desktop) --}}
 <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8">
 
-    {{-- ════════════════════
-         LEFT — Cart Items
-    ════════════════════ --}}
+    {{-- LEFT — Cart Items --}}
     <div class="w-full lg:w-2/3 flex flex-col gap-6">
 
-        {{-- ── Cart card ─────────────────────────────────────────── --}}
+        {{-- Cart card --}}
         <div class="bg-white rounded-[10px] p-5 sm:p-6"
              style="box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
 
@@ -174,7 +168,7 @@
                 </div>
                 @endforeach
 
-                {{-- ── Empty state ── --}}
+                {{-- Empty state --}}
                 <div id="cart-empty" class="hidden py-14 flex flex-col items-center gap-4 text-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16" fill="none"
                          viewBox="0 0 24 24" stroke="#d2d2d2" stroke-width="1.2">
@@ -199,7 +193,7 @@
         </div>{{-- /.cart card --}}
 
 
-        {{-- ── Upsell banner ─────────────────────────────────────── --}}
+        {{-- Upsell banner --}}
         <div class="relative overflow-hidden rounded-[30px] p-6 sm:p-8
                     flex items-center justify-between gap-4"
              style="background-color: #fff2d9;">
@@ -224,15 +218,13 @@
         </div>
 
 
-        {{-- ── Trust badges ───────────────────────────────────────── --}}
+        {{-- Trust badges --}}
         
 
     </div>{{-- /.left column --}}
 
 
-    {{-- ════════════════════
-         RIGHT — Order Summary
-    ════════════════════ --}}
+    {{-- RIGHT — Order Summary --}}
     <div class="w-full lg:w-1/3">
         <div class="bg-white p-6 rounded-[10px] sticky top-24"
              style="box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);">
@@ -313,7 +305,7 @@
 <script>
 $(function () {
 
-    /* ── CSRF header for all AJAX requests ───────────────── */
+    /*  CSRF header for all AJAX requests  */
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
@@ -358,7 +350,7 @@ $(function () {
         $('#cart-empty').toggleClass('hidden', !isEmpty);
     }
 
-    /* ── Qty + ─────────────────────────────────────────── */
+    /*  Qty +  */
     $(document).on('click', '.btn-qty-plus', function () {
         var $item  = $(this).closest('.cart-item');
         var $qty   = $item.find('.item-qty');
@@ -368,7 +360,7 @@ $(function () {
         $.post('{{ route("cart.update") }}', { product_id: $item.data('id'), qty: newQty });
     });
 
-    /* ── Qty − ─────────────────────────────────────────── */
+    /*  Qty −  */
     $(document).on('click', '.btn-qty-minus', function () {
         var $item  = $(this).closest('.cart-item');
         var $qty   = $item.find('.item-qty');
@@ -380,7 +372,7 @@ $(function () {
         }
     });
 
-    /* ── Remove single item — AJAX then DOM ─────────────── */
+    /*  Remove single item — AJAX then DOM  */
     $(document).on('click', '.btn-remove-item', function () {
         var $item      = $(this).closest('.cart-item');
         var productId  = $item.data('id');
@@ -401,7 +393,7 @@ $(function () {
         });
     });
 
-    /* ── Delete all — AJAX then DOM ─────────────────────── */
+    /*  Delete all — AJAX then DOM  */
     $('#btn-delete-all').on('click', function () {
         $.ajax({
             url:    '{{ route("cart.clear") }}',
@@ -418,13 +410,13 @@ $(function () {
         });
     });
 
-    /* ── Select all ─────────────────────────────────────── */
+    /*  Select all  */
     $('#select-all').on('change', function () {
         $('.item-check').prop('checked', $(this).prop('checked'));
         recalc();
     });
 
-    /* ── Individual checkbox ────────────────────────────── */
+    /*  Individual checkbox  */
     $(document).on('change', '.item-check', function () {
         var total   = $('.item-check').length;
         var checked = $('.item-check:checked').length;
@@ -432,11 +424,11 @@ $(function () {
         recalc();
     });
 
-    /* ── Init ───────────────────────────────────────────── */
+    /*  Init  */
     recalc();
     checkEmpty();
 
-    /* ── Store-status: checkout button state driven server-side ─ */
+    /*  Store-status: checkout button state driven server-side  */
     @if (!$storeOpen)
     $(document).on('click', '#btn-checkout', function (e) { e.preventDefault(); });
     @endif

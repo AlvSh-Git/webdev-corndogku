@@ -1,9 +1,9 @@
 {{--
-    Order Detail Drawer — slide-in panel kanan
-    IDs: #order-detail-drawer, #close-drawer-btn, #drawer-backdrop
+     Order Detail Drawer — slide-in panel kanan
+     IDs: #order-detail-drawer, #close-drawer-btn, #drawer-backdrop
 --}}
 
-{{-- ── BACKDROP ──────────────────────────────────────────────────────── --}}
+{{-- BACKDROP --}}
 <div id="drawer-backdrop"
      style="position:fixed;inset:0;
             z-index:9998;
@@ -11,7 +11,7 @@
             display:none;
             pointer-events:auto;"></div>
 
-{{-- ── PANEL ─────────────────────────────────────────────────────────── --}}
+{{-- PANEL --}}
 <div id="order-detail-drawer"
      style="position:fixed;top:0;right:0;bottom:0;
             width:min(460px,96vw);
@@ -23,9 +23,7 @@
             transition:transform 0.3s ease-in-out;
             pointer-events:auto;">
 
-    {{-- ════════════════════════════════════════════════
-         HEADER
-    ════════════════════════════════════════════════ --}}
+    {{-- HEADER --}}
     <div style="flex:none;display:flex;align-items:flex-start;
                 justify-content:space-between;
                 padding:18px 20px 16px;
@@ -91,7 +89,7 @@
     {{-- SCROLLABLE BODY--}}
     <div style="flex:1;overflow-y:auto;padding:18px 20px 0;">
 
-        {{-- 1. ORDER ID + CUSTOMER — 2-kolom ─────────────────────── --}}
+        {{-- 1. ORDER ID + CUSTOMER — 2-kolom --}}
         <div style="display:grid;grid-template-columns:1fr 1fr;
                     border:1px solid #EFEFEF;border-radius:12px;
                     overflow:hidden;margin-bottom:12px;">
@@ -163,7 +161,7 @@
             </div>
         </div>
 
-        {{-- 2. PAYMENT / SOURCE / TIME — 3-kolom ─────────────────── --}}
+        {{-- 2. PAYMENT / SOURCE / TIME — 3-kolom --}}
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
                     border:1px solid #EFEFEF;border-radius:12px;
                     overflow:hidden;margin-bottom:18px;">
@@ -209,7 +207,7 @@
             </div>
         </div>
 
-        {{-- 3. UPDATE STATUS — Horizontal Stepper ─────────────────── --}}
+        {{-- 3. UPDATE STATUS — Horizontal Stepper --}}
         <div style="margin-bottom:18px;">
 
             <div style="display:flex;align-items:center;
@@ -314,10 +312,10 @@
             </div>
         </div>
 
-        {{-- 4. DIVIDER ──────────────────────────────────────────────── --}}
+        {{-- 4. DIVIDER --}}
         <div style="border-top:1px solid #F0F0F0;margin-bottom:16px;"></div>
 
-        {{-- 5. ITEMS ────────────────────────────────────────────────── --}}
+        {{-- 5. ITEMS --}}
         <div style="margin-bottom:20px;">
             <p style="font-size:13px;font-weight:700;
                        color:var(--color-black);margin:0 0 12px;">
@@ -333,9 +331,7 @@
 
     </div>{{-- /body --}}
 
-    {{-- ════════════════════════════════════════════════
-         FOOTER — total
-    ════════════════════════════════════════════════ --}}
+    {{-- FOOTER — total --}}
     <div style="flex:none;padding:14px 20px 16px;
                 border-top:1px solid #F0F0F0;">
 

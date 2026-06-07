@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* ── Root: prevent horizontal scroll + unify background ──
+        /*  Root: prevent horizontal scroll + unify background 
            NOTE: overflow-x must be on html only, NOT on body.
            Setting overflow-x:hidden on body breaks position:fixed/sticky. */
         html {
@@ -39,7 +39,7 @@
             transform: translateY(-2px);
         }
 
-        /* ── Auto-running product marquee ───────────────────── */
+        /*  Auto-running product marquee  */
         .marquee-viewport { overflow: hidden; }
         .marquee-track {
             width: max-content;
@@ -86,11 +86,11 @@
             box-shadow: 6px 8px 32px rgba(0,0,0,0.18);
         }
 
-        /* ── Horizontal scroll — no visible scrollbar ── */
+        /*  Horizontal scroll — no visible scrollbar  */
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* ── Seamless marquee ticker (sections 2-4 Figma poster area) ── */
+        /*  Seamless marquee ticker (sections 2-4 Figma poster area)  */
         @keyframes marquee {
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -101,11 +101,11 @@
             white-space: nowrap;
         }
 
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        /* 
            FLOATING FOOD DECORATION — absolute inside #promo-cards-wrapper
            The images stay anchored to the promo section and do NOT follow
            the viewport. Scroll listener adds/removes .active class only.
-           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           
            LEFT SIZE   → width on .floating-food-left  (+ xl override below)
            RIGHT SIZE  → width on .floating-food-right (+ xl override below)
            LEFT POS    → left:0 + active translateX on .floating-food-left
@@ -113,7 +113,7 @@
            WHEN LEFT   → LEFT_SHOW  in scroll script (default 80 px)
            WHEN RIGHT  → RIGHT_SHOW in scroll script (default 350 px)
            MOBILE HIDE → display:none on .floating-food (restored at 1024 px)
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+         */
 
         .floating-food {
             position: absolute;                        /* anchored to #promo-cards-wrapper */
@@ -156,7 +156,7 @@
             transform: translateY(-50%) translateX(36%) scaleX(-1);    /* ← ~64 % visible from right */
         }
 
-        /* ━━━ Prevent horizontal overflow / blank right strip at any resolution ━━━
+        /*  Prevent horizontal overflow / blank right strip at any resolution 
            The floating-food decorations are anchored off-screen via translateX,
            which otherwise extends the document and creates a page-wide horizontal
            scroll (blank background on the right at wide viewports). Clip it here. */
@@ -165,9 +165,7 @@
 </head>
 <body class="font-sans antialiased" style="background-color: var(--color-light); color: var(--color-black);">
 
-{{-- ══════════════════════════════════════════════════════════════
-     1. NAVBAR — edge-to-edge with wide inner container
-══════════════════════════════════════════════════════════════ --}}
+{{-- 1. NAVBAR — edge-to-edge with wide inner container --}}
 <header class="fixed top-0 left-0 right-0 z-[9999] w-full bg-white border-b"
         style="border-color: var(--color-border); box-shadow: 0 1px 6px rgba(0,0,0,0.07);">
 
@@ -355,9 +353,7 @@
      64px = navbar only | 112px = navbar + store-closed banner --}}
 <div style="height: {{ !($storeInfo['is_open'] ?? true) ? '112px' : '64px' }};"></div>
 
-{{-- ══════════════════════════════════════════════════════════════
-     2-4. HERO POSTER + TICKER + PROMO CARDS — Figma "thumbnail users"
-══════════════════════════════════════════════════════════════ --}}
+{{-- 2-4. HERO POSTER + TICKER + PROMO CARDS — Figma "thumbnail users" --}}
 <div class="relative w-full bg-[#FFFEF0] pb-16">
 
     {{-- Hero — red section.
@@ -367,10 +363,10 @@
                     lg:flex lg:flex-row lg:items-center lg:justify-center
                     lg:py-10">
 
-        {{-- ══ MOBILE & TABLET LAYOUT (hidden on lg+) ══
+        {{-- MOBILE & TABLET LAYOUT (hidden on lg+) 
              Text sits in the left column; corndog is absolutely anchored to the bottom-right.
              min-height on the wrapper controls the section height — the image matches it exactly.
-        --}}
+ --}}
         <div class="lg:hidden relative w-full flex flex-row items-stretch overflow-hidden"
              style="min-height: clamp(290px, 80vw, 430px);">
 
@@ -412,7 +408,7 @@
                         object-position: right bottom;">
         </div>
 
-        {{-- ══ DESKTOP LAYOUT (≥ 1024 px) — original layout preserved unchanged ══ --}}
+        {{-- DESKTOP LAYOUT (≥ 1024 px) — original layout preserved unchanged --}}
 
         {{-- Left corndog (desktop only) --}}
         <img src="{{ asset('assets/img/gmbr_banner_corndog_02.png') }}" alt="Corndog Left"
@@ -527,7 +523,7 @@
 {{-- (old hero section replaced by Figma poster block — hidden pending full deletion) --}}
 <section style="display:none;">
 
-    {{-- ── Peeking decorative images — left & right edges ── --}}
+    {{-- Peeking decorative images — left & right edges --}}
     <img src="{{ asset('assets/img/home_corndog_01.png') }}"
          alt="Corndog Decoration"
          class="absolute top-10 -left-12 md:-left-24 w-32 md:w-64 object-contain pointer-events-none z-0 hidden sm:block opacity-90 drop-shadow-xl">
@@ -536,7 +532,7 @@
          alt="Bingsoo Decoration"
          class="absolute top-48 -right-12 md:-right-24 w-32 md:w-64 object-contain pointer-events-none z-0 hidden sm:block opacity-90 drop-shadow-xl">
 
-    {{-- ── Decorative corndogs (absolute, z-0, desktop only) ── --}}
+    {{-- Decorative corndogs (absolute, z-0, desktop only) --}}
     <div class="absolute bottom-0 left-0 z-0 hidden lg:block pointer-events-none"
          style="width: clamp(180px, 20vw, 300px); opacity: 0.72; transform: rotate(-6deg); transform-origin: bottom left;">
         <img src="{{ asset('assets/img/CA_MOZZA_POTATO.png') }}" alt=""
@@ -555,7 +551,7 @@
              class="w-full object-contain" draggable="false">
     </div>
 
-    {{-- ── Floating review card (z-20, sits on top of corndog) ── --}}
+    {{-- Floating review card (z-20, sits on top of corndog) --}}
     <div class="absolute z-20 hidden lg:block pointer-events-none"
          style="right: 4%; top: 18%;">
         <div class="bg-white rounded-2xl px-4 py-3"
@@ -805,9 +801,7 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     5. CUSTOMIZE CORNDOG BANNER
-══════════════════════════════════════════════════════════════ --}}
+{{-- 5. CUSTOMIZE CORNDOG BANNER --}}
 <section class="w-full py-6 sm:py-8" style="background-color: var(--color-light);">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
 
@@ -846,9 +840,7 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     6. MENU CATEGORIES + PER-CATEGORY PRODUCT ROWS (id="menu")
-══════════════════════════════════════════════════════════════ --}}
+{{-- 6. MENU CATEGORIES + PER-CATEGORY PRODUCT ROWS (id="menu") --}}
 <section id="menu" class="w-full" style="background-color: var(--color-light);">
 
     {{-- Section heading --}}
@@ -859,7 +851,7 @@
         </h2>
     </div>
 
-    {{-- ── Category tab buttons ─────────────────────────────────
+    {{-- Category tab buttons 
          flex-wrap so the buttons wrap to a centered second line on narrow
          screens instead of overflowing the centered row (which clipped the
          first/last button on mobile). --}}
@@ -884,7 +876,7 @@
         @endforeach
     </div>
 
-    {{-- ── One horizontal-scroll product row per category ──────── --}}
+    {{-- One horizontal-scroll product row per category --}}
     @foreach ($categories as $category)
         @if (strtolower($category->name) === 'custom') @continue @endif
         @php $catProducts = $products->where('category_id', $category->id); @endphp
@@ -963,9 +955,7 @@
 
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     7. LOCATION & HOURS — full-width section
-══════════════════════════════════════════════════════════════ --}}
+{{-- 7. LOCATION & HOURS — full-width section --}}
 <section class="w-full py-16" style="background-color: #FFFEF0;">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
@@ -1017,9 +1007,7 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     8. TESTIMONIALS — full-width "Your trust in us"
-══════════════════════════════════════════════════════════════ --}}
+{{-- 8. TESTIMONIALS — full-width "Your trust in us" --}}
 <section class="w-full py-16" style="background: linear-gradient(90deg, #FFECC2 0%, #FFE6B0 35%, #FFDEA0 70%, #FFD98A 100%);">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12">
 
@@ -1119,9 +1107,7 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════════════════════════
-     9. FOOTER — full-width
-══════════════════════════════════════════════════════════════ --}}
+{{-- 9. FOOTER — full-width --}}
 <footer class="w-full" style="background-color: var(--color-primary);">
     <div class="max-w-[1440px] 2xl:max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-16 2xl:px-12 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -1178,9 +1164,7 @@
     </div>
 </footer>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PRODUCT DETAIL MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- PRODUCT DETAIL MODAL --}}
 <div id="product-modal"
      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 hidden"
      style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
@@ -1286,18 +1270,18 @@
 <script>
 $(function () {
 
-    /* ── CSRF header for all AJAX requests ───────────────── */
+    /*  CSRF header for all AJAX requests  */
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
-    /* ── Current modal product data ─────────────────────── */
+    /*  Current modal product data  */
     var currentProductId    = null;
     var currentProductPrice = 0;
     var currentProductImage = '';
     var currentProductDesc  = '';
 
-    /* ── Auto-running product marquee ──────────────────────── */
+    /*  Auto-running product marquee  */
     var MARQUEE_SPEED = 70; // pixels per second
 
     function buildMarquee($track) {
@@ -1353,7 +1337,7 @@ $(function () {
         if ($track.length) buildMarquee($track);
     }
 
-    /* ── Category tab → product row switcher ───────────────── */
+    /*  Category tab → product row switcher  */
     $('.category-btn').on('click', function () {
         var target = $(this).data('target');
 
@@ -1401,7 +1385,7 @@ $(function () {
 
     var isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
 
-    /* ── Custom Corndog CTA — require login ─────────────── */
+    /*  Custom Corndog CTA — require login  */
     $('#btn-custom-cta').on('click', function (e) {
         if (!isLoggedIn) {
             e.preventDefault();
@@ -1454,7 +1438,7 @@ $(function () {
         $('body').css('overflow', 'hidden');
     });
 
-    /* ── Add to cart (outline button) — stay on page ────── */
+    /*  Add to cart (outline button) — stay on page  */
     $(document).on('click', '.btn-add-only', function () {
         if (!isLoggedIn) {
             Swal.fire({
@@ -1506,7 +1490,7 @@ $(function () {
         });
     });
 
-    /* ── Pesan Sekarang (solid button) — add then redirect ─ */
+    /*  Pesan Sekarang (solid button) — add then redirect  */
     $(document).on('click', '.btn-order-now', function () {
         if (!isLoggedIn) {
             Swal.fire({
@@ -1619,9 +1603,7 @@ $(function () {
 })();
 </script>
 
-{{-- ════════════════════════════════════════════════════════════
-     CHATBOT WIDGET — floating bottom-right on all customer pages
-════════════════════════════════════════════════════════════ --}}
+{{-- CHATBOT WIDGET — floating bottom-right on all customer pages --}}
 
 {{-- Floating trigger button — #FFBE54 pill, 15px radius, same-color badge with white ring (Figma 347:4278) --}}
 <button id="chatbot-trigger"
@@ -1837,12 +1819,12 @@ $(function () {
     var rightImg = document.getElementById('floating-food-right');
     if (!leftImg || !rightImg) return;
 
-    /* ── SCROLL THRESHOLDS (px from top) ─────────────────────────────
+    /*  SCROLL THRESHOLDS (px from top) 
        LEFT_SHOW  → scrollY needed to show the left  image  ← tweak here
        LEFT_HIDE  → scrollY at which the left  image hides again (< SHOW for hysteresis)
        RIGHT_SHOW → scrollY needed to show the right image  ← tweak here
        RIGHT_HIDE → scrollY at which the right image hides again
-    ──────────────────────────────────────────────────────────────────── */
+     */
     var LEFT_SHOW  = 80;    /* ← scrollY to show left  image  */
     var LEFT_HIDE  = 50;    /* ← scrollY to hide left  image again */
     var RIGHT_SHOW = 350;   /* ← scrollY to show right image (~3 scroll steps) */

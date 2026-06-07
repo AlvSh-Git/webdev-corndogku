@@ -12,16 +12,14 @@
     : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
         data-client-key="{{ config('services.midtrans.client_key', '') }}"></script>
 
-{{-- ══════════════════════════════════════════════════════════════
+{{--
      CASHIER POS — Desktop-app layout (no page scroll on lg+)
      Wrapper fills <main> exactly (h-full).
      Left column scrolls independently; right panel stretches to bottom.
-══════════════════════════════════════════════════════════════ --}}
+--}}
 <div class="flex flex-col lg:flex-row lg:h-full gap-5 overflow-hidden">
 
-    {{-- ══════════════════════════════════════════
-         LEFT — Product Catalog (independently scrollable on lg+)
-    ══════════════════════════════════════════ --}}
+    {{-- LEFT — Product Catalog (independently scrollable on lg+) --}}
     <div class="w-full lg:w-7/12 xl:w-8/12 lg:h-full lg:overflow-y-auto pr-2 flex flex-col gap-4">
 
         {{-- Kasir heading + store badge --}}
@@ -87,19 +85,19 @@
 
     </div>{{-- /left --}}
 
-    {{-- ══════════════════════════════════════════
-         RIGHT — Order Panel (h-full, stretches to screen bottom on lg+)
-         On mobile it's moved ABOVE the product list via #pos-order-panel order rule.
-    ══════════════════════════════════════════ --}}
+    {{--
+     RIGHT — Order Panel (h-full, stretches to screen bottom on lg+)
+     On mobile it's moved ABOVE the product list via #pos-order-panel order rule.
+--}}
     <div id="pos-order-panel"
          class="w-full lg:w-5/12 xl:w-4/12 lg:h-full flex flex-col bg-white rounded-2xl shadow overflow-hidden">
 
-        {{-- ── Panel header (flex-none) ──────────────────────────── --}}
+        {{-- Panel header (flex-none) --}}
         <div class="flex-none border-b border-gray-100 p-3">
             <h2 class="font-black text-sm" style="color:var(--color-black);">Order Menu</h2>
         </div>
 
-        {{-- ── Customer Info Box (flex-none — never scrolls) ── --}}
+        {{-- Customer Info Box (flex-none — never scrolls) --}}
         <div class="flex-none border-b border-gray-100 p-2">
                 <div id="customer-box"
                      style="border-radius:8px;padding:8px;
@@ -219,7 +217,7 @@
                 </div>
         </div>{{-- /customer box --}}
 
-        {{-- ── Cart list (flex-1 overflow-y-auto) — ONLY this section scrolls ── --}}
+        {{-- Cart list (flex-1 overflow-y-auto) — ONLY this section scrolls --}}
         <div id="cart-wrapper" class="flex-1 overflow-y-auto p-3">
 
                 {{-- Empty state --}}
@@ -248,7 +246,7 @@
 
             </div>{{-- /cart-wrapper --}}
 
-        {{-- ── Footer — totals + Order button (flex-none, always pinned) ── --}}
+        {{-- Footer — totals + Order button (flex-none, always pinned) --}}
         <div class="flex-none p-3 border-t border-gray-100 bg-white">
 
             <div id="cart-summary" style="display:none;margin-bottom:8px;">
@@ -285,9 +283,7 @@
 </div>{{-- /flex --}}
 
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAYMENT MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAYMENT MODAL --}}
 <div id="payment-modal"
      style="display:none;position:fixed;inset:0;z-index:8000;
             background:rgba(0,0,0,0.45);
@@ -365,9 +361,7 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PROCESSING MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- PROCESSING MODAL --}}
 <div id="processing-modal"
      style="display:none;position:fixed;inset:0;z-index:8100;
             background:rgba(0,0,0,0.55);
@@ -386,9 +380,7 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════
-     SUCCESS / RECEIPT MODAL
-══════════════════════════════════════════════════════════════ --}}
+{{-- SUCCESS / RECEIPT MODAL --}}
 <div id="success-modal"
      style="display:none;position:fixed;inset:0;z-index:8200;
             background:rgba(0,0,0,0.50);
@@ -501,12 +493,12 @@
 <script>
 $(function () {
 
-    /* ── CSRF for all AJAX ─────────────────────────────────────── */
+    /*  CSRF for all AJAX  */
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        STATE
-    ══════════════════════════════════════════════════════════════ */
+     */
     let cart          = {};   // { id: { id, name, price, qty, stock, img } }
     let customerSaved = false;
     let customerId    = null;
@@ -529,9 +521,9 @@ $(function () {
             .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        PRODUCT GRID — AJAX pagination
-    ══════════════════════════════════════════════════════════════ */
+     */
     function buildProductCard(p) {
         const img        = p.image || '{{ asset("assets/img/CA_ORIGINAL.png") }}';
         const outOfStock = !p.is_available || p.stock <= 0;
@@ -658,9 +650,9 @@ $(function () {
     /* Initial load */
     loadProducts(1);
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        CUSTOMER SEARCH — shared dropdown builder
-    ══════════════════════════════════════════════════════════════ */
+     */
     /* Resolve a customer's WhatsApp number. Prefer the real `phone` column.
        Google SSO users have an email-derived `username` (NOT a phone), so we
        must never fall back to it for them. Legacy walk-in customers, however,
@@ -747,9 +739,9 @@ $(function () {
         }
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        ORDER TYPE RADIO
-    ══════════════════════════════════════════════════════════════ */
+     */
     function syncOrderTypeStyles() {
         $('.order-type-radio').each(function () {
             const $lbl = $(this).siblings('.order-type-label');
@@ -768,9 +760,9 @@ $(function () {
 
     syncOrderTypeStyles();
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        SAVE CUSTOMER
-    ══════════════════════════════════════════════════════════════ */
+     */
     $('#btn-save-customer').on('click', function () {
         customerName  = $('#customer-name-input').val().trim();
         customerPhone = $('#customer-phone-input').val().trim();
@@ -799,9 +791,9 @@ $(function () {
         updateOrderButton();
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        ADD TO CART
-    ══════════════════════════════════════════════════════════════ */
+     */
     $(document).on('click', '.product-card', function () {
         if (!customerSaved) {
             $('#customer-box').css('border-color','var(--color-primary)');
@@ -836,9 +828,9 @@ $(function () {
         renderCart();
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        CART RENDER
-    ══════════════════════════════════════════════════════════════ */
+     */
     function renderCart() {
         const $wrapper = $('#cart-wrapper');
         const keys     = Object.keys(cart);
@@ -973,9 +965,9 @@ $(function () {
         }
     }
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        PAYMENT MODAL
-    ══════════════════════════════════════════════════════════════ */
+     */
     $('#btn-order').on('click', function () {
         if (!storeIsOpen) {
             Swal.fire({
@@ -1014,9 +1006,9 @@ $(function () {
                .css({ borderColor:'var(--color-primary)', color:'var(--color-primary)', background:'#FFF5F5' });
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        CONFIRM & SUBMIT
-    ══════════════════════════════════════════════════════════════ */
+     */
     $('#btn-confirm-order').on('click', function () {
         const paymentMethod = $('input[name="payment_method"]:checked').val() || 'Cash';
 
@@ -1103,9 +1095,9 @@ $(function () {
         });
     });
 
-    /* ══════════════════════════════════════════════════════════════
+    /* 
        RECEIPT MODAL
-    ══════════════════════════════════════════════════════════════ */
+     */
     function showReceipt(res) {
         lastOrderId = res.order_id || null;
 
@@ -1151,7 +1143,7 @@ $(function () {
         $('#success-modal').css('display', 'flex');
     }
 
-    /* ── Send WhatsApp receipt ─────────────────────────────────── */
+    /*  Send WhatsApp receipt  */
     $('#btn-send-wa').on('click', function () {
         if (!lastOrderId) return;
 

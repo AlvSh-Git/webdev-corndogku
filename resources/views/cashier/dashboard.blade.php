@@ -5,7 +5,7 @@
 @section('content')
 
 @php
-    /* ── Fallback stubs — only used when DB is completely unavailable ── */
+    /*  Fallback stubs — only used when DB is completely unavailable  */
     $selectedDate  = $selectedDate  ?? today()->toDateString();
     $revenueToday  = $revenueToday  ?? 0;
     $revenueGrowth = $revenueGrowth ?? 0;
@@ -79,9 +79,7 @@
 }
 </style>
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAGE HEADER
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAGE HEADER --}}
 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
 
     <div class="flex items-center gap-3">
@@ -123,14 +121,14 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════
+{{--
      MAIN GRID — 12-col on desktop, 1-col on mobile
      Row 1: Stats(8) + Calendar(4)
      Row 2: Orders(8) + Status(4)
-══════════════════════════════════════════════════════════════ --}}
+--}}
 <div id="dash-grid" class="flex flex-col gap-6 w-full">
 
-    {{-- ── CALENDAR ──────────────────────────────────────────────────── --}}
+    {{-- CALENDAR --}}
     <div id="dash-calendar" class="rounded-xl p-4"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
 
@@ -190,7 +188,7 @@
         </p>
     </div>
 
-    {{-- ── TOP STATS WRAPPER ─────────────────────────────────────────── --}}
+    {{-- TOP STATS WRAPPER --}}
     <div id="dash-stats">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -289,7 +287,7 @@
         </div>
     </div>{{-- /stats wrapper --}}
 
-    {{-- ── REVENUE CHART ─────────────────────────────────────────────── --}}
+    {{-- REVENUE CHART --}}
     <div id="dash-chart" class="rounded-xl p-5"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
         <div class="flex items-center justify-between mb-4">
@@ -306,7 +304,7 @@
         </div>
     </div>
 
-    {{-- ── ORDER STATUS SUMMARY ──────────────────────────────────────── --}}
+    {{-- ORDER STATUS SUMMARY --}}
     <div id="dash-status" class="rounded-xl p-4 flex flex-col gap-3"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
         <div class="flex items-center justify-between">
@@ -334,7 +332,7 @@
         </div>
     </div>
 
-    {{-- ── ACTIVE ORDERS TABLE ───────────────────────────────────────── --}}
+    {{-- ACTIVE ORDERS TABLE --}}
     <div id="dash-orders" class="rounded-xl overflow-hidden"
          style="background-color:var(--color-white);box-shadow:var(--shadow-card);">
 
@@ -463,9 +461,9 @@ $(function () {
     const CSRF = '{{ csrf_token() }}';
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': CSRF } });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        SHARED STATE
-    ═══════════════════════════════════════════════════════════ */
+     */
     let SELECTED_DATE = '{{ $displaySel }}';
     let currentStatus = 'all';
     let currentPage   = 1;
@@ -474,12 +472,12 @@ $(function () {
     let winEnd   = '{{ $winEndPHP }}';
     let lastTotalOrders = -1;
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        AUDIO — Web Audio API (no external file, no CORS issues)
        The AudioContext must be created/resumed after a user gesture.
        We unlock it on the very first interaction so the beep is
        ready before the first 15-second poll fires.
-    ═══════════════════════════════════════════════════════════ */
+     */
     let audioCtx = null;
 
     function unlockAudio() {
@@ -508,9 +506,9 @@ $(function () {
         } catch (e) {}
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        DATE UTILITIES
-    ═══════════════════════════════════════════════════════════ */
+     */
     function toISO(d) {
         return d.getFullYear()
             + '-' + String(d.getMonth() + 1).padStart(2, '0')
@@ -523,9 +521,9 @@ $(function () {
     }
     function todayISO() { return toISO(new Date()); }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        CALENDAR — AJAX navigation (no full page reload)
-    ═══════════════════════════════════════════════════════════ */
+     */
     function highlightDate(dateStr) {
         const today = todayISO();
         $('#cal-dates .cal-date-btn').each(function () {
@@ -651,9 +649,9 @@ $(function () {
         fetchChartData(d);
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        STATS — AJAX update
-    ═══════════════════════════════════════════════════════════ */
+     */
     const UP_ARROW   = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>';
     const DOWN_ARROW = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;margin-right:2px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
 
@@ -680,7 +678,7 @@ $(function () {
 
                 $('#widget-pending-orders').text(Number(res.pendingOrders) + ' orders');
 
-                /* ── NEW ORDER DETECTION ── */
+                /*  NEW ORDER DETECTION  */
                 if (dateStr === todayISO()) {
                     const currentTotal = Number(res.totalOrders);
 
@@ -716,9 +714,9 @@ $(function () {
                 }
             });
     }
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        REVENUE CHART
-    ═══════════════════════════════════════════════════════════ */
+     */
     const revenueChart = new Chart(document.getElementById('revenue-chart'), {
         type: 'line',
         data: {
@@ -776,9 +774,9 @@ $(function () {
             });
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ORDER TABLE HELPERS
-    ═══════════════════════════════════════════════════════════ */
+     */
     const statusCfg = {
         Pending:   { bg:'rgba(245,158,11,0.12)', text:'#B45309', dot:'#F59E0B', row:'rgba(255,251,235,0.7)' },
         Preparing: { bg:'rgba(249,115,22,0.12)', text:'#C2410C', dot:'#F97316', row:'rgba(255,247,237,0.7)' },
@@ -933,9 +931,9 @@ $(function () {
     fetchStats(SELECTED_DATE);
     fetchOrders('all', 1);
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        ORDER DETAIL DRAWER
-    ═══════════════════════════════════════════════════════════ */
+     */
     const stepOrder   = ['Pending','Preparing','Ready','Completed'];
     const typeMap     = { takeaway:'Take Away', 'dine-in':'Dine In', online:'Online Order' };
     const payMap      = { QRIS:'QRIS', Cash:'Cash', Debit:'Debit Card' };
@@ -1075,9 +1073,9 @@ $(function () {
     $(document).on('click', '#drawer-backdrop', function (e) { e.preventDefault(); closeDrawer(); });
     $(document).on('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        STEPPER STEP CLICK — SweetAlert2 confirmation + AJAX
-    ═══════════════════════════════════════════════════════════ */
+     */
     $(document).on('click', '.step-item', function (e) {
         e.stopPropagation();
         if (!drawerOrder) return;
@@ -1122,9 +1120,9 @@ $(function () {
         });
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        BATALKAN ORDER — SweetAlert2 textarea for reason
-    ═══════════════════════════════════════════════════════════ */
+     */
     $(document).on('click', '#btn-batalkan-order', function (e) {
         e.stopPropagation();
         if (!drawerOrder) return;
@@ -1179,9 +1177,9 @@ $(function () {
         });
     });
 
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        UPDATE TABLE ROW after status change
-    ═══════════════════════════════════════════════════════════ */
+     */
     function updateTableRow(order) {
         const cfg = statusCfg[order.status] || statusCfg.Pending;
         $('#orders-tbody .order-row').each(function () {
@@ -1202,12 +1200,12 @@ $(function () {
             } catch (_) {}
         });
     }
-    /* ═══════════════════════════════════════════════════════════
+    /* 
        AUTO-REFRESH POLLING — every 15 seconds
        FIX 5: interval now calls BOTH fetchStats (detects new orders
        and triggers the toast + beep) AND fetchOrders with silent=true
        (keeps the table current for status changes without a spinner).
-    ═══════════════════════════════════════════════════════════ */
+     */
     setInterval(function () {
         if (SELECTED_DATE !== todayISO()) return;
         fetchStats(SELECTED_DATE);

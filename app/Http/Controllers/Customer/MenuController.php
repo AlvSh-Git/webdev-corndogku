@@ -6,19 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+// Public menu, custom-corndog builder, and the product catalog API.
 class MenuController extends Controller
 {
+    // Show the menu page.
     public function index()
     {
         $storeInfo = $this->calcStoreStatus();
         return view('customer.menu', compact('storeInfo'));
     }
 
+    // Return the store open/closed status as JSON.
     public function storeStatus(): \Illuminate\Http\JsonResponse
     {
         return response()->json($this->calcStoreStatus());
     }
 
+    // Show the build-your-own corndog page.
     public function customize()
     {
         $customProducts = Product::whereHas('category', fn($q) => $q->whereRaw('LOWER(name) = ?', ['custom']))
@@ -32,6 +36,7 @@ class MenuController extends Controller
         return view('customer.customize', compact('isianProducts', 'varianProducts', 'sauceProducts'));
     }
 
+    // Check whether a product name contains any of the keywords.
     private function matchesType(string $name, array $keywords): bool
     {
         $lower = strtolower($name);
@@ -41,6 +46,7 @@ class MenuController extends Controller
         return false;
     }
 
+    // Return a filtered, sorted, paginated product list as JSON.
     public function catalog(Request $request): \Illuminate\Http\JsonResponse
     {
         $category = $request->input('category', 'Semua');

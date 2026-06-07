@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// A single line on an order; custom_notes (JSON) holds the custom corndog parts.
 class OrderItem extends Model
 {
     protected $fillable = ['order_id', 'product_id', 'product_name', 'quantity', 'subtotal', 'custom_notes'];

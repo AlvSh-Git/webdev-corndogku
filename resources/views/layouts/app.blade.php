@@ -43,9 +43,7 @@
          class="hidden fixed inset-0 z-40 bg-black/40"
          aria-hidden="true"></div>
 
-    {{-- ════════════════════════════════════════════════════════════
-         SIDEBAR — off-canvas
-    ════════════════════════════════════════════════════════════ --}}
+    {{-- SIDEBAR — off-canvas --}}
     <aside id="sidebar"
            class="fixed inset-y-0 left-0 z-50 flex flex-col w-56
                   -translate-x-full transition-transform duration-300 ease-in-out"
@@ -123,9 +121,7 @@
         </div>
     </aside>
 
-    {{-- ════════════════════════════════════════════════════════════
-         MAIN CONTENT AREA
-    ════════════════════════════════════════════════════════════ --}}
+    {{-- MAIN CONTENT AREA --}}
     <div class="flex-1 min-w-0 flex flex-col lg:overflow-hidden">
 
         {{-- TOP NAVBAR --}}
@@ -173,7 +169,7 @@
 <script>
 $(function () {
 
-    /* ── Sidebar open/close ─────────────────────────────────── */
+    /*  Sidebar open/close  */
     function openSidebar() {
         $('#sidebar').removeClass('-translate-x-full').addClass('translate-x-0');
         $('#sidebar-backdrop').removeClass('hidden');

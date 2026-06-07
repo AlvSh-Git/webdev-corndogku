@@ -11,9 +11,7 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════════════════════════════
-     PAGE WRAPPER
-══════════════════════════════════════════════════════════════ --}}
+{{-- PAGE WRAPPER --}}
 <div class="relative min-h-screen" style="background-color:var(--color-light);">
 
     {{-- Decorative blob (top-right) --}}
@@ -26,7 +24,7 @@
 
     <div class="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-20">
 
-        {{-- ── HERO ──────────────────────────────────────── --}}
+        {{-- HERO --}}
         <div class="flex flex-col sm:flex-row sm:items-end gap-6 pt-10 mb-10">
 
             {{-- Avatar --}}
@@ -58,7 +56,7 @@
 
         </div>
 
-        {{-- ── TAB NAVIGATION (Profile / History) ─────────── --}}
+        {{-- TAB NAVIGATION (Profile / History) --}}
         <div class="flex mb-8 overflow-hidden"
              style="background-color: rgba(255,255,255,0.9);
                     box-shadow: 3px 4px 20px 0px rgba(0,0,0,0.25);
@@ -92,7 +90,7 @@
 
         </div>{{-- /.tab bar --}}
 
-        {{-- ── ORDERS CARD ─────────────────────────────────── --}}
+        {{-- ORDERS CARD --}}
         <div class="bg-white rounded-2xl overflow-hidden mb-12"
              style="box-shadow:0 4px 30px rgba(0,0,0,0.08);">
 
@@ -276,7 +274,7 @@
                     </div>
                 </div>
 
-                {{-- ── BILL Modal — Figma-matched receipt for order #{{ $order->id }} ── --}}
+                {{-- BILL Modal — Figma-matched receipt for order #{{ $order->id }} --}}
                 @php
                     $receiptType = match ($order->order_type) {
                         'dine-in'  => 'Dine-in',
@@ -499,7 +497,7 @@
 
 @push('scripts')
 <script>
-/* ── Toggle receipt modal visibility ── */
+/*  Toggle receipt modal visibility  */
 function toggleReceipt(modalID) {
     var modal = document.getElementById(modalID);
     if (modal) {
@@ -508,7 +506,7 @@ function toggleReceipt(modalID) {
     }
 }
 
-/* ── Send plain-text receipt via Fonnte (no image capture) ── */
+/*  Send plain-text receipt via Fonnte (no image capture)  */
 function sendFonnteWhatsApp(button) {
     let orderId      = $(button).data('order-id');
     let originalText = $(button).html();
@@ -538,7 +536,7 @@ function sendFonnteWhatsApp(button) {
     });
 }
 
-/* ── Auto-open after Midtrans redirect ── */
+/*  Auto-open after Midtrans redirect  */
 @if(session('show_receipt_for_order'))
 window.addEventListener('DOMContentLoaded', function () {
     toggleReceipt('receiptModal-{{ session("show_receipt_for_order") }}');

@@ -12,11 +12,7 @@
 @endphp
 
 <style>
-    /* The native <input type="time"> renders its own clock/picker icon,
-       which collided with the custom clock SVG → two clock icons per
-       field (most obvious on mobile). Hide the native indicator but keep
-       it as an invisible, clickable overlay on the right so tapping the
-       custom clock still opens the time picker. */
+   
     .buka-input::-webkit-calendar-picker-indicator,
     .tutup-input::-webkit-calendar-picker-indicator {
         position: absolute;
@@ -29,15 +25,13 @@
         opacity: 0;
         cursor: pointer;
     }
-    /* Firefox / others: hide any spin controls so the field stays clean. */
+
     .buka-input::-moz-clear,
     .tutup-input::-moz-clear { display: none; }
 </style>
 
-{{-- Full-page wrapper: cream background + decorative blobs ──────────── --}}
 <div class="relative overflow-hidden -m-4 sm:-m-6 lg:-m-8 p-4 sm:p-6 lg:p-8" style="background-color:#fffef0;min-height:calc(100vh - 4rem);">
 
-    {{-- Decorative background blobs --}}
     <div class="pointer-events-none absolute inset-0 overflow-hidden select-none" aria-hidden="true">
         <div class="absolute rounded-full"
              style="width:215px;height:215px;left:-80px;top:140px;background-color:#ffd97a;opacity:.65;"></div>
@@ -56,8 +50,7 @@
         <div class="absolute rounded-full" style="width:15px;height:15px;right:12px;top:530px;background-color:#f59e0b;"></div>
     </div>
 
-    {{-- Page header: title + 3D storefront illustration ─────────────── --}}
-    <div class="relative z-10 flex items-start justify-between mb-6">
+]    <div class="relative z-10 flex items-start justify-between mb-6">
         <div>
             <h1 class="font-bold text-gray-900 leading-tight"
                 style="font-size:clamp(1.5rem,3vw,2.25rem);">Jadwal Operasional Toko</h1>
@@ -65,19 +58,16 @@
         </div>
     </div>
 
-    {{-- Two-panel layout ─────────────────────────────────────────────── --}}
     <div class="relative z-10 flex flex-col lg:flex-row gap-6 items-start">
 
-        {{-- ═══════════════════════════════════════════════════════════
-             LEFT — Schedule Table Card
-        ═══════════════════════════════════════════════════════════ --}}
+        {{-- Schedule Table Card--}}
         <div class="flex-1 min-w-0 bg-white rounded-3xl shadow-md">
             <form method="POST" action="{{ route('owner.jadwal.save') }}">
                 @csrf
 
-                {{-- Schedule rows — stacked on mobile, table-like grid on md+ --}}
+                {{-- Schedule rows stacked on mobile --}}
                 <div class="m-4 sm:m-6 border border-gray-200 rounded-2xl overflow-hidden">
-                    {{-- Column headers (desktop only) --}}
+                    {{-- Column headers desktop only --}}
                     <div class="hidden md:grid md:grid-cols-[5.5rem_9rem_1fr_1fr] md:items-center md:gap-2 px-4 py-3"
                          style="background-color:#fff8e4;border-bottom:1px solid #e5e7eb;">
                         <div class="text-sm font-bold text-gray-800">Hari</div>
@@ -178,9 +168,7 @@
             </form>
         </div>
 
-        {{-- ═══════════════════════════════════════════════════════════
-             RIGHT — Manual Override Card
-        ═══════════════════════════════════════════════════════════ --}}
+        {{--  Manual   --}}
         <div class="w-full lg:w-72 xl:w-80 flex-none">
             <div class="bg-white rounded-3xl p-6 flex flex-col gap-4"
                  style="box-shadow:3px 4px 20px rgba(0,0,0,0.07);">
@@ -191,7 +179,7 @@
                     <p style="color:#6b7280;font-size:10px;margin-top:2px;">Anda dapat menutup atau membuka toko kapan saja.</p>
                 </div>
 
-                {{-- Status box ──────────────────────────────────────── --}}
+                {{-- Status box  --}}
                 <div id="status-box"
                      class="rounded-2xl border flex items-center justify-between gap-2 px-4 py-3"
                      style="background-color:{{ $isOpen ? '#f2fcf2' : '#fff6f6' }};border-color:{{ $isOpen ? '#dcfce7' : '#fecaca' }};">
@@ -268,7 +256,7 @@
 
     </div>{{-- /two-panel --}}
 
-    {{-- Save success flash ───────────────────────────────────────────── --}}
+    {{-- Save success flash  --}}
     @if (session('saved'))
     <div id="flash-saved"
          class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl text-white text-sm font-semibold shadow-xl"
@@ -293,14 +281,14 @@ $(function () {
     var todayLabel = @json($todayLabel);
     var todayBuka  = @json($todayBuka);
 
-    // ── Toggle pill click ─────────────────────────────────────────────
+    //  Toggle pill click 
     $(document).on('click', '.toggle-pill', function () {
         var $row = $(this).closest('.jadwal-row');
         var $cb  = $row.find('.day-toggle');
         $cb.prop('checked', !$cb.prop('checked')).trigger('change');
     });
 
-    // ── Toggle state change ───────────────────────────────────────────
+    //  Toggle state change 
     $(document).on('change', '.day-toggle', function () {
         var $row      = $(this).closest('.jadwal-row');
         var isChecked = $(this).is(':checked');
@@ -336,7 +324,7 @@ $(function () {
         }
     });
 
-    // ── Update right-panel status UI after AJAX ───────────────────────
+    // ── Update right-panel status UI after AJAX 
     function updateStatusUI(info) {
         var isOpen   = info.is_open;
         var isManual = (info.reason === 'manual');
@@ -398,7 +386,7 @@ $(function () {
         });
     });
 
-    // ── Tutup Sekarang — Step 1: choose reopen day & time ────────────
+    // ── Tutup Sekarang — Step 1: choose reopen day & time 
     $('#btn-tutup').on('click', function () {
         if ($(this).prop('disabled')) return;
 

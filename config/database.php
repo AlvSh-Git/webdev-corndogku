@@ -55,6 +55,10 @@ return [
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            // Explicit WIB session timezone so TIMESTAMP read/write is identical on
+            // every server and the sync can't drift by an offset. Both local and
+            // cPanel must use the same value (see docs/sync runbook before deploy).
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
@@ -62,6 +66,24 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+        ],
+
+        // Local rehearsal connection: a clone of the live cPanel database, used
+        // to develop and dry-run the sync engine offline. Not used in production.
+        'cpanel_copy' => [
+            'driver' => 'mysql',
+            'host' => env('CPANEL_COPY_DB_HOST', '127.0.0.1'),
+            'port' => env('CPANEL_COPY_DB_PORT', '6000'),
+            'database' => env('CPANEL_COPY_DB_DATABASE', 'corndogku_cpanel_copy'),
+            'username' => env('CPANEL_COPY_DB_USERNAME', 'root'),
+            'password' => env('CPANEL_COPY_DB_PASSWORD', env('DB_PASSWORD', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'timezone' => env('DB_TIMEZONE', '+07:00'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
         ],
 
         'mariadb' => [

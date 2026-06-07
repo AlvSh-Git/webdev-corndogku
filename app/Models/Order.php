@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasUlid;
 
 // A customer order; cashier_id is set when it is rung up at the POS.
 class Order extends Model
 {
+    use HasUlid;
+
     protected $fillable = ['user_id', 'cashier_id', 'customer_phone', 'order_number', 'total_price', 'status', 'cancellation_reason', 'order_type'];
 
     public function user()

@@ -15,5 +15,5 @@ if (config('sync.role') === 'local') {
     Schedule::command('sync:run')
         ->everyMinute()
         ->withoutOverlapping()
-        ->runInBackground();
+        ->appendOutputTo(storage_path('logs/sync.log'));
 }

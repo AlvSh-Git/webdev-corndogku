@@ -271,19 +271,25 @@
     </div>
 
     {{-- Pagination --}}
+    <style>
+        /* Force Laravel's default Tailwind paginator into a single row */
+        #table-pagination-container nav { display: flex; align-items: center; gap: 0.5rem; flex: 1 1 auto; justify-content: flex-end; }
+        /* Hide the mobile "Previous / Next" stacked block */
+        #table-pagination-container nav > div:first-child { display: none !important; }
+        /* Force the desktop "Showing X to Y... < 1 2 >" block to always be visible inline */
+        #table-pagination-container nav > div:last-child { display: flex !important; flex: 1 1 auto; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        #table-pagination-container nav p { margin: 0; }
+    </style>
     <div id="table-pagination-container"
-         class="px-5 py-3 flex items-center justify-between gap-4 flex-wrap"
+         class="flex flex-row items-center justify-between w-full mt-4 pt-4 pb-4 px-5 gap-4"
          style="border-top:1px solid var(--color-border);">
-        <span class="text-xs" style="color:#555;">
-            Period total: <span class="font-semibold" style="color:var(--color-primary);">
+        <span class="text-xs whitespace-nowrap" style="color:#555;">
+            Period total:
+            <span class="font-semibold" style="color:var(--color-primary);">
                 Rp {{ number_format($totalRevenue, 0, ',', '.') }}
             </span>
         </span>
-        <div class="text-xs [&_nav]:flex [&_nav]:items-center [&_nav]:gap-1
-                    [&_a]:px-2.5 [&_a]:py-1 [&_a]:rounded-lg [&_a]:font-medium [&_a]:transition-colors
-                    [&_span[aria-current]]:px-2.5 [&_span[aria-current]]:py-1 [&_span[aria-current]]:rounded-lg [&_span[aria-current]]:font-semibold"
-             style="--pg-active-bg:var(--color-primary); --pg-active-color:var(--color-white);
-                    --pg-border:1px solid var(--color-border);">
+        <div class="flex items-center gap-4 flex-1 justify-end">
             {{ $transactions->links() }}
         </div>
     </div>
@@ -306,9 +312,10 @@
                 <p id="modal-order-number" class="text-white font-bold text-lg leading-tight">#—</p>
             </div>
             <button id="modal-close"
-                    class="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/20"
+                    type="button"
+                    class="modal-close-btn w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/20"
                     style="color:white;">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                <svg class="w-4 h-4 pointer-events-none" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <path d="M18 6 6 18M6 6l12 12"/>
                 </svg>
@@ -386,6 +393,33 @@ $(function () {
     function fmtDate(str) {
         var d = new Date(str);
         return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    function fmtCustomNotes(raw) {
+        if (!raw) return '';
+        var data = raw;
+        if (typeof raw === 'string') {
+            var trimmed = raw.trim();
+            if (!trimmed) return '';
+            if (trimmed.charAt(0) !== '{' && trimmed.charAt(0) !== '[') {
+                return trimmed;
+            }
+            try { data = JSON.parse(trimmed); }
+            catch (e) { return trimmed; }
+        }
+        if (!data || typeof data !== 'object') return '';
+        var parts = [];
+        Object.keys(data).forEach(function (key) {
+            var val = data[key];
+            if (val === null || val === undefined || val === '') return;
+            var label = key.charAt(0).toUpperCase() + key.slice(1);
+            parts.push(label + ': ' + val);
+        });
+        return parts.join(', ');
+    }
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     //  Daily Revenue Chart 
@@ -488,10 +522,11 @@ $(function () {
                     rows = '<tr><td colspan="3" class="py-4 text-center text-xs" style="color:#9c9c9c;">No items found.</td></tr>';
                 } else {
                     $.each(res.items, function (_, item) {
+                        var notes = fmtCustomNotes(item.custom_notes);
                         rows += '<tr>' +
                             '<td class="py-2 pr-2" style="color:var(--color-black);">' +
-                                '<span class="font-medium">' + item.product_name + '</span>' +
-                                (item.custom_notes ? '<br><span class="text-xs" style="color:#9c9c9c;">' + item.custom_notes + '</span>' : '') +
+                                '<span class="font-medium">' + escapeHtml(item.product_name) + '</span>' +
+                                (notes ? '<span class="text-xs text-gray-500 mt-1 block">' + escapeHtml(notes) + '</span>' : '') +
                             '</td>' +
                             '<td class="py-2 text-center text-xs font-semibold" style="color:#555;">× ' + item.quantity + '</td>' +
                             '<td class="py-2 text-right font-semibold whitespace-nowrap" style="color:var(--color-primary);">' + fmtRp(item.subtotal) + '</td>' +
@@ -513,8 +548,12 @@ $(function () {
         });
     });
 
-    // Close modal
-    $('#modal-close, #modal-order-detail').on('click', function (e) {
+    // Close modal — delegated so handlers survive any DOM swap
+    $(document).on('click', '.modal-close-btn, #modal-close', function (e) {
+        e.preventDefault();
+        $modal.addClass('hidden');
+    });
+    $(document).on('click', '#modal-order-detail', function (e) {
         if (e.target === this) $modal.addClass('hidden');
     });
     $(document).on('keydown', function (e) {

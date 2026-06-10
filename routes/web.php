@@ -51,10 +51,11 @@ Route::middleware('auth')->group(function () {
     // Checkout
     Route::get('/checkout',        [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::post('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('checkout.confirm');
 
     // Order history
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    // Re-open Midtrans payment for an unpaid online order from history.
+    Route::post('/history/{id}/pay', [HistoryController::class, 'pay'])->name('history.pay');
 
     // Customer profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');

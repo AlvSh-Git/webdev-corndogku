@@ -60,8 +60,11 @@ abstract class Controller
         $isToday = $date === today()->toDateString();
         $active  = $this->activeOrderStatuses();
 
-        // Counts of the selected day's orders, grouped by status.
+        // Counts of the selected day's orders, grouped by status. staffVisible()
+        // keeps these badges in step with the list — unpaid online orders are
+        // excluded from both.
         $byStatusOnDate = \App\Models\Order::whereDate('created_at', $date)
+            ->staffVisible()
             ->selectRaw('status, COUNT(*) as c')
             ->groupBy('status')
             ->pluck('c', 'status');
@@ -69,6 +72,7 @@ abstract class Controller
         // On the live board, active statuses carry over from every day.
         $activeAll = $isToday
             ? \App\Models\Order::whereIn('status', $active)
+                ->staffVisible()
                 ->selectRaw('status, COUNT(*) as c')
                 ->groupBy('status')
                 ->pluck('c', 'status')

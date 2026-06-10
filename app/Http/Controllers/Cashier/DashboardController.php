@@ -49,6 +49,7 @@ class DashboardController extends Controller
 
         try {
             $dbOrders = Order::with(['user', 'cashier', 'items.product', 'payment'])
+                ->staffVisible()
                 ->whereDate('created_at', $selectedDate)
                 ->latest()
                 ->get();
@@ -149,7 +150,7 @@ class DashboardController extends Controller
 
             // List = today's orders + still-active carryover (see ordersForDay).
             $query = $this->ordersForDay(
-                Order::with(['user', 'cashier', 'items.product', 'payment']),
+                Order::with(['user', 'cashier', 'items.product', 'payment'])->staffVisible(),
                 $date
             )->latest();
 
@@ -223,6 +224,7 @@ class DashboardController extends Controller
 
         try {
             $dbOrders = Order::selectRaw('total_price, status, order_type')
+                ->staffVisible()
                 ->whereDate('created_at', $date)
                 ->get();
 

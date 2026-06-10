@@ -249,20 +249,40 @@
 
                             {{-- Total + Struk button --}}
                             <div class="mt-3 flex items-end justify-between gap-3">
-                                <button type="button"
-                                        onclick="toggleReceipt('receiptModal-{{ $order->id }}')"
-                                        class="flex items-center gap-1.5 text-xs font-semibold
-                                               px-3 py-1.5 rounded-full transition-opacity hover:opacity-70"
-                                        style="background-color:rgba(166,23,28,0.08);color:var(--color-primary);">
-                                    <svg class="w-3.5 h-3.5 flex-none" fill="none" stroke="currentColor"
-                                         stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0
-                                                 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1
-                                                 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Lihat Struk
-                                </button>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <button type="button"
+                                            onclick="toggleReceipt('receiptModal-{{ $order->id }}')"
+                                            class="flex items-center gap-1.5 text-xs font-semibold
+                                                   px-3 py-1.5 rounded-full transition-opacity hover:opacity-70"
+                                            style="background-color:rgba(166,23,28,0.08);color:var(--color-primary);">
+                                        <svg class="w-3.5 h-3.5 flex-none" fill="none" stroke="currentColor"
+                                             stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0
+                                                     012-2h5.586a1 1 0 01.707.293l5.414 5.414a1
+                                                     1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Lihat Struk
+                                    </button>
+
+                                    {{-- Pay now — only for an unpaid online order (still "Menunggu") --}}
+                                    @if ($order->order_type === 'online' && $order->status === 'Pending')
+                                        <button type="button"
+                                                class="pay-now-btn flex items-center gap-1.5 text-xs font-bold
+                                                       px-3 py-1.5 rounded-full text-white transition-opacity hover:opacity-90"
+                                                style="background-color:var(--color-primary);"
+                                                data-order-id="{{ $order->id }}"
+                                                data-order-number="{{ $order->order_number }}">
+                                            <svg class="w-3.5 h-3.5 flex-none" fill="none" stroke="currentColor"
+                                                 stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0
+                                                         00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                            </svg>
+                                            Bayar Sekarang
+                                        </button>
+                                    @endif
+                                </div>
                                 <div class="text-right">
                                     <p class="text-xs" style="color:#9c9c9c;">Total Pembayaran</p>
                                     <p class="font-black text-lg leading-tight" style="color:var(--color-primary);">
@@ -496,6 +516,80 @@
 @endsection
 
 @push('scripts')
+@php
+    // Load Snap only when at least one order on this page is still payable.
+    $hasPayable = $orders->getCollection()
+        ->contains(fn ($o) => $o->order_type === 'online' && $o->status === 'Pending');
+@endphp
+@if ($hasPayable)
+<script src="{{ config('services.midtrans.is_production')
+        ? 'https://app.midtrans.com/snap/snap.js'
+        : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
+        data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+<script>
+/*  Re-open Midtrans payment for an unpaid online order  */
+$(function () {
+    var PAY_URL_BASE = '{{ url('/history') }}';
+    var HISTORY_URL  = '{{ route('history') }}';
+
+    // Poll our OWN status endpoint (updated by the signed Midtrans webhook) until
+    // the order leaves "Pending". The browser never asserts payment — it only
+    // waits for the server to confirm it with Midtrans.
+    function pollPaidHistory(id, attempt) {
+        $.getJSON('/api/orders/' + id)
+            .done(function (o) {
+                if (o && o.status && o.status !== 'Pending') {
+                    window.location.href = HISTORY_URL + '?receipt=' + id;
+                } else if (attempt < 6) {
+                    setTimeout(function () { pollPaidHistory(id, attempt + 1); }, 1500);
+                } else {
+                    window.location.reload();
+                }
+            })
+            .fail(function () { window.location.reload(); });
+    }
+
+    $('.pay-now-btn').on('click', function () {
+        var $btn        = $(this);
+        var orderId     = $btn.data('order-id');
+        var orderNumber = String($btn.data('order-number'));
+        var original    = $btn.html();
+
+        $btn.prop('disabled', true).text('Menyiapkan…');
+
+        $.post(PAY_URL_BASE + '/' + orderId + '/pay')
+            .done(function (res) {
+                if (!res || !res.snap_token) {
+                    Swal.fire('Gagal', (res && res.error) || 'Tidak dapat memulai pembayaran.', 'error');
+                    $btn.prop('disabled', false).html(original);
+                    return;
+                }
+                snap.pay(res.snap_token, {
+                    // The signed Midtrans webhook is the authoritative confirmation
+                    // server-side; the browser only waits for it, never asserts paid.
+                    onSuccess: function () {
+                        $btn.prop('disabled', true).text('Memverifikasi…');
+                        pollPaidHistory(orderId, 0);
+                    },
+                    onPending: function () { window.location.reload(); },
+                    onError: function () {
+                        Swal.fire('Pembayaran gagal', 'Silakan coba lagi.', 'error');
+                        $btn.prop('disabled', false).html(original);
+                    },
+                    onClose: function () {
+                        $btn.prop('disabled', false).html(original);
+                    }
+                });
+            })
+            .fail(function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.error) || 'Terjadi kesalahan. Coba lagi.';
+                Swal.fire('Gagal', msg, 'error');
+                $btn.prop('disabled', false).html(original);
+            });
+    });
+});
+</script>
+@endif
 <script>
 /*  Toggle receipt modal visibility  */
 function toggleReceipt(modalID) {
@@ -536,10 +630,12 @@ function sendFonnteWhatsApp(button) {
     });
 }
 
-/*  Auto-open after Midtrans redirect  */
-@if(session('show_receipt_for_order'))
+/*  Auto-open the receipt after a Midtrans redirect (?receipt=<id>), or after a
+    cashier/owner-side flow that still flashes the session key.  */
+@php $autoReceipt = session('show_receipt_for_order') ?? (int) request('receipt'); @endphp
+@if($autoReceipt)
 window.addEventListener('DOMContentLoaded', function () {
-    toggleReceipt('receiptModal-{{ session("show_receipt_for_order") }}');
+    toggleReceipt('receiptModal-{{ $autoReceipt }}');
 });
 @endif
 </script>

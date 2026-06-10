@@ -366,7 +366,13 @@ class PurchaseController extends Controller
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        $order = Order::with('items')->where('order_number', $orderId)->first();
+        // A re-payment from the order-history page uses a unique "-R{timestamp}"
+        // order_id (Midtrans forbids reusing one), so strip that suffix back to
+        // the real order_number before looking it up. The signature above is
+        // still verified against the full order_id Midtrans actually sent.
+        $lookupNumber = preg_replace('/-R\d+$/', '', (string) $orderId);
+
+        $order = Order::with('items')->where('order_number', $lookupNumber)->first();
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }

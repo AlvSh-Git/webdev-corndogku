@@ -392,9 +392,29 @@
 @if($snapToken)
 <script>
 $(function () {
-    var CSRF      = $('meta[name="csrf-token"]').attr('content');
-    var ORDER_NO  = '{{ $orderId }}';
-    var HISTORY   = '{{ route("history") }}';
+    var CSRF       = $('meta[name="csrf-token"]').attr('content');
+    var ORDER_NO   = '{{ $orderId }}';
+    var HISTORY    = '{{ route("history") }}';
+    var CREATED_ID = null;  // DB id of the order, returned by checkout.store
+
+    // Poll our OWN status endpoint (updated by the signed Midtrans webhook) until
+    // the order leaves "Pending". We never tell the server it was paid — we only
+    // wait for the server to learn so from Midtrans. Gives up gracefully after a
+    // few tries; the webhook will still finalize the order regardless.
+    function pollPaid(orderId, attempt) {
+        if (!orderId) { window.location.href = HISTORY; return; }
+        $.getJSON('/api/orders/' + orderId)
+            .done(function (o) {
+                if (o && o.status && o.status !== 'Pending') {
+                    window.location.href = HISTORY + '?receipt=' + orderId;
+                } else if (attempt < 6) {
+                    setTimeout(function () { pollPaid(orderId, attempt + 1); }, 1500);
+                } else {
+                    window.location.href = HISTORY;
+                }
+            })
+            .fail(function () { window.location.href = HISTORY; });
+    }
 
     var payBtnHtml =
         '<svg class="w-6 h-6 flex-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
@@ -412,18 +432,13 @@ $(function () {
     function openSnap($btn) {
         snap.pay('{{ $snapToken }}', {
             enabledPayments: ['qris', 'gopay', 'shopeepay'],
-            // The order already exists (created above), so payment confirmation is
-            // handled by the Midtrans webhook server-side — reliable even when this
-            // callback never fires (e.g. mobile e-wallet app-switch). These handlers
-            // are just for fast UX feedback.
+            // The order already exists (created above) and payment is confirmed by
+            // the signed Midtrans webhook server-side — reliable even when this
+            // callback never fires (e.g. mobile e-wallet app-switch). onSuccess
+            // only waits for the webhook to land; it never asserts payment itself.
             onSuccess: function () {
-                $btn.prop('disabled', true).html(spinner('Menyimpan pesanan...'));
-                $.ajax({
-                    url: '{{ route("checkout.confirm") }}',
-                    type: 'POST',
-                    data: { _token: CSRF, order_number: ORDER_NO },
-                    complete: function () { window.location.href = HISTORY; }
-                });
+                $btn.prop('disabled', true).html(spinner('Memverifikasi pembayaran...'));
+                pollPaid(CREATED_ID, 0);
             },
             // Pending (e.g. QRIS displayed, awaiting scan) — order is saved; the
             // webhook flips it to paid. Send the customer to their order history.
@@ -451,6 +466,7 @@ $(function () {
             data: { _token: CSRF, order_number: ORDER_NO },
             success: function (res) {
                 if (res && res.redirect) { window.location.href = res.redirect; return; }
+                CREATED_ID = (res && res.order_id) || null;
                 $btn.html(spinner('Membuka pembayaran...'));
                 openSnap($btn);
             },

@@ -210,36 +210,14 @@ class CheckoutController extends Controller
         // truth from here on, so a dropped payment callback can't lose it.
         session()->forget('cart');
 
-        return response()->json(['success' => true, 'order_number' => $orderNumber]);
-    }
-
-    // Mark the order as paid from the Snap onSuccess callback.
-    public function confirm(Request $request)
-    {
-        if (!auth()->check()) {
-            return response()->json(['error' => 'Unauthenticated'], 401);
-        }
-
-        $orderNumber = (string) $request->input('order_number', '');
-
-        $order = Order::where('order_number', $orderNumber)
-            ->where('user_id', auth()->id())
-            ->first();
-
-        if ($order) {
-            $order->payment()->updateOrCreate([], [
-                'payment_method' => 'QRIS',
-                'amount'         => $order->total_price,
-                'status'         => 'Paid',
-            ]);
-
-            if ($order->status === 'Pending') {
-                $order->update(['status' => 'Preparing']);
-            }
-
-            session()->flash('show_receipt_for_order', $order->id);
-        }
-
-        return response()->json(['redirect' => route('history')]);
+        // order_id lets the client poll the read-only status endpoint after Snap
+        // reports success. Payment is confirmed exclusively by the signed Midtrans
+        // webhook (PurchaseController::midtransNotification) — never by the
+        // browser — so the front-end only waits for, and never asserts, "Paid".
+        return response()->json([
+            'success'      => true,
+            'order_number' => $orderNumber,
+            'order_id'     => $createdOrderId,
+        ]);
     }
 }

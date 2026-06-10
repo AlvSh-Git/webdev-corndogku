@@ -111,9 +111,9 @@
             {{-- Status filter tabs --}}
             @php
                 $tabs = [
-                    ['label' => 'Semua',      'key' => null],
-                    ['label' => 'Menunggu',   'key' => 'Menunggu'],
-                    ['label' => 'Diproses',   'key' => 'Diproses'],
+                    ['label' => 'Semua',                'key' => null],
+                    ['label' => 'Menunggu Pembayaran',  'key' => 'Menunggu'],
+                    ['label' => 'Diproses',             'key' => 'Diproses'],
                     ['label' => 'Selesai',    'key' => 'Selesai'],
                     ['label' => 'Dibatalkan', 'key' => 'Dibatalkan'],
                 ];
@@ -137,7 +137,7 @@
             {{-- Order list --}}
             @php
                 $statusConfig = [
-                    'Pending'   => ['label'=>'Menunggu',   'color'=>'#3B82F6', 'bg'=>'#EFF6FF',
+                    'Pending'   => ['label'=>'Menunggu Pembayaran', 'color'=>'#3B82F6', 'bg'=>'#EFF6FF',
                                     'icon'=>'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
                     'Preparing' => ['label'=>'Diproses',   'color'=>'#F59E0B', 'bg'=>'#FFFBEB',
                                     'icon'=>'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],

@@ -18,10 +18,12 @@ if (config('sync.role') === 'local') {
         ->appendOutputTo(storage_path('logs/sync.log'));
 
     // Safety net for unpaid online orders Midtrans never sent an expire
-    // notification for (abandoned before a QR charge) — the webhook handles the
-    // charged-then-expired case in real time. Runs on the authoritative 'local'
-    // node so it doesn't double-sweep the synced cPanel database.
-    Schedule::command('orders:cancel-expired')
+    // notification for (abandoned at the "select payment" step, before any QR
+    // charge) — the webhook handles the charged-then-expired case in real time
+    // (~15 min). These never-charged orders get a full 24h grace before the sweep
+    // cancels them and frees their reserved stock. Runs on the authoritative
+    // 'local' node so it doesn't double-sweep the synced cPanel database.
+    Schedule::command('orders:cancel-expired --minutes=1440')
         ->everyFiveMinutes()
         ->withoutOverlapping();
 }

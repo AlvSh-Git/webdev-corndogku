@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Log;
 // Online checkout flow (Midtrans Snap payment).
 class CheckoutController extends Controller
 {
+    // A customer may hold at most this many unpaid online orders at once. Reaching
+    // the limit blocks new checkouts until one is paid — or auto-cancelled by the
+    // orders:cancel-expired sweep — so abandoned orders never lock anyone out.
+    private const MAX_UNPAID_ORDERS = 3;
+
     // Show the checkout page and build the Midtrans Snap token.
     public function index()
     {
@@ -23,6 +28,10 @@ class CheckoutController extends Controller
 
         if (!$this->calcStoreStatus()['is_open']) {
             return redirect()->route('cart')->with('error', 'Toko sedang tutup. Checkout akan diaktifkan kembali saat toko buka.');
+        }
+
+        if ($this->unpaidOrderCount(auth()->id()) >= self::MAX_UNPAID_ORDERS) {
+            return redirect()->route('cart')->with('error', $this->unpaidLimitMessage());
         }
 
         $cart = session()->get('cart', []);
@@ -103,6 +112,17 @@ class CheckoutController extends Controller
         // re-open Snap for the same order instead of creating a duplicate.
         if (Order::where('order_number', $orderNumber)->exists()) {
             return response()->json(['success' => true, 'order_number' => $orderNumber]);
+        }
+
+        // Too many outstanding (unpaid) orders — block creating another. This
+        // counts only the user's still-pending unpaid orders; paid and
+        // auto-cancelled ones drop out, so the limit can never lock a customer
+        // out permanently.
+        if ($this->unpaidOrderCount(auth()->id()) >= self::MAX_UNPAID_ORDERS) {
+            return response()->json([
+                'error'   => 'unpaid_limit',
+                'message' => $this->unpaidLimitMessage(),
+            ], 403);
         }
 
         if (empty($cart)) {
@@ -219,5 +239,26 @@ class CheckoutController extends Controller
             'order_number' => $orderNumber,
             'order_id'     => $createdOrderId,
         ]);
+    }
+
+    // Count the user's outstanding online orders — still Pending with no
+    // successful payment. Mirrors the orders:cancel-expired predicate, so an
+    // order leaves this count the moment it is paid or auto-cancelled.
+    private function unpaidOrderCount(int $userId): int
+    {
+        return Order::where('user_id', $userId)
+            ->where('order_type', 'online')
+            ->where('status', 'Pending')
+            ->where(function ($q) {
+                $q->whereDoesntHave('payment')
+                  ->orWhereHas('payment', fn ($p) => $p->where('status', 'Unpaid'));
+            })
+            ->count();
+    }
+
+    private function unpaidLimitMessage(): string
+    {
+        return 'Kamu memiliki ' . self::MAX_UNPAID_ORDERS . ' pesanan yang belum dibayar. '
+            . 'Selesaikan pembayaran (atau tunggu pembatalan otomatis) sebelum membuat pesanan baru.';
     }
 }

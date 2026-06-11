@@ -918,6 +918,118 @@
         height: 240px !important;
     }
 }
+
+/*  Short, wide landscape tablets (e.g. 1024×600).
+    Width 1024 falls under the max-width:1180 block above, which stacks the
+    title + stepper vertically and uses a ~520px-tall preview — that assumes a
+    TALL viewport and overflows/overlaps badly when the screen is only ~600px
+    high. Here we restore a compact HORIZONTAL layout that fits the short height
+    without scrolling: title top-left, stepper top-right, preview centred, and
+    the pill / instruction card / CTA arranged along the bottom.
+    This block comes last, so it overrides the 1180 block when both match.
+    Targets wide tablets (901–1180px) that are short (≤820px tall) — this
+    covers BOTH 1024×600 (Android) and 1024×768 (iPad landscape). The 1180px
+    cap means it never touches the desktop layout (which applies above 1180px),
+    and the 820px cap means portrait tablets (e.g. 1024×1366) keep the stacked
+    layout that was designed for them.  */
+@media (min-width: 901px) and (max-width: 1180px) and (max-height: 820px) {
+
+    /* Keep the whole wizard on one screen — no scroll */
+    .custom-page { overflow: hidden !important; }
+
+    /* Title → compact, anchored top-left */
+    .custom-title-wrap {
+        top: 14px !important;
+        left: 26px !important;
+        right: auto !important;
+        transform: scale(0.58) !important;
+        transform-origin: top left !important;
+    }
+
+    /* Stepper → horizontal row, back in the top-right corner */
+    #stepper {
+        top: 22px !important;
+        right: 36px !important;
+        left: auto !important;
+        transform: scale(0.74) !important;
+        transform-origin: top right !important;
+    }
+    .step-line { min-width: 46px !important; }
+
+    /* Preview → lifted, and sized with vh so it grows on the taller 768px
+       screen instead of looking small (the px caps keep it from overflowing
+       on the shorter 600px screen). Adjust the vh values / caps to taste. */
+    .custom-preview-area {
+        top: 42% !important;
+        width: min(44vw, 440px) !important;
+        height: min(52vh, 400px) !important;
+    }
+    .corndog-blob { width: min(34vw, 300px); height: min(28vh, 220px); }
+    #base-corndog,
+    #middle-varian { height: min(50vh, 380px) !important; max-height: none !important; }
+    #overlay-sauce  { height: min(52vh, 396px) !important; max-height: none !important; }
+
+    /* Arrows → flank the preview, vertically centred on it */
+    #btn-prev,
+    #btn-next {
+        top: 42% !important;
+        transform: translateY(-50%) !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 36px !important;
+    }
+    #btn-prev { left: 36px; }
+    #btn-next { right: 36px; }
+
+    /* Dots → just under the preview, above the bottom band */
+    #carousel-dots { bottom: 96px; }
+
+    /* Selection name pill → bottom-left band */
+    .selection-pill {
+        left: 44px !important;
+        bottom: 92px !important;
+        min-width: 220px !important;
+        height: 60px !important;
+    }
+    #carousel-label-text { font-size: 18px !important; }
+
+    /* Instruction card → bottom-right band, compact */
+    #step-card {
+        right: 36px !important;
+        bottom: 78px !important;
+        width: 320px !important;
+        padding: 14px 18px !important;
+    }
+    #step-card-num   { width: 36px !important; height: 36px !important; font-size: 18px !important; }
+    #step-card-title { font-size: 17px !important; line-height: 1.15 !important; }
+    #step-card-desc  { font-size: 12.5px !important; line-height: 1.2 !important; margin-top: 6px !important; }
+    #add-sauce-wrap  { margin-top: 8px !important; padding-top: 8px !important; }
+    #add-sauce-wrap p { margin-bottom: 6px !important; }
+    #add-sauce-btn   { padding-top: 9px !important; padding-bottom: 9px !important; }
+
+    /* Review panel (step 4) → right side; scrolls internally if it gets tall */
+    #review-panel {
+        right: 36px !important;
+        bottom: 78px !important;
+        width: 360px !important;
+        max-height: calc(100vh - 150px) !important;
+        overflow: auto !important;
+        padding: 16px !important;
+    }
+    #review-items { gap: 8px !important; margin-bottom: 10px !important; }
+
+    /* CTA → full-width centred strip pinned to the very bottom */
+    .button-area-custom {
+        bottom: 20px !important;
+        width: min(62vw, 560px) !important;
+    }
+    #btn-next-step { font-size: 18px !important; padding: 11px 22px !important; }
+    #btn-back {
+        left: -158px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
     </style>
 </head>
 <body class="font-sans antialiased h-screen overflow-hidden flex flex-col">

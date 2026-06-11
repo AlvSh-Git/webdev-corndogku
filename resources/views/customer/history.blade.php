@@ -159,6 +159,7 @@
             @forelse($orders as $order)
                 @php
                     $sc = $statusConfig[$order->status] ?? $statusConfig['Pending'];
+                    $firstItem  = $order->items->first();
                     $customItem = $order->items->first(fn($i) => !empty($i->custom_notes));
                     $thumbVarianImg = null;
                     $thumbSauceImg  = null;
@@ -168,11 +169,14 @@
                         $firstSauce = trim(explode(',', $cn['sauces'] ?? '')[0]);
                         $thumbSauceImg = $customSauceMap[$firstSauce] ?? null;
                     }
+                    $firstProductImg = $firstItem?->product?->image
+                        ? asset($firstItem->product->image)
+                        : null;
                 @endphp
                 <div class="border-b" style="border-color:#f5f5f5;">
                     <div class="flex items-start gap-4 px-6 py-5">
 
-                        {{-- Product thumbnail --}}
+                        {{-- Product thumbnail — custom corndog > first item's product image > fallback --}}
                         @if ($customItem && $thumbVarianImg)
                             <div class="relative w-20 h-20 rounded-2xl overflow-hidden flex-none border"
                                  style="background-color:#FDECD8; border-color:#ececec; flex-shrink:0;">
@@ -184,6 +188,11 @@
                                          style="z-index:10;">
                                 @endif
                             </div>
+                        @elseif ($firstProductImg)
+                            <img src="{{ $firstProductImg }}"
+                                 alt="{{ $firstItem->product_name }}"
+                                 class="w-20 h-20 rounded-2xl object-cover flex-none border"
+                                 style="border-color:#ececec;">
                         @else
                             <img src="{{ asset('assets/img/CA_ORIGINAL.png') }}"
                                  alt="Order thumbnail"
@@ -326,16 +335,25 @@
                         </button>
 
                         {{-- Status badge --}}
-                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full
-                                    bg-[#E8F5E9] text-[#4CAF50] mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                        </div>
-
-                        {{-- Title --}}
-                        <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">Order Complete!</h3>
+                        @if ($order->status === 'Cancelled')
+                            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full
+                                        bg-red-100 text-red-500 mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">Order Cancelled</h3>
+                        @else
+                            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full
+                                        bg-[#E8F5E9] text-[#4CAF50] mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">Order Complete!</h3>
+                        @endif
 
                         {{-- Customer & order metadata --}}
                         <div class="bg-[#F5F5F5] rounded-xl p-4 mb-6 text-sm text-gray-600 space-y-2">

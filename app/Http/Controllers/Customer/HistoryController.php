@@ -30,7 +30,7 @@ class HistoryController extends Controller
             'Dibatalkan' => 'Cancelled',
         ];
 
-        $query = Order::with('items')
+        $query = Order::with('items.product')
             ->where('user_id', auth()->id())
             ->latest();
 
